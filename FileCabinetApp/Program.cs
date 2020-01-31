@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
@@ -18,12 +19,15 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
             new Tuple<string, Action<string>>("stat", Stat),
+            new Tuple<string, Action<string>>("create", Create),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
+            new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
+            new string[] { "create", "create new records", "The 'create' command create new records." },
         };
 
         public static void Main(string[] args)
@@ -103,6 +107,36 @@ namespace FileCabinetApp
         {
             var recordsCount = Program.fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        private static void Create(string parameters)
+        {
+            if (!string.IsNullOrEmpty(parameters))
+            {
+                Console.Write("First name: ");
+                string firstName = Console.ReadLine();
+                Console.Write("Last name: ");
+                string lastName = Console.ReadLine();
+                Console.Write("Date of birth: ");
+                CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+                DateTimeStyles styles = DateTimeStyles.None;
+                DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
+                var recordsCount = Program.fileCabinetService.GetStat();
+                fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
+                Console.WriteLine($"Record #{recordsCount} is created.");
+            }
+            else
+            {
+                Console.WriteLine("Available commands:");
+
+                foreach (var helpMessage in helpMessages)
+                {
+                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
+                }
+            }
+
+            Console.WriteLine();
+
         }
     }
 }
