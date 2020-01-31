@@ -12,7 +12,7 @@ namespace FileCabinetApp
         private const int ExplanationHelpIndex = 2;
 
         private static bool isRunning = true;
-        private static FileCabinetService fileCabinetService;
+        private static FileCabinetService fileCabinetService = new FileCabinetService();
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
@@ -20,6 +20,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("exit", Exit),
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
+            new Tuple<string, Action<string>>("list", List),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -111,7 +112,7 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
-            if (!string.IsNullOrEmpty(parameters))
+            if (string.IsNullOrEmpty(parameters))
             {
                 Console.Write("First name: ");
                 string firstName = Console.ReadLine();
@@ -123,7 +124,7 @@ namespace FileCabinetApp
                 DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
                 var recordsCount = Program.fileCabinetService.GetStat();
                 fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
-                Console.WriteLine($"Record #{recordsCount} is created.");
+                Console.WriteLine($"Record #{recordsCount + 1} is created.");
             }
             else
             {
@@ -136,7 +137,12 @@ namespace FileCabinetApp
             }
 
             Console.WriteLine();
+        }
 
+        private static void List(string parameters)
+        {
+            var records = Program.fileCabinetService.GetRecords();
+            Console.WriteLine($"{records}");
         }
     }
 }
