@@ -116,12 +116,15 @@ namespace FileCabinetApp
             {
                 Console.Write("First name: ");
                 string firstName = Console.ReadLine();
+
                 Console.Write("Last name: ");
                 string lastName = Console.ReadLine();
+
                 Console.Write("Date of birth: ");
                 CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
                 DateTimeStyles styles = DateTimeStyles.None;
                 DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
+
                 var recordsCount = Program.fileCabinetService.GetStat();
                 fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
                 Console.WriteLine($"Record #{recordsCount + 1} is created.");
