@@ -28,12 +28,12 @@ namespace FileCabinetApp
                 throw new ArgumentNullException($"Parameter {nameof(lastName)} cannot be null");
             }
 
-            if (firstName.Length <= 2 || firstName.Length > 60)
+            if (firstName.Length < 2 || firstName.Length > 60)
             {
                 throw new ArgumentException($"Parameter {nameof(firstName)} cannot have length less than 3 or more than 60");
             }
 
-            if (lastName.Length <= 2 || lastName.Length > 60)
+            if (lastName.Length < 2 || lastName.Length > 60)
             {
                 throw new ArgumentException($"Parameter {nameof(lastName)} cannot have length less than 3 or more than 60");
             }
@@ -72,6 +72,24 @@ namespace FileCabinetApp
         public int GetStat()
         {
             return this.list.Count;
+        }
+
+        public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth)
+        {
+            if (id > this.list.Count)
+            {
+                throw new ArgumentException($"This {nameof(id)} record does not exist");
+            }
+
+            var record = new FileCabinetRecord
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+            };
+
+            this.list[id] = record;
         }
     }
 }

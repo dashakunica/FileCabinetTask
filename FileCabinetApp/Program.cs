@@ -22,6 +22,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
+            new Tuple<string, Action<string>>("edit", Edit),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -31,6 +32,7 @@ namespace FileCabinetApp
             new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
             new string[] { "create", "create new records", "The 'create' command create new records." },
             new string[] { "list", "shows list of records", "The 'list' command shows list of records." },
+            new string[] { "edit id", "edit current records", "The 'list' command shows list of records." },
         };
 
         public static void Main(string[] args)
@@ -154,7 +156,50 @@ namespace FileCabinetApp
         private static void List(string parameters)
         {
             var records = Program.fileCabinetService.GetRecords();
-            Console.WriteLine($"{records}");
+            foreach (var record in records)
+            {
+                Console.WriteLine(record.ToString());
+            }
+        }
+
+        private static void Edit(string parameters)
+        {
+            if (string.IsNullOrEmpty(parameters))
+            {
+                try
+                {
+                    int id = Convert.ToInt32(parameters.Remove(0, 5));
+                    Console.Write("First name: ");
+                    string firstName = Console.ReadLine();
+
+                    Console.Write("Last name: ");
+                    string lastName = Console.ReadLine();
+
+                    Console.Write("Date of birth: ");
+                    CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+                    DateTimeStyles styles = DateTimeStyles.None;
+                    DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
+
+                    var recordsCount = Program.fileCabinetService.GetStat();
+                    fileCabinetService.EditRecord(id, firstName, lastName, dateOfBirth);
+                    Console.WriteLine($"Record #{id} is updated.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message + "Please try again and enter command create.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Available commands:");
+
+                foreach (var helpMessage in helpMessages)
+                {
+                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }
