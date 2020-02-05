@@ -19,5 +19,10 @@ namespace FileCabinetApp
         public decimal Popertie2 { get; set; }
 
         public char Popertie3 { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("#{0}, {1}, {2}, {3}", Id, FirstName, LastName, DateOfBirth);
+        }
     }
 }

@@ -18,6 +18,41 @@ namespace FileCabinetApp
                 DateOfBirth = dateOfBirth,
             };
 
+            if (firstName is null)
+            {
+                throw new ArgumentNullException($"Parameter {nameof(firstName)} cannot be null");
+            }
+
+            if (lastName is null)
+            {
+                throw new ArgumentNullException($"Parameter {nameof(lastName)} cannot be null");
+            }
+
+            if (firstName.Length <= 2 || firstName.Length > 60)
+            {
+                throw new ArgumentException($"Parameter {nameof(firstName)} cannot have length less than 3 or more than 60");
+            }
+
+            if (lastName.Length <= 2 || lastName.Length > 60)
+            {
+                throw new ArgumentException($"Parameter {nameof(lastName)} cannot have length less than 3 or more than 60");
+            }
+
+            if (firstName.Trim().Length == 0)
+            {
+                throw new ArgumentException($"Parameter {nameof(firstName)} cannot have only whitespaces");
+            }
+
+            if (lastName.Trim().Length == 0)
+            {
+                throw new ArgumentException($"Parameter {nameof(lastName)} cannot have only whitespaces");
+            }
+
+            if (dateOfBirth.Day < new DateTime(1950, 01, 01).Day || dateOfBirth.Day > DateTime.Now.Day)
+            {
+                throw new ArgumentException($"Parameter {nameof(dateOfBirth)} cannot be less than 01-Jan-1950 and more than current day");
+            }
+
             this.list.Add(record);
 
             return record.Id;
@@ -31,7 +66,7 @@ namespace FileCabinetApp
                 fileCabinetRecords[i] = this.list[i];
             }
 
-            return Array.Empty<FileCabinetRecord>();
+            return fileCabinetRecords;
         }
 
         public int GetStat()

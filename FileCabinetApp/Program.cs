@@ -14,6 +14,7 @@ namespace FileCabinetApp
         private static bool isRunning = true;
         private static FileCabinetService fileCabinetService = new FileCabinetService();
 
+
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
@@ -29,6 +30,7 @@ namespace FileCabinetApp
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
             new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
             new string[] { "create", "create new records", "The 'create' command create new records." },
+            new string[] { "list", "shows list of records", "The 'list' command shows list of records." },
         };
 
         public static void Main(string[] args)
