@@ -91,5 +91,11 @@ namespace FileCabinetApp
 
             this.list[id] = record;
         }
+
+        public FileCabinetRecord[] FindByFirstName(string firstName) { }
+
+        public FileCabinetRecord[] FindByLastName(string firstName) { }
+
+        public FileCabinetRecord[] FindByDateOfBirth(string firstName) { }
     }
 }

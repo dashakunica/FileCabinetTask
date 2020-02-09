@@ -29,6 +29,7 @@ namespace FileCabinetApp
         {
             new Tuple<string, Action<string, string>>("find firstname", FindByFirstName),
             new Tuple<string, Action<string, string>>("find lastname", FindByLastName),
+            new Tuple<string, Action<string, string>>("find dateofbirth", FindByDateOfBirth),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -41,6 +42,7 @@ namespace FileCabinetApp
             new string[] { "edit", "edit current records", "The 'edit' command edit current record." },
             new string[] { "find firstname", "find all records with current firstname", "The 'find firstname' command shows all records with current firstname." },
             new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
+            new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
         };
 
         public static void Main(string[] args)
@@ -218,6 +220,11 @@ namespace FileCabinetApp
         }
 
         private static void FindByLastName(string parameters, string text)
+        {
+
+        }
+
+        private static void FindByDateOfBirth(string parameters, DateTime text)
         {
 
         }
