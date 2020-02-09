@@ -69,10 +69,7 @@ namespace FileCabinetApp
                     var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
                     commands[index].Item2(parameters);
                 }
-                else
-                {
-                    index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
-                }
+
                 else 
                 {
                     PrintMissedCommandInfo(command);
