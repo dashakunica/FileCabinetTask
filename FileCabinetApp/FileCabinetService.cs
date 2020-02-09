@@ -8,6 +8,10 @@ namespace FileCabinetApp
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
         public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth)
         {
             var record = new FileCabinetRecord
