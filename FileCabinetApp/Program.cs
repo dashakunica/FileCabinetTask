@@ -25,6 +25,12 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
         };
 
+        private static Tuple<string, Action<string, string>>[] findCommands = new Tuple<string, Action<string, string>>[]
+        {
+            new Tuple<string, Action<string, string>>("find firstname", FindByFirstName),
+            new Tuple<string, Action<string, string>>("find lastname", FindByLastName),
+        };
+
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
@@ -32,7 +38,9 @@ namespace FileCabinetApp
             new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
             new string[] { "create", "create new records", "The 'create' command create new records." },
             new string[] { "list", "shows list of records", "The 'list' command shows list of records." },
-            new string[] { "edit id", "edit current records", "The 'list' command shows list of records." },
+            new string[] { "edit", "edit current records", "The 'edit' command edit current record." },
+            new string[] { "find firstname", "find all records with current firstname", "The 'find firstname' command shows all records with current firstname." },
+            new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
         };
 
         public static void Main(string[] args)
@@ -63,8 +71,13 @@ namespace FileCabinetApp
                 }
                 else
                 {
+                    index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
+                }
+                else 
+                {
                     PrintMissedCommandInfo(command);
                 }
+
             }
             while (isRunning);
         }
@@ -200,6 +213,16 @@ namespace FileCabinetApp
             }
 
             Console.WriteLine();
+        }
+
+        private static void FindByFirstName(string parameters, string text)
+        {
+
+        }
+
+        private static void FindByLastName(string parameters, string text)
+        {
+
         }
     }
 }
