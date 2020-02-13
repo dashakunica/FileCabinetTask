@@ -4,5 +4,139 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
+        <member name="T:FileCabinetApp.FileCabinetRecord">
+            <summary>
+            Class for cabinet record type.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.Id">
+            <summary>
+            Gets or sets Id of record.
+            </summary>
+            <value>
+            Id.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.FirstName">
+            <summary>
+            Gets or sets FirstName of record.
+            </summary>
+            <value>
+            FirstName.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.LastName">
+            <summary>
+            Gets or sets LastName of record.
+            </summary>
+            <value>
+            LastName.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.DateOfBirth">
+            <summary>
+            Gets or sets DateOfBirth of record.
+            </summary>
+            <value>
+            DateOfBirth.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie1">
+            <summary>
+            Gets or sets Propertie1 of record.
+            </summary>
+            <value>
+            Popertie1.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie2">
+            <summary>
+            Gets or sets Propertie2 of record.
+            </summary>
+            <value>
+            Propertie2.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie3">
+            <summary>
+            Gets or sets Propertie3 of record.
+            </summary>
+            <value>
+            Propertie3.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecord.ToString">
+            <summary>
+            Override method for string representation of record.
+            </summary>
+            <returns>String representation of record.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetService">
+            <summary>
+            Service for working with file cabinet.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.CreateRecord(System.String,System.String,System.DateTime)">
+            <summary>
+            Method which create new record.
+            </summary>
+            <param name="firstName">First name.</param>
+            <param name="lastName">Last name.</param>
+            <param name="dateOfBirth">Date of birth.</param>
+            <returns>Id of record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.GetRecords">
+            <summary>
+            Get all records.
+            </summary>
+            <returns>All records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.GetStat">
+            <summary>
+            Get amount of record.
+            </summary>
+            <returns>Amount of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.EditRecord(System.Int32,System.String,System.String,System.DateTime)">
+            <summary>
+            Edit current record.
+            </summary>
+            <param name="id">Id.</param>
+            <param name="firstName">First name.</param>
+            <param name="lastName">Last name.</param>
+            <param name="dateOfBirth">Date of birth.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.FindByFirstName(System.String)">
+            <summary>
+            Methods for finding first name.
+            </summary>
+            <param name="firstName">First name.</param>
+            <returns>Records with this first name.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.FindByLastName(System.String)">
+            <summary>
+            Methods for finding last name.
+            </summary>
+            <param name="lastName">Last name.</param>
+            <returns>Records with this last name.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.FindByDateOfBirth(System.DateTime)">
+            <summary>
+            Methods for finding date of birth.
+            </summary>
+            <param name="dateOfBirth">Date of birth.</param>
+            <returns>Record with this date of birth.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Program">
+            <summary>
+            API.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Program.Main(System.String[])">
+            <summary>
+            Entry poin of app.
+            </summary>
+            <param name="args">Args.</param>
+        </member>
     </members>
 </doc>

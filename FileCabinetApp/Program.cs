@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// API.
+    /// </summary>
     public static class Program
     {
         private const string DeveloperName = "Darya Kunickaya";
@@ -38,6 +41,10 @@ namespace FileCabinetApp
             new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
         };
 
+        /// <summary>
+        /// Entry poin of app.
+        /// </summary>
+        /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
