@@ -14,7 +14,6 @@ namespace FileCabinetApp
         private static bool isRunning = true;
         private static FileCabinetService fileCabinetService = new FileCabinetService();
 
-
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
@@ -132,7 +131,7 @@ namespace FileCabinetApp
                     fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
                     Console.WriteLine($"Record #{recordsCount + 1} is created.");
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
                     Console.WriteLine(ex.Message + " Please try again and enter command 'create'.");
                 }
@@ -164,7 +163,7 @@ namespace FileCabinetApp
                 fileCabinetService.EditRecord(id, firstName, lastName, dateOfBirth);
                 Console.WriteLine($"Record #{id} is updated.");
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 Console.WriteLine(ex.Message + "Please try again and enter command create.");
             }

@@ -21,7 +21,7 @@ namespace FileCabinetApp
 
         public override string ToString()
         {
-            return string.Format(new CultureInfo("en-US"), "#{0}, {1}, {2}, {3:D}", this.Id, this.FirstName, this.LastName, this.DateOfBirth);
+            return string.Format(new CultureInfo("en-US"), "#{0}, {1}, {2}, {3}", this.Id, this.FirstName, this.LastName, this.DateOfBirth);
         }
     }
 }
