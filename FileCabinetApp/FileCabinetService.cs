@@ -8,9 +8,9 @@ namespace FileCabinetApp
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<int, string> firstNameDictionary = new Dictionary<int, string>();
+        private readonly Dictionary<int, string> lastNameDictionary = new Dictionary<int, string>();
+        private readonly Dictionary<int, DateTime> dateOfBirthDictionary = new Dictionary<int, DateTime>();
 
         public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth)
         {
@@ -59,6 +59,10 @@ namespace FileCabinetApp
 
             this.list.Add(record);
 
+            this.firstNameDictionary.Add(record.Id, record.FirstName);
+            this.lastNameDictionary.Add(record.Id, record.LastName);
+            this.dateOfBirthDictionary.Add(record.Id, record.DateOfBirth);
+
             return record.Id;
         }
 
@@ -93,13 +97,44 @@ namespace FileCabinetApp
                 DateOfBirth = dateOfBirth,
             };
 
-            this.list[id] = record;
+            this.list[id - 1] = record;
+
+            this.firstNameDictionary[id - 1] = record.FirstName;
+            this.lastNameDictionary[id - 1] = record.LastName;
+            this.dateOfBirthDictionary[id - 1] = record.DateOfBirth;
         }
 
-        public FileCabinetRecord[] FindByFirstName(string firstName) { }
+        public FileCabinetRecord[] FindByFirstName(string firstName)
+        {
+            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+                delegate(FileCabinetRecord name)
+                {
+                    return name.FirstName.Equals(firstName, StringComparison.InvariantCultureIgnoreCase);
+                }).ToArray();
 
-        public FileCabinetRecord[] FindByLastName(string firstName) { }
+            return fileCabinetRecords;
+        }
 
-        public FileCabinetRecord[] FindByDateOfBirth(string firstName) { }
+        public FileCabinetRecord[] FindByLastName(string lastName)
+        {
+            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+                delegate(FileCabinetRecord name)
+                {
+                    return name.LastName.Equals(lastName, StringComparison.InvariantCultureIgnoreCase);
+                }).ToArray();
+
+            return fileCabinetRecords;
+        }
+
+        public FileCabinetRecord[] FindByDateOfBirth(DateTime dateOfBirth)
+        {
+            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+                delegate(FileCabinetRecord name)
+                {
+                    return name.DateOfBirth.Equals(dateOfBirth);
+                }).ToArray();
+
+            return fileCabinetRecords;
+        }
     }
 }

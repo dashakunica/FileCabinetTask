@@ -23,13 +23,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
-        };
-
-        private static Tuple<string, Action<string, string>>[] findCommands = new Tuple<string, Action<string, string>>[]
-        {
-            new Tuple<string, Action<string, string>>("find firstname", FindByFirstName),
-            new Tuple<string, Action<string, string>>("find lastname", FindByLastName),
-            new Tuple<string, Action<string, string>>("find dateofbirth", FindByDateOfBirth),
+            new Tuple<string, Action<string>>("find", Find),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -71,12 +65,10 @@ namespace FileCabinetApp
                     var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
                     commands[index].Item2(parameters);
                 }
-
-                else 
+                else
                 {
                     PrintMissedCommandInfo(command);
                 }
-
             }
             while (isRunning);
         }
@@ -132,16 +124,9 @@ namespace FileCabinetApp
             {
                 try
                 {
-                    Console.Write("First name: ");
-                    string firstName = Console.ReadLine();
-
-                    Console.Write("Last name: ");
-                    string lastName = Console.ReadLine();
-
-                    Console.Write("Date of birth: ");
-                    CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
-                    DateTimeStyles styles = DateTimeStyles.None;
-                    DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
+                    string firstName = EnterFirstName();
+                    string lastName = EnterLastName();
+                    DateTime dateOfBirth = EnterDateOfBirth();
 
                     var recordsCount = Program.fileCabinetService.GetStat();
                     fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
@@ -149,16 +134,7 @@ namespace FileCabinetApp
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message + "Please try again and enter command create.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Available commands:");
-
-                foreach (var helpMessage in helpMessages)
-                {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
+                    Console.WriteLine(ex.Message + " Please try again and enter command 'create'.");
                 }
             }
 
@@ -176,57 +152,81 @@ namespace FileCabinetApp
 
         private static void Edit(string parameters)
         {
-            if (string.IsNullOrEmpty(parameters))
+            try
             {
-                try
-                {
-                    int id = Convert.ToInt32(parameters.Remove(0, 5));
-                    Console.Write("First name: ");
-                    string firstName = Console.ReadLine();
+                int id = Convert.ToInt32(parameters, NumberFormatInfo.InvariantInfo);
 
-                    Console.Write("Last name: ");
-                    string lastName = Console.ReadLine();
+                string firstName = EnterFirstName();
+                string lastName = EnterLastName();
+                DateTime dateOfBirth = EnterDateOfBirth();
 
-                    Console.Write("Date of birth: ");
-                    CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
-                    DateTimeStyles styles = DateTimeStyles.None;
-                    DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
-
-                    var recordsCount = Program.fileCabinetService.GetStat();
-                    fileCabinetService.EditRecord(id, firstName, lastName, dateOfBirth);
-                    Console.WriteLine($"Record #{id} is updated.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message + "Please try again and enter command create.");
-                }
+                var recordsCount = Program.fileCabinetService.GetStat();
+                fileCabinetService.EditRecord(id, firstName, lastName, dateOfBirth);
+                Console.WriteLine($"Record #{id} is updated.");
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("Available commands:");
-
-                foreach (var helpMessage in helpMessages)
-                {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
-                }
+                Console.WriteLine(ex.Message + "Please try again and enter command create.");
             }
 
             Console.WriteLine();
         }
 
-        private static void FindByFirstName(string parameters, string text)
+        private static void Find(string parameter)
         {
+            var inputs = parameter.Split(' ', 2);
+            int indexPropertie = 0;
+            int indexParameter = 1;
 
+            FileCabinetRecord[] records;
+
+            if (inputs[indexPropertie].Equals("firstName", StringComparison.InvariantCultureIgnoreCase))
+            {
+                records = fileCabinetService.FindByFirstName(inputs[indexParameter]);
+                foreach (var record in records)
+                {
+                    Console.WriteLine(record.ToString());
+                }
+            }
+            else if (inputs[indexPropertie].Equals("lastName", StringComparison.InvariantCultureIgnoreCase))
+            {
+                records = fileCabinetService.FindByLastName(inputs[indexParameter]);
+                foreach (var record in records)
+                {
+                    Console.WriteLine(record.ToString());
+                }
+            }
+            else if (inputs[indexPropertie].Equals("date Of birth", StringComparison.InvariantCultureIgnoreCase))
+            {
+                records = fileCabinetService.FindByDateOfBirth(Convert.ToDateTime(inputs[indexParameter], CultureInfo.CreateSpecificCulture("en-US")));
+                foreach (var record in records)
+                {
+                    Console.WriteLine(record.ToString());
+                }
+            }
         }
 
-        private static void FindByLastName(string parameters, string text)
+        private static string EnterFirstName()
         {
-
+            Console.Write("First name: ");
+            string firstName = Console.ReadLine();
+            return firstName;
         }
 
-        private static void FindByDateOfBirth(string parameters, DateTime text)
+        private static string EnterLastName()
         {
+            Console.Write("Last name: ");
+            string lastName = Console.ReadLine();
+            return lastName;
+        }
 
+        private static DateTime EnterDateOfBirth()
+        {
+            Console.Write("Date of birth: ");
+            CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
+            DateTimeStyles styles = DateTimeStyles.None;
+            DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
+            return dateOfBirth;
         }
     }
 }
