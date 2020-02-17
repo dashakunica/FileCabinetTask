@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace FileCabinetApp
 {
@@ -41,7 +42,7 @@ namespace FileCabinetApp
         /// Get all records.
         /// </summary>
         /// <returns>All records.</returns>
-        public FileCabinetRecord[] GetRecords()
+        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
             FileCabinetRecord[] fileCabinetRecords = new FileCabinetRecord[this.list.Count];
             for (int i = 0; i < this.list.Count; i++)
