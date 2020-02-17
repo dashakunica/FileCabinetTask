@@ -193,7 +193,7 @@ namespace FileCabinetApp
 
             try
             {
-                FileCabinetCustomService.ValidateParameter(record);
+                CustomValidator.ValidateParameter(record);
             }
             catch (ArgumentException ex)
             {
