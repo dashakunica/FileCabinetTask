@@ -7,8 +7,8 @@ namespace FileCabinetApp
     /// <summary>
     /// For custom validation.
     /// </summary>
-    public class FileCabinetCustomService
+    public class FileCabinetCustomService : FileCabinetService
     {
-
+        
     }
 }

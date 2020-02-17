@@ -18,54 +18,14 @@ namespace FileCabinetApp
         /// <summary>
         /// Method which create new record.
         /// </summary>
-        /// <param name="firstName">First name.</param>
-        /// <param name="lastName">Last name.</param>
-        /// <param name="dateOfBirth">Date of birth.</param>
+        /// <param name="record">Record.</param>
         /// <returns>Id of record.</returns>
-        public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth)
+        public int CreateRecord(FileCabinetRecord record)
         {
-            var record = new FileCabinetRecord
+            record = new FileCabinetRecord
             {
                 Id = this.list.Count + 1,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
             };
-
-            if (firstName is null)
-            {
-                throw new ArgumentNullException($"Parameter {nameof(firstName)} cannot be null");
-            }
-
-            if (lastName is null)
-            {
-                throw new ArgumentNullException($"Parameter {nameof(lastName)} cannot be null");
-            }
-
-            if (firstName.Length < 2 || firstName.Length > 60)
-            {
-                throw new ArgumentException($"Parameter {nameof(firstName)} cannot have length less than 3 or more than 60");
-            }
-
-            if (lastName.Length < 2 || lastName.Length > 60)
-            {
-                throw new ArgumentException($"Parameter {nameof(lastName)} cannot have length less than 3 or more than 60");
-            }
-
-            if (firstName.Trim().Length == 0)
-            {
-                throw new ArgumentException($"Parameter {nameof(firstName)} cannot have only whitespaces");
-            }
-
-            if (lastName.Trim().Length == 0)
-            {
-                throw new ArgumentException($"Parameter {nameof(lastName)} cannot have only whitespaces");
-            }
-
-            if (dateOfBirth.Day < new DateTime(1950, 01, 01).Day || dateOfBirth.Day > DateTime.Now.Day)
-            {
-                throw new ArgumentException($"Parameter {nameof(dateOfBirth)} cannot be less than 01-Jan-1950 and more than current day");
-            }
 
             this.list.Add(record);
 
@@ -103,30 +63,19 @@ namespace FileCabinetApp
         /// <summary>
         /// Edit current record.
         /// </summary>
-        /// <param name="id">Id.</param>
-        /// <param name="firstName">First name.</param>
-        /// <param name="lastName">Last name.</param>
-        /// <param name="dateOfBirth">Date of birth.</param>
-        public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth)
+        /// <param name="record">Record.</param>
+        public void EditRecord(FileCabinetRecord record)
         {
-            if (id > this.list.Count)
+            if (record.Id > this.list.Count)
             {
-                throw new ArgumentException($"This {nameof(id)} record does not exist.");
+                throw new ArgumentException($"This {nameof(record.Id)} record does not exist.");
             }
 
-            var record = new FileCabinetRecord
-            {
-                Id = id,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-            };
+            this.list[record.Id - 1] = record;
 
-            this.list[id - 1] = record;
-
-            this.firstNameDictionary[id - 1] = record.FirstName;
-            this.lastNameDictionary[id - 1] = record.LastName;
-            this.dateOfBirthDictionary[id - 1] = record.DateOfBirth;
+            this.firstNameDictionary[record.Id - 1] = record.FirstName;
+            this.lastNameDictionary[record.Id - 1] = record.LastName;
+            this.dateOfBirthDictionary[record.Id - 1] = record.DateOfBirth;
         }
 
         /// <summary>

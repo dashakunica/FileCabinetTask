@@ -17,6 +17,12 @@ namespace FileCabinetApp
         private static bool isRunning = true;
         private static FileCabinetService fileCabinetService = new FileCabinetService();
 
+        private static Tuple<string, Action<string>>[] valdateRules = new Tuple<string, Action<string>>[]
+        {
+            new Tuple<string, Action<string>>("default", PrintHelp),
+            new Tuple<string, Action<string>>("custom", Exit),
+        };
+
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
@@ -47,6 +53,9 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
+            Console.Write(args[0]);
+            var parameters = Console.ReadLine();
+
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
             Console.WriteLine();
@@ -128,20 +137,29 @@ namespace FileCabinetApp
         {
             if (string.IsNullOrEmpty(parameters))
             {
+                string firstName = EnterFirstName();
+                string lastName = EnterLastName();
+                DateTime dateOfBirth = EnterDateOfBirth();
+
+                var recordsCount = Program.fileCabinetService.GetStat();
+                var record = new FileCabinetRecord
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    DateOfBirth = dateOfBirth,
+                };
+
                 try
                 {
-                    string firstName = EnterFirstName();
-                    string lastName = EnterLastName();
-                    DateTime dateOfBirth = EnterDateOfBirth();
-
-                    var recordsCount = Program.fileCabinetService.GetStat();
-                    fileCabinetService.CreateRecord(firstName, lastName, dateOfBirth);
-                    Console.WriteLine($"Record #{recordsCount + 1} is created.");
+                    FileCabinetCustomService.ValidateParameter(record);
                 }
                 catch (ArgumentException ex)
                 {
-                    Console.WriteLine(ex.Message + " Please try again and enter command 'create'.");
+                    Console.WriteLine(ex.Message + "Please try again and enter command create.");
                 }
+
+                fileCabinetService.CreateRecord(record);
+                Console.WriteLine($"Record #{recordsCount + 1} is created.");
             }
 
             Console.WriteLine();
@@ -158,23 +176,32 @@ namespace FileCabinetApp
 
         private static void Edit(string parameters)
         {
+            int id = Convert.ToInt32(parameters, NumberFormatInfo.InvariantInfo);
+
+            string firstName = EnterFirstName();
+            string lastName = EnterLastName();
+            DateTime dateOfBirth = EnterDateOfBirth();
+
+            var recordsCount = Program.fileCabinetService.GetStat();
+            var record = new FileCabinetRecord
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+            };
+
             try
             {
-                int id = Convert.ToInt32(parameters, NumberFormatInfo.InvariantInfo);
-
-                string firstName = EnterFirstName();
-                string lastName = EnterLastName();
-                DateTime dateOfBirth = EnterDateOfBirth();
-
-                var recordsCount = Program.fileCabinetService.GetStat();
-                fileCabinetService.EditRecord(id, firstName, lastName, dateOfBirth);
-                Console.WriteLine($"Record #{id} is updated.");
+                FileCabinetCustomService.ValidateParameter(record);
             }
             catch (ArgumentException ex)
             {
                 Console.WriteLine(ex.Message + "Please try again and enter command create.");
             }
 
+            fileCabinetService.EditRecord(record);
+            Console.WriteLine($"Record #{id} is updated.");
             Console.WriteLine();
         }
 
