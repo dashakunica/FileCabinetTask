@@ -4,9 +4,9 @@ using System.Text;
 
 namespace FileCabinetApp
 {
-    public class DefaultValidator : IRecordValidator<FileCabinetRecord>
+    public class DefaultValidator : IRecordValidator
     {
-        internal static void ValidateParameter(FileCabinetRecord record)
+        public void ValidateParameter(FileCabinetRecord record)
         {
             if (record.FirstName is null)
             {

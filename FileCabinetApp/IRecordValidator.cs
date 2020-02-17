@@ -4,8 +4,8 @@ using System.Text;
 
 namespace FileCabinetApp
 {
-    public interface IRecordValidator<T>
+    public interface IRecordValidator
     {
-        public static void ValidateParameter(T value);
+        public void ValidateParameter(FileCabinetRecord value);
     }
 }

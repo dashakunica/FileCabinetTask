@@ -10,6 +10,7 @@ namespace FileCabinetApp
     public class FileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+        private readonly IRecordValidator validator;
 
         private readonly Dictionary<int, string> firstNameDictionary = new Dictionary<int, string>();
         private readonly Dictionary<int, string> lastNameDictionary = new Dictionary<int, string>();
