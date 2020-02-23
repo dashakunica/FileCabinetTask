@@ -50,7 +50,9 @@ namespace FileCabinetApp
                 fileCabinetRecords[i] = this.list[i];
             }
 
-            return fileCabinetRecords;
+            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
+
+            return readOnlyRecords;
         }
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">First name.</param>
         /// <returns>Records with this first name.</returns>
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
             FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
@@ -93,7 +95,9 @@ namespace FileCabinetApp
                     return name.FirstName.Equals(firstName, StringComparison.InvariantCultureIgnoreCase);
                 }).ToArray();
 
-            return fileCabinetRecords;
+            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
+
+            return readOnlyRecords;
         }
 
         /// <summary>
@@ -101,7 +105,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Last name.</param>
         /// <returns>Records with this last name.</returns>
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
             FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
@@ -109,7 +113,9 @@ namespace FileCabinetApp
                     return name.LastName.Equals(lastName, StringComparison.InvariantCultureIgnoreCase);
                 }).ToArray();
 
-            return fileCabinetRecords;
+            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
+
+            return readOnlyRecords;
         }
 
         /// <summary>
@@ -117,7 +123,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Date of birth.</param>
         /// <returns>Record with this date of birth.</returns>
-        public FileCabinetRecord[] FindByDateOfBirth(DateTime dateOfBirth)
+        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
             FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
@@ -125,7 +131,9 @@ namespace FileCabinetApp
                     return name.DateOfBirth.Equals(dateOfBirth);
                 }).ToArray();
 
-            return fileCabinetRecords;
+            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
+
+            return readOnlyRecords;
         }
     }
 }

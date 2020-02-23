@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Collections.ObjectModel;
 
 namespace FileCabinetApp
 {
@@ -53,8 +54,10 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
-            Console.Write(args[0]);
-            var parameters = Console.ReadLine();
+            for (int i = 0; i < args.Length; i++)
+            {
+
+            }
 
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
             Console.WriteLine(Program.HintMessage);
@@ -151,7 +154,7 @@ namespace FileCabinetApp
 
                 try
                 {
-                    FileCabinetCustomService.ValidateParameter(record);
+                    CustomValidator.ValidateParameter(record);
                 }
                 catch (ArgumentException ex)
                 {
@@ -211,7 +214,7 @@ namespace FileCabinetApp
             int indexPropertie = 0;
             int indexParameter = 1;
 
-            FileCabinetRecord[] records;
+            ReadOnlyCollection<FileCabinetRecord> records;
 
             if (inputs[indexPropertie].Equals("firstName", StringComparison.InvariantCultureIgnoreCase))
             {
@@ -239,10 +242,39 @@ namespace FileCabinetApp
             }
         }
 
+        private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<T, Tuple<bool, string>> validator)
+        {
+            do
+            {
+                T value;
+
+                var input = Console.ReadLine();
+                var conversionResult = converter(input);
+
+                if (!conversionResult.Item1)
+                {
+                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                value = conversionResult.Item3;
+
+                var validationResult = validator(value);
+                if (!validationResult.Item1)
+                {
+                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                return value;
+            }
+            while (true);
+        }
+
         private static string EnterFirstName()
         {
             Console.Write("First name: ");
-            string firstName = Console.ReadLine();
+            var firstName = ReadInput(stringConverter, firstNameValidator);
             return firstName;
         }
 
