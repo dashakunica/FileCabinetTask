@@ -9,26 +9,26 @@ namespace FileCabinetApp
     {
         private FileCabinetRecord[] records;
 
-        public FileCabinetServiceSnapshot(FileCabinetRecord[] record) => this.records = records;
+        public FileCabinetServiceSnapshot(FileCabinetRecord[] record) => records = Records;
 
-        //public FileCabinetRecord[] Record
-        //{
-        //    get
-        //    {
-        //        if (this.record is null)
-        //        {
-        //            throw new ArgumentNullException(nameof(record));
-        //        }
+        public FileCabinetRecord[] Records
+        {
+            get
+            {
+                if (this.records is null)
+                {
+                    throw new ArgumentNullException(nameof(records));
+                }
 
-        //        return record;
-        //    }
-        //    set => this.record = value;
-        //}
+                return records;
+            }
+            set => this.records = value;
+        }
 
-        //public FileCabinetRecord[] GetRecords()
-        //{
-        //    return (FileCabinetRecord[])this.record.Clone();
-        //}
+        public FileCabinetRecord[] GetRecords()
+        {
+            return (FileCabinetRecord[])this.records.Clone();
+        }
 
         public void SaveToCsv(StreamWriter streamWriter)
         {
