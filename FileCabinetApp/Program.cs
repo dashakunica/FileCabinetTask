@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace FileCabinetApp
 {
@@ -33,6 +34,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
+            new Tuple<string, Action<string>>("export", Export),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -46,6 +48,7 @@ namespace FileCabinetApp
             new string[] { "find firstname", "find all records with current firstname", "The 'find firstname' command shows all records with current firstname." },
             new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
             new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
+            new string[] { "export", "export all records in CSV", "The 'export' command export all records in CSV"},
         };
 
         /// <summary>
@@ -154,7 +157,7 @@ namespace FileCabinetApp
 
                 try
                 {
-                    CustomValidator.ValidateParameter(record);
+                    // CustomValidator.ValidateParameter(record);
                 }
                 catch (ArgumentException ex)
                 {
@@ -196,7 +199,7 @@ namespace FileCabinetApp
 
             try
             {
-                CustomValidator.ValidateParameter(record);
+                //CustomValidator.ValidateParameter(record);
             }
             catch (ArgumentException ex)
             {
@@ -274,7 +277,7 @@ namespace FileCabinetApp
         private static string EnterFirstName()
         {
             Console.Write("First name: ");
-            var firstName = ReadInput(stringConverter, firstNameValidator);
+            string firstName = Console.ReadLine();
             return firstName;
         }
 
@@ -292,6 +295,23 @@ namespace FileCabinetApp
             DateTimeStyles styles = DateTimeStyles.None;
             DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
             return dateOfBirth;
+        }
+
+        private static void Export(string parameter)
+        {
+            FileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot();
+            try
+            {
+                snapshot.SaveToCsv(new StreamWriter(parameter, false, System.Text.Encoding.Default));
+            }
+            catch (ArgumentException) ////?
+            {
+                Console.WriteLine("File is exist - rewrite e:\filename.csv? [Y/n] Y");
+            }
+            catch(AccessViolationException) ////?
+            {
+                Console.WriteLine("Export failed: can't open file e:\filename.csv.");
+            }
         }
     }
 }

@@ -4,11 +4,6 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
-        <member name="T:FileCabinetApp.FileCabinetCustomService">
-            <summary>
-            For custom validation.
-            </summary>
-        </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>
             Class for cabinet record type.
@@ -126,43 +121,6 @@
             </summary>
             <param name="dateOfBirth">Date of birth.</param>
             <returns>Record with this date of birth.</returns>
-        </member>
-        <member name="T:FileCabinetApp.IntroduceParameter">
-            <summary>
-            Immutable class for parameters.
-            </summary>
-        </member>
-        <member name="P:FileCabinetApp.IntroduceParameter.Id">
-            <summary>
-            Gets Id of record.
-            </summary>
-            <value>
-            Id.
-            </value>
-        </member>
-        <member name="P:FileCabinetApp.IntroduceParameter.FirstName">
-            <summary>
-            Gets FirstName of record.
-            </summary>
-            <value>
-            FirstName.
-            </value>
-        </member>
-        <member name="P:FileCabinetApp.IntroduceParameter.LastName">
-            <summary>
-            Gets LastName of record.
-            </summary>
-            <value>
-            LastName.
-            </value>
-        </member>
-        <member name="P:FileCabinetApp.IntroduceParameter.DateOfBirth">
-            <summary>
-            Gets DateOfBirth of record.
-            </summary>
-            <value>
-            DateOfBirth.
-            </value>
         </member>
         <member name="T:FileCabinetApp.Program">
             <summary>

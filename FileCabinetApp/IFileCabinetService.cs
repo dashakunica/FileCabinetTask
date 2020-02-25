@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FileCabinetApp
 {
-    interface IFileCabinetService
+    public interface IFileCabinetService
     {
     }
 }
