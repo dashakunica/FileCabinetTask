@@ -13,10 +13,13 @@ namespace FileCabinetApp
 
         public void Write(FileCabinetRecord record)
         {
-            this.xmlWriter.Write(record.Id);
-            this.xmlWriter.Write(record.FirstName);
-            this.xmlWriter.Write(record.LastName);
-            this.xmlWriter.Write(record.DateOfBirth);
+            xmlWriter.WriteStartElement($"Employee {record.Id}");
+
+            xmlWriter.WriteElementString("FirstName", record.FirstName);
+            xmlWriter.WriteElementString("LastName", record.LastName);
+            xmlWriter.WriteElementString("Salary", record.DateOfBirth.ToString());
+
+            xmlWriter.WriteEndElement();
         }
     }
 }

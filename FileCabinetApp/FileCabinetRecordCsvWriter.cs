@@ -13,10 +13,7 @@ namespace FileCabinetApp
 
         public void Write(FileCabinetRecord record)
         {
-            this.textWriter.Write(record.Id);
-            this.textWriter.Write(record.FirstName);
-            this.textWriter.Write(record.LastName);
-            this.textWriter.Write(record.DateOfBirth);
+            this.textWriter.Write(record.ToString());
         }
     }
 }

@@ -8,7 +8,7 @@ namespace FileCabinetApp
     /// <summary>
     /// Service for working with file cabinet.
     /// </summary>
-    public class FileCabinetService
+    public class FileCabinetMemoryService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
@@ -22,11 +22,14 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="record">Record.</param>
         /// <returns>Id of record.</returns>
-        public int CreateRecord(FileCabinetRecord record)
+        public int CreateRecord(FileCabinetAdditionRecord recordAddition)
         {
-            record = new FileCabinetRecord
+            var record = new FileCabinetRecord
             {
                 Id = this.list.Count + 1,
+                FirstName = recordAddition.FirstName,
+                LastName = recordAddition.LastName,              //////?
+                DateOfBirth = recordAddition.DateOfBirth,
             };
 
             this.list.Add(record);

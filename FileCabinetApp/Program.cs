@@ -17,7 +17,7 @@ namespace FileCabinetApp
         private const int ExplanationHelpIndex = 2;
 
         private static bool isRunning = true;
-        private static FileCabinetService fileCabinetService = new FileCabinetService();
+        private static FileCabinetMemoryService fileCabinetService = new FileCabinetMemoryService();
 
         private static Tuple<string, Action<string>>[] valdateRules = new Tuple<string, Action<string>>[]
         {
@@ -148,7 +148,7 @@ namespace FileCabinetApp
                 DateTime dateOfBirth = EnterDateOfBirth();
 
                 var recordsCount = Program.fileCabinetService.GetStat();
-                var record = new FileCabinetRecord
+                var record = new FileCabinetAdditionRecord
                 {
                     FirstName = firstName,
                     LastName = lastName,              //////?
@@ -157,7 +157,7 @@ namespace FileCabinetApp
 
                 try
                 {
-                    // CustomValidator.ValidateParameter(record);
+                    //CustomValidator.ValidateParameter(record);
                 }
                 catch (ArgumentException ex)
                 {
@@ -299,19 +299,43 @@ namespace FileCabinetApp
 
         private static void Export(string parameter)
         {
+            var inputs = parameter.Split(' ', 2);
+            int indexPropertie = 0;
+            int indexParameter = 1;
+
             FileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot();
-            try
+            if (inputs[indexPropertie].Equals("csv", StringComparison.InvariantCultureIgnoreCase))
             {
-                snapshot.SaveToCsv(new StreamWriter(parameter, false, System.Text.Encoding.Default));
+                try
+                {
+                    snapshot.SaveToCsv(new StreamWriter(inputs[indexParameter], false, System.Text.Encoding.Unicode));
+                }
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine($"Export failed: can't open file {inputs[indexParameter]}.");
+                }
+                finally
+                {
+                    Console.WriteLine($"All records are exported to file {inputs[indexParameter]}");
+                }
             }
-            catch (ArgumentException) ////?
+
+            if (inputs[indexPropertie].Equals("xml", StringComparison.InvariantCultureIgnoreCase))
             {
-                Console.WriteLine("File is exist - rewrite e:\filename.csv? [Y/n] Y");
+                try
+                {
+                    snapshot.SaveToXml(new StreamWriter(inputs[indexParameter], false, System.Text.Encoding.Unicode));
+                }
+                catch (FileNotFoundException)
+                {
+                    Console.WriteLine($"Export failed: can't open file {inputs[indexParameter]}.");
+                }
+                finally
+                {
+                    Console.WriteLine($"All records are exported to file {inputs[indexParameter]}");
+                }
             }
-            catch(AccessViolationException) ////?
-            {
-                Console.WriteLine("Export failed: can't open file e:\filename.csv.");
-            }
+
         }
     }
 }

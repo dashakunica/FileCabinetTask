@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Xml;
 
 namespace FileCabinetApp
 {
@@ -9,7 +10,7 @@ namespace FileCabinetApp
     {
         private FileCabinetRecord[] records;
 
-        public FileCabinetServiceSnapshot(FileCabinetRecord[] record) => records = Records;
+        public FileCabinetServiceSnapshot(FileCabinetRecord[] records) => this.records = records;
 
         public FileCabinetRecord[] Records
         {
@@ -40,6 +41,25 @@ namespace FileCabinetApp
             foreach (var record in this.records)
             {
                 fileCabinetRecordCsvWriter.Write(record);
+            }
+        }
+
+        public void SaveToXml(StreamWriter streamWriter)
+        {
+            using (XmlWriter xmlWriter = XmlWriter.Create(streamWriter))
+            {
+                FileCabinetRecordXmlWriter fileCabinetRecordXmlWriter = new FileCabinetRecordXmlWriter(xmlWriter);
+
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement("Records");
+
+                foreach (var record in this.records)
+                {
+                    fileCabinetRecordXmlWriter.Write(record);
+                }
+
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndDocument();
             }
         }
     }
