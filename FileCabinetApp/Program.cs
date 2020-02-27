@@ -148,7 +148,7 @@ namespace FileCabinetApp
                 DateTime dateOfBirth = EnterDateOfBirth();
 
                 var recordsCount = Program.fileCabinetService.GetStat();
-                var record = new FileCabinetAdditionRecord
+                var record = new FileCabinetRecord
                 {
                     FirstName = firstName,
                     LastName = lastName,              //////?
