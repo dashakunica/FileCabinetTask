@@ -16,14 +16,22 @@ namespace FileCabinetApp
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
 
-        private static bool isRunning = true;
-        private static FileCabinetMemoryService fileCabinetService = new FileCabinetMemoryService();
-
-        private static Tuple<string, Action<string>>[] valdateRules = new Tuple<string, Action<string>>[]
+        private static string[] commandLineParameters = new string[]
         {
-            new Tuple<string, Action<string>>("default", PrintHelp),
-            new Tuple<string, Action<string>>("custom", Exit),
+            "--validation-rules",
+            "--storage",
         };
+
+        private static string[] shortCommandLineParameters = new string[]
+        {
+            "-v",
+            "-s",
+        };
+
+        private static bool isRunning = true;
+
+        private static IFileCabinetService fileCabinetService = new FileCabinetMemoryService();
+        private static IRecordValidator validator = new DefaultValidator();
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
@@ -57,9 +65,34 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
-            for (int i = 0; i < args.Length; i++)
+            if (args[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
             {
+                string parameter = args[1];
+                switch (parameter.ToLower())
+                {
+                    case "default":
+                        validator = new DefaultValidator();
+                        break;
 
+                    case "custom":
+                        validator = new CustomValidator();
+                        break;
+                }
+            }
+
+            if (args[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
+            {
+                string parameter = args[1];
+                switch (parameter.ToLower())
+                {
+                    case "memory":
+                        fileCabinetService = new FileCabinetMemoryService();
+                        break;
+
+                    case "file":
+                        fileCabinetService = new FileCabinetFilesystemService();
+                        break;
+                }
             }
 
             Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
@@ -151,13 +184,13 @@ namespace FileCabinetApp
                 var record = new FileCabinetRecord
                 {
                     FirstName = firstName,
-                    LastName = lastName,              //////?
+                    LastName = lastName,
                     DateOfBirth = dateOfBirth,
                 };
 
                 try
                 {
-                    //CustomValidator.ValidateParameter(record);
+                    validator.ValidateParameter(record);
                 }
                 catch (ArgumentException ex)
                 {
@@ -199,7 +232,7 @@ namespace FileCabinetApp
 
             try
             {
-                //CustomValidator.ValidateParameter(record);
+                validator.ValidateParameter(record);
             }
             catch (ArgumentException ex)
             {

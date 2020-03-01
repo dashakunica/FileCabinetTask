@@ -3,9 +3,7 @@
     "FileCabinetApp": {
       "commandName": "Project",
       "environmentVariables": {
-        "--validation-rules=": "Default",
-        "Key": "Value",
-        "-v": "Value"
+        "": ""
       }
     }
   }

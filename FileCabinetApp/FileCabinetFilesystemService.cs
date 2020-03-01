@@ -36,5 +36,10 @@ namespace FileCabinetApp
         {
             throw new NotImplementedException();
         }
+
+        public FileCabinetServiceSnapshot MakeSnapshot()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

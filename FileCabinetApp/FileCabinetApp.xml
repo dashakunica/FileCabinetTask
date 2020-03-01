@@ -9,7 +9,7 @@
             Service for working with file cabinet.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.FileCabinetAdditionRecord)">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Method which create new record.
             </summary>
