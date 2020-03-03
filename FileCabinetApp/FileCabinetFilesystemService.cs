@@ -12,7 +12,6 @@ namespace FileCabinetApp
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private FileStream fileStream;
         private IRecordValidator validator;
-        
 
         public FileCabinetFilesystemService()
         { }
@@ -114,7 +113,8 @@ namespace FileCabinetApp
 
         public int GetStat()
         {
-            throw new NotImplementedException();
+            long numberOfRecords = this.fileStream.Length / SIZEOFRECORD;
+            return (int)numberOfRecords;
         }
 
         public FileCabinetServiceSnapshot MakeSnapshot()
