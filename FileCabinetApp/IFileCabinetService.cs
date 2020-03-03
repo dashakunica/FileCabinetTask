@@ -19,5 +19,7 @@ namespace FileCabinetApp
         ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth);
 
         FileCabinetServiceSnapshot MakeSnapshot();
+
+        int GetStat();
     }
 }

@@ -90,13 +90,14 @@ namespace FileCabinetApp
                         break;
 
                     case "file":
-                        fileCabinetService = new FileCabinetFilesystemService();
+                        FileStream fileStream = new FileStream("cabinet-records.db", FileMode.Create);
+                        fileCabinetService = new FileCabinetFilesystemService(fileStream);
                         break;
                 }
             }
 
-            Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
-            Console.WriteLine(Program.HintMessage);
+            Console.WriteLine($"File Cabinet Application, developed by {DeveloperName}");
+            Console.WriteLine(HintMessage);
             Console.WriteLine();
 
             do

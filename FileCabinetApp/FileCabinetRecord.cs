@@ -46,7 +46,7 @@ namespace FileCabinetApp
         /// <value>
         /// Popertie1.
         /// </value>
-        public short Propertie1 { get; set; }
+        public short Status { get; set; }
 
         /// <summary>
         /// Gets or sets Propertie2 of record.
