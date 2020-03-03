@@ -30,7 +30,7 @@ namespace FileCabinetApp
 
         private static bool isRunning = true;
 
-        private static IFileCabinetService fileCabinetService = new FileCabinetMemoryService();
+        private static IFileCabinetService fileCabinetService = new FileCabinetFilesystemService();
         private static IRecordValidator validator = new DefaultValidator();
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
@@ -65,9 +65,11 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
-            if (args[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
+            Console.Write("$ FileCabinetApp.exe ");
+            var inputConsoleParameters = Console.ReadLine().Split(' ', 2);
+            if (inputConsoleParameters[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
             {
-                string parameter = args[1];
+                string parameter = inputConsoleParameters[1];
                 switch (parameter.ToLower())
                 {
                     case "default":
@@ -80,9 +82,9 @@ namespace FileCabinetApp
                 }
             }
 
-            if (args[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
+            if (inputConsoleParameters[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
             {
-                string parameter = args[1];
+                string parameter = inputConsoleParameters[1];
                 switch (parameter.ToLower())
                 {
                     case "memory":

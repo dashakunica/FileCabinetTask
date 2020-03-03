@@ -92,7 +92,7 @@
             DateOfBirth.
             </value>
         </member>
-        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie1">
+        <member name="P:FileCabinetApp.FileCabinetRecord.Status">
             <summary>
             Gets or sets Propertie1 of record.
             </summary>

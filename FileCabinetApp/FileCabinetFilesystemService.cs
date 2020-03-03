@@ -8,9 +8,14 @@ namespace FileCabinetApp
 {
     public class FileCabinetFilesystemService : IFileCabinetService
     {
+        private const long SIZEOFRECORD = 256;
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private FileStream fileStream;
         private IRecordValidator validator;
+        
+
+        public FileCabinetFilesystemService()
+        { }
 
         public FileCabinetFilesystemService(FileStream fileStream)
         {
@@ -34,14 +39,7 @@ namespace FileCabinetApp
 
         public int CreateRecord(FileCabinetRecord record)
         {
-
-            record = new FileCabinetRecord
-            {
-                Id = this.list.Count + 1,
-                FirstName = record.FirstName,
-                LastName = record.LastName,
-                DateOfBirth = record.DateOfBirth,
-            };
+            this.validator.ValidateParameter(record);
 
             byte[] byteId = BitConverter.GetBytes(record.Id);
             byte[] byteFirstName = Encoding.UTF8.GetBytes(record.FirstName);
@@ -88,7 +86,30 @@ namespace FileCabinetApp
 
         public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
-            throw new NotImplementedException();
+            FileCabinetRecord record = new FileCabinetRecord();
+
+            using (BinaryReader binReader = new BinaryReader(this.fileStream))
+            {
+                List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+                long numberOfRecords = this.fileStream.Length / SIZEOFRECORD;
+                for (int i = 0; i < numberOfRecords; i++)
+                {
+                    record.Id = binReader.ReadInt32();
+                    record.FirstName = binReader.ReadString();
+                    record.LastName = binReader.ReadString();
+                    int year = binReader.ReadInt32();
+                    int month = binReader.ReadInt32();
+                    int day = binReader.ReadInt32();
+
+                    record.DateOfBirth = new DateTime(year, month, day);
+
+                    list.Add(record);
+                }
+
+                ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(list);
+
+                return readOnlyRecords;
+            }
         }
 
         public int GetStat()
