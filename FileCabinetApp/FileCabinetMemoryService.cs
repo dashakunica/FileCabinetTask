@@ -28,7 +28,7 @@ namespace FileCabinetApp
             {
                 Id = this.list.Count + 1,
                 FirstName = recordAddition.FirstName,
-                LastName = recordAddition.LastName,              //////?
+                LastName = recordAddition.LastName,
                 DateOfBirth = recordAddition.DateOfBirth,
             };
 

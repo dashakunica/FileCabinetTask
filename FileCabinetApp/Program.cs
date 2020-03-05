@@ -12,6 +12,8 @@ namespace FileCabinetApp
     {
         private const string DeveloperName = "Darya Kunickaya";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
+        private const string DefaultRootDirectory = @"C:\Users\User\FileCabinet\FileCabinetApp\bin\Debug\netcoreapp3.1";
+        private const string BinaryFileName = "cabinet-records.db";
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
@@ -65,9 +67,11 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
+           
             Console.Write("$ FileCabinetApp.exe ");
             var inputConsoleParameters = Console.ReadLine().Split(' ', 2);
-            if (inputConsoleParameters[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
+            if (inputConsoleParameters[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase)
+                || inputConsoleParameters[0].Equals(shortCommandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
             {
                 string parameter = inputConsoleParameters[1];
                 switch (parameter.ToLower())
@@ -82,18 +86,22 @@ namespace FileCabinetApp
                 }
             }
 
-            if (inputConsoleParameters[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
+            if (inputConsoleParameters[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase)
+                || inputConsoleParameters[0].Equals(shortCommandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
             {
                 string parameter = inputConsoleParameters[1];
                 switch (parameter.ToLower())
                 {
                     case "memory":
                         fileCabinetService = new FileCabinetMemoryService();
+                        Console.WriteLine("memory service");
                         break;
 
                     case "file":
-                        FileStream fileStream = new FileStream("cabinet-records.db", FileMode.Create);
+                        string fullPath = Path.Combine(DefaultRootDirectory, BinaryFileName);
+                        FileStream fileStream = File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
                         fileCabinetService = new FileCabinetFilesystemService(fileStream);
+                        Console.WriteLine("file service");
                         break;
                 }
             }
