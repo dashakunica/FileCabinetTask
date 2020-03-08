@@ -65,7 +65,18 @@ namespace FileCabinetApp
 
         public void EditRecord(FileCabinetRecord record)
         {
-            throw new NotImplementedException();
+            if (record is null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            int beginPossitin = record.Id * (int)SizeOfRecord;
+            fileStream.Position = beginPossitin;
+
+            var byteRecord = RecordToBytes(record);
+            this.fileStream.Write(byteRecord, 0, byteRecord.Length);
+
+            this.fileStream.Flush();
         }
 
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
