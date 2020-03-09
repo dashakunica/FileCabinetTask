@@ -92,11 +92,11 @@ namespace FileCabinetApp
         /// <returns>Records with this first name.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+            var fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
                 {
                     return name.FirstName.Equals(firstName, StringComparison.InvariantCultureIgnoreCase);
-                }).ToArray();
+                });
 
             ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
 
@@ -110,11 +110,11 @@ namespace FileCabinetApp
         /// <returns>Records with this last name.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
-            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+            var fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
                 {
                     return name.LastName.Equals(lastName, StringComparison.InvariantCultureIgnoreCase);
-                }).ToArray();
+                });
 
             ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
 
@@ -128,11 +128,11 @@ namespace FileCabinetApp
         /// <returns>Record with this date of birth.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
-            FileCabinetRecord[] fileCabinetRecords = this.list.FindAll(
+            var fileCabinetRecords = this.list.FindAll(
                 delegate(FileCabinetRecord name)
                 {
                     return name.DateOfBirth.Equals(dateOfBirth);
-                }).ToArray();
+                });
 
             ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
 
