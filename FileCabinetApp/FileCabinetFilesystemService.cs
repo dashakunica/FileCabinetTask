@@ -82,7 +82,7 @@ namespace FileCabinetApp
 
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
-            var fileCabinetRecords = BinaryRecordsToList();
+            var fileCabinetRecords = this.BinaryRecordsToList();
 
             var matchrecords = fileCabinetRecords.FindAll(
                delegate (FileCabinetRecord name)
@@ -97,7 +97,7 @@ namespace FileCabinetApp
 
         public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            var fileCabinetRecords = BinaryRecordsToList();
+            var fileCabinetRecords = this.BinaryRecordsToList();
 
             var matchrecords = fileCabinetRecords.FindAll(
                 delegate (FileCabinetRecord name)
@@ -190,7 +190,7 @@ namespace FileCabinetApp
                     nameLength = MaxStringLength;
                 }
 
-                Array.Copy(byteLastName, 0, nameBuffer, 0, nameLength);
+                Array.Copy(byteLastName, 0, lastNameBuffer, 0, nameLength);
 
                 binaryWriter.Write(lastNameLength);
                 binaryWriter.Write(lastNameBuffer);
@@ -213,7 +213,6 @@ namespace FileCabinetApp
 
         private static FileCabinetRecord BytesToUser(byte[] bytes)
         {
-
             if (bytes == null)
             {
                 throw new ArgumentNullException(nameof(bytes));
@@ -236,8 +235,11 @@ namespace FileCabinetApp
 
                 record.LastName = Encoding.ASCII.GetString(lastNameBuffer, 0, lastNameLength);
 
-                var ticks = binaryReader.ReadInt64();
-                record.DateOfBirth = new DateTime(ticks);
+                int day = binaryReader.ReadInt32();
+                int month = binaryReader.ReadInt32();
+                int year = binaryReader.ReadInt32();
+
+                record.DateOfBirth = new DateTime(day, month, year);
             }
 
             return record;
@@ -251,7 +253,7 @@ namespace FileCabinetApp
             {
                 var recordBuffer = new byte[SizeOfRecord];
 
-                this.fileStream.Read(recordBuffer, (i * (int)SizeOfRecord) + 1, (int)SizeOfRecord);
+                this.fileStream.Read(recordBuffer, i * recordBuffer.Length, recordBuffer.Length);
                 var record = BytesToUser(recordBuffer);
 
                 list.Add(record);

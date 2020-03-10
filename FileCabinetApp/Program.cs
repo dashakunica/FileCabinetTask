@@ -12,11 +12,12 @@ namespace FileCabinetApp
     {
         private const string DeveloperName = "Darya Kunickaya";
         private const string HintMessage = "Enter your command, or enter 'help' to get help.";
-        private const string DefaultRootDirectory = @"C:\Users\User\FileCabinet\FileCabinetApp\bin\Debug\netcoreapp3.1";
-        private const string BinaryFileName = "cabinet-records.db";
         private const int CommandHelpIndex = 0;
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
+
+        private static string DefaultRootDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        private static string BinaryFileName = "cabinet-records.db";
 
         private static string[] commandLineParameters = new string[]
         {
@@ -67,7 +68,6 @@ namespace FileCabinetApp
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
-           
             Console.Write("$ FileCabinetApp.exe ");
             var inputConsoleParameters = Console.ReadLine().Split(' ', 2);
             if (inputConsoleParameters[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase)
@@ -191,7 +191,6 @@ namespace FileCabinetApp
                 string lastName = EnterLastName();
                 DateTime dateOfBirth = EnterDateOfBirth();
 
-                var recordsCount = Program.fileCabinetService.GetStat();
                 var record = new FileCabinetRecord
                 {
                     FirstName = firstName,
@@ -209,7 +208,9 @@ namespace FileCabinetApp
                 }
 
                 fileCabinetService.CreateRecord(record);
-                Console.WriteLine($"Record #{recordsCount + 1} is created.");
+
+                var recordsCount = Program.fileCabinetService.GetStat();
+                Console.WriteLine($"Record #{recordsCount} is created.");
             }
 
             Console.WriteLine();
@@ -222,6 +223,8 @@ namespace FileCabinetApp
             {
                 Console.WriteLine(record.ToString());
             }
+
+            Console.WriteLine();
         }
 
         private static void Edit(string parameters)
@@ -287,6 +290,8 @@ namespace FileCabinetApp
                     Console.WriteLine(record.ToString());
                 }
             }
+
+            Console.WriteLine();
         }
 
         private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<T, Tuple<bool, string>> validator)
