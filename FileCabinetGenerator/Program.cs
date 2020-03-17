@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using FileCabinet.Writers;
+using System.Xml;
 
 namespace FileCabinetGenerator
 {
@@ -47,6 +49,39 @@ namespace FileCabinetGenerator
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
+            }
+
+            using var stream = File.Create(filePath);
+            using var writer = new StreamWriter(stream);
+            var records = Generate(startId, recordsAmount);
+
+            if (fileType.Equals("csv", StringComparison.CurrentCultureIgnoreCase))
+            {
+                var fileWriter = new StreamWriter(filePath);
+                var csvWriter = new CsvWriter(fileWriter, records);
+                csvWriter.Write();
+                fileWriter.Close();
+            }
+
+            if (fileType.Equals("xml", StringComparison.CurrentCultureIgnoreCase))
+            {
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Indent = true
+                };
+                using (var fileWriter = XmlWriter.Create(filePath, settings))
+                {
+                    var xmlWriter = new XmlWriters(fileWriter, records.ToArray());
+                    xmlWriter.Write();
+                }
+            }
+        }
+
+        private static void ExportAsCsv(IEnumerable<FileCabinetRecordSerializable> records, StreamWriter writer)
+        {
+            foreach (var record in records)
+            {
+                writer.WriteLine(record.ToString());
             }
         }
 
