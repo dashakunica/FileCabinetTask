@@ -46,7 +46,7 @@ namespace FileCabinetApp
         /// <value>
         /// Popertie1.
         /// </value>
-        public short Status { get; set; }
+        public short Bonuses { get; set; }
 
         /// <summary>
         /// Gets or sets Propertie2 of record.
@@ -54,7 +54,7 @@ namespace FileCabinetApp
         /// <value>
         /// Propertie2.
         /// </value>
-        public decimal Propertie2 { get; set; }
+        public decimal Salary { get; set; }
 
         /// <summary>
         /// Gets or sets Propertie3 of record.
@@ -62,7 +62,7 @@ namespace FileCabinetApp
         /// <value>
         /// Propertie3.
         /// </value>
-        public char Propertie3 { get; set; }
+        public char Sex { get; set; }
 
         /// <summary>
         /// Override method for string representation of record.
@@ -70,7 +70,9 @@ namespace FileCabinetApp
         /// <returns>String representation of record.</returns>
         public override string ToString()
         {
-            return string.Format(new CultureInfo("en-US"), "#{0}, {1}, {2}, {3}", this.Id, this.FirstName, this.LastName, this.DateOfBirth);
+            return string.Format(new CultureInfo("en-US"), 
+                "#Id {0}, {1}, {2}, {3}, Sex:{4}, Salary:{5}, Bonuses:{6}", 
+                this.Id, this.FirstName, this.LastName, this.DateOfBirth, this.Sex, this.Salary, this.Bonuses);
         }
     }
 }

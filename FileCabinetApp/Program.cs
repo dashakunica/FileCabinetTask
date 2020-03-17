@@ -187,9 +187,20 @@ namespace FileCabinetApp
         {
             if (string.IsNullOrEmpty(parameters))
             {
-                string firstName = EnterFirstName();
-                string lastName = EnterLastName();
-                DateTime dateOfBirth = EnterDateOfBirth();
+                Console.Write();
+                var firstName = ReadInput(Converter.StringConverter, validator);
+                Console.Write(("lastNameInputMessage", CultureInfo.InvariantCulture));
+                var lastName = ReadInput(Converter.StringConverter, validator.ValidateLastName);
+                Console.Write(Resource.GetString("sexInputMessage", CultureInfo.InvariantCulture));
+                var sex = ReadInput(Converter.SexConverter, validator.ValidateSex);
+                Console.Write(Resource.GetString("weightInputMessage", CultureInfo.InvariantCulture));
+                var weight = ReadInput(Converter.WeightConverter, validator.ValidateWeight);
+                Console.Write(Resource.GetString("heightInputMessage", CultureInfo.InvariantCulture));
+                var height = ReadInput(Converter.HeightConverter, validator.ValidateHeight);
+                Console.Write(Resource.GetString("dateOfBirthInputMessage", CultureInfo.InvariantCulture));
+                DateTime dateOfBirth = ReadInput(Converter.DateOfBirthConverter, validator.ValidateDateOfBirth);
+                int record = fileCabinetService.CreateRecord(height, weight, sex, firstName, lastName, dateOfBirth);
+                Console.WriteLine(Resource.GetString("recordCreateMessage", CultureInfo.InvariantCulture), record);
 
                 var record = new FileCabinetRecord
                 {
@@ -323,27 +334,22 @@ namespace FileCabinetApp
             while (true);
         }
 
-        private static string EnterFirstName()
+        private static (string, string, DateTime, short, decimal, char) GetData()
         {
-            Console.Write("First name: ");
-            string firstName = Console.ReadLine();
-            return firstName;
-        }
-
-        private static string EnterLastName()
-        {
-            Console.Write("Last name: ");
-            string lastName = Console.ReadLine();
-            return lastName;
-        }
-
-        private static DateTime EnterDateOfBirth()
-        {
+            Console.Write("First Name: ");
+            var firstName = ReadInput<string>(Converter.StringConverter, dataInput.Validator.FirstNameValidator);
+            Console.Write("Last Name: ");
+            var lastName = ReadInput<string>(dataInput.Converter.StringConverter, dataInput.Validator.LastNameValidator);
             Console.Write("Date of birth: ");
-            CultureInfo culture = CultureInfo.CreateSpecificCulture("en-US");
-            DateTimeStyles styles = DateTimeStyles.None;
-            DateTime dateOfBirth = DateTime.Parse(Console.ReadLine(), culture, styles);
-            return dateOfBirth;
+            var dateOfBirth = ReadInput<DateTime>(dataInput.Converter.DateTimeConverter, dataInput.Validator.DateOfBirthValidator);
+            Console.Write("Work place number: ");
+            var workPlaceNumber = ReadInput<short>(dataInput.Converter.ShortConverter, dataInput.Validator.WorkPlaceNumberValidator);
+            Console.Write("Salary: ");
+            var salary = ReadInput<decimal>(dataInput.Converter.DecimalConverter, dataInput.Validator.SalaryValidator);
+            Console.Write("Department: ");
+            var department = ReadInput<char>(dataInput.Converter.CharConverter, dataInput.Validator.DepartmentValidator);
+
+            return (firstName, lastName, dateOfBirth, workPlaceNumber, salary, department);
         }
 
         private static void Export(string parameter)
