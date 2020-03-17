@@ -62,7 +62,7 @@ namespace FileCabinetApp
         /// <value>
         /// Propertie3.
         /// </value>
-        public char Sex { get; set; }
+        public char AccountType { get; set; }
 
         /// <summary>
         /// Override method for string representation of record.
@@ -70,9 +70,7 @@ namespace FileCabinetApp
         /// <returns>String representation of record.</returns>
         public override string ToString()
         {
-            return string.Format(new CultureInfo("en-US"), 
-                "#Id {0}, {1}, {2}, {3}, Sex:{4}, Salary:{5}, Bonuses:{6}", 
-                this.Id, this.FirstName, this.LastName, this.DateOfBirth, this.Sex, this.Salary, this.Bonuses);
+            return string.Format(new CultureInfo("en-US"), "#{0}, {1}, {2}, {3}", this.Id, this.FirstName, this.LastName, this.DateOfBirth);
         }
     }
 }
