@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
@@ -22,6 +23,10 @@ namespace FileCabinetApp
 
         private readonly Dictionary<int, long> identificatorCache = new Dictionary<int, long>();
         private readonly Dictionary<int, long> removedCache = new Dictionary<int, long>();
+
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
         public FileCabinetFilesystemService()
         { }
@@ -132,15 +137,9 @@ namespace FileCabinetApp
             return readOnlyRecords;
         }
 
-        public int GetStat()
+        public (int active, int removed) GetStat()
         {
-            if (this.fileStream is null)
-            {
-                return 0;
-            }
-
-            long numberOfRecords = this.fileStream.Length / SizeOfRecord;
-            return (int)numberOfRecords;
+            return (this.identificatorCache.Count, this.removedCache.Count);
         }
 
         public FileCabinetServiceSnapshot MakeSnapshot()
@@ -274,7 +273,7 @@ namespace FileCabinetApp
             {
                 try
                 {
-                    if (record.Id <= this.GetStat())
+                    if (this.GetRecords().Any(x => x.Id == record.Id))
                     {
                         this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                     }
@@ -344,7 +343,7 @@ namespace FileCabinetApp
             this.binaryWriter.Write(RemovedFlag);
             return position;
         }
-        
+
         private bool ExistRecord(int id)
         {
             if (this.identificatorCache.ContainsKey(id))
@@ -353,6 +352,80 @@ namespace FileCabinetApp
             }
 
             return false;
+        }
+
+        public void Purge()
+        {
+            var records = this.GetRecords();
+            var removed = this.GetStat().removed;
+            this.fileStream.Position = 0;
+            foreach (var record in records)
+            {
+                this.WriteToFile(this.fileStream.Position, record);
+            }
+
+            this.fileStream.SetLength(this.fileStream.Position);
+            this.identificatorCache.Clear();
+            this.removedCache.Clear();
+            this.InitializeChaches();
+            this.InitializeDictionaries();
+        }
+
+        private void WriteToFile(long position, FileCabinetRecord record)
+        {
+            this.binaryWriter.Seek((int)position, SeekOrigin.Begin);
+            this.binaryWriter.Write((short)0);
+            this.binaryWriter.Write(record.Id);
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(char.MinValue, MaxStringLength - record.FirstName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(char.MinValue, MaxStringLength - record.LastName.Length)).ToArray()));
+            this.binaryWriter.Write(record.DateOfBirth.Month);
+            this.binaryWriter.Write(record.DateOfBirth.Day);
+            this.binaryWriter.Write(record.DateOfBirth.Year);
+            this.binaryWriter.Write(record.Bonuses);
+            this.binaryWriter.Write(record.Salary);
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.AccountType.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        private void InitializeChaches()
+        {
+            var count = (int)(this.fileStream.Length / SizeOfRecord);
+            for (int i = 0; i < count; i++)
+            {
+                var statusposition = this.FieldOfNRecord(i, FieldOffset.Status);
+                this.fileStream.Position = statusposition;
+                var status = this.binaryReader.ReadInt16();
+
+                var idposition = this.FieldOfNRecord(i, FieldOffset.Id);
+                this.fileStream.Position = idposition;
+                var id = this.binaryReader.ReadInt32();
+
+                if (status == RemovedFlag)
+                {
+                    this.removedCache.Add(id, idposition - (int)FieldOffset.Id);
+                }
+                else
+                {
+                    this.identificatorCache.Add(id, idposition - (int)FieldOffset.Id);
+                }
+            }
+        }
+
+        private void InitializeDictionaries()
+        {
+            var records = this.GetRecords();
+
+            foreach (var record in records)
+            {
+                ServiceHelper.AddRecordToDictionary(record.FirstName, record, this.firstNameDictionary);
+                ServiceHelper.AddRecordToDictionary(record.LastName, record, this.lastNameDictionary);
+                ServiceHelper.AddRecordToDictionary(record.DateOfBirth, record, this.dateOfBirthDictionary);
+            }
+        }
+
+        private long FieldOfNRecord(int number, FieldOffset fieldOffset = FieldOffset.Status)
+        {
+            var position = (number * SizeOfRecord) + (long)fieldOffset;
+            return position < this.fileStream.Length ? position : -1;
         }
     }
 }
