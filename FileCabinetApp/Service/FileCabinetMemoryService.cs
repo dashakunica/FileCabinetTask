@@ -280,5 +280,32 @@ namespace FileCabinetApp
 
             this.dateOfBirthDictionary[newDateOfBirth].Add(record);
         }
+
+        public void RemoveRecord(int id)
+        {
+            FileCabinetRecord temp = null;
+
+            foreach (var record in this.list)
+            {
+                if (record.Id == id)
+                {
+                    temp = record;
+                    this.list.Remove(record);
+                    break;
+                }
+            }
+
+            if (temp != null)
+            {
+                this.RemoveRecordFromDictionaries(temp);
+            }
+        }
+
+        private void RemoveRecordFromDictionaries(FileCabinetRecord record)
+        {
+            this.firstNameDictionary[record.FirstName].Remove(record);
+            this.lastNameDictionary[record.LastName].Remove(record);
+            this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
+        }
     }
 }

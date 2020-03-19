@@ -23,5 +23,7 @@ namespace FileCabinetApp
         int GetStat();
 
         public void Restore(FileCabinetServiceSnapshot snapshot, out int failed);
+
+        void RemoveRecord(int id);
     }
 }

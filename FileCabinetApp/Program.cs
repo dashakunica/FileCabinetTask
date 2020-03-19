@@ -48,6 +48,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
             new Tuple<string, Action<string>>("import", Import),
+            new Tuple<string, Action<string>>("remove", Remove),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -63,6 +64,7 @@ namespace FileCabinetApp
             new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
             new string[] { "export", "export all records in CSV", "The 'export' command export all records in CSV"},
             new string[] { "import", "import records", "The 'import' import records from file." },
+            new string[] { "remove", "remove record", "The 'remove' remove specified record." },
         };
 
         /// <summary>
@@ -410,6 +412,23 @@ namespace FileCabinetApp
 
                 fileCabinetService.Restore(snapshot, out int failed);
                 Console.WriteLine($"{snapshot?.Records.Count - failed} were imported from {path}.");
+            }
+        }
+
+        private static void Remove(string parameters)
+        {
+            var id = int.Parse(parameters, CultureInfo.InvariantCulture);
+            fileCabinetService.RemoveRecord(id);
+            Console.WriteLine($"Record #{id} is removed.");
+        }
+
+        private static void Purge(string parameters)
+        {
+            if (fileCabinetService is FileCabinetFilesystemService)
+            {
+                var (active, removed) = fileCabinetService.GetStat();
+                fileCabinetService.Purge();
+                Console.WriteLine($"Data file processing is completed: {removed} of {removed + active} records were purged.");
             }
         }
     }

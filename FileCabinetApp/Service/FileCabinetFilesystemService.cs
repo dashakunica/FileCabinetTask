@@ -11,10 +11,17 @@ namespace FileCabinetApp
     {
         private const int MaxStringLength = 120;
         private const long SizeOfRecord = sizeof(int) * 4 + MaxStringLength * 2;
+        private const short RemovedFlag = 0b0000_0000_0000_0100;
+
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private FileStream fileStream;
+        private readonly BinaryReader binaryReader;
+        private readonly BinaryWriter binaryWriter;
         private IRecordValidator validator;
         private string path;
+
+        private readonly Dictionary<int, long> identificatorCache = new Dictionary<int, long>();
+        private readonly Dictionary<int, long> removedCache = new Dictionary<int, long>();
 
         public FileCabinetFilesystemService()
         { }
@@ -27,6 +34,8 @@ namespace FileCabinetApp
             }
 
             this.fileStream = fileStream;
+            this.binaryReader = new BinaryReader(fileStream);
+            this.binaryWriter = new BinaryWriter(fileStream);
         }
 
         public FileCabinetFilesystemService(string path)
@@ -314,6 +323,36 @@ namespace FileCabinetApp
             this.fileStream.Flush();
 
             return record.Id;
+        }
+
+        public void RemoveRecord(int id)
+        {
+            if (!this.ExistRecord(id))
+            {
+                throw new InvalidOperationException($"Record #{id} doesn't exists.");
+            }
+
+            var removedPoition = this.MarkRecordAsRemoved(id);
+            this.removedCache.Add(id, removedPoition);
+            this.identificatorCache.Remove(id);
+        }
+
+        private long MarkRecordAsRemoved(int id)
+        {
+            var position = this.identificatorCache[id];
+            this.binaryReader.BaseStream.Position = position;
+            this.binaryWriter.Write(RemovedFlag);
+            return position;
+        }
+        
+        private bool ExistRecord(int id)
+        {
+            if (this.identificatorCache.ContainsKey(id))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
