@@ -49,9 +49,11 @@ namespace FileCabinetApp
         /// Get amount of record.
         /// </summary>
         /// <returns>Amount of records.</returns>
-        public int GetStat()
+        public (int active, int removed) GetStat() => (this.list.Count, 0);
+
+        public void Purge()
         {
-            return this.list.Count;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -158,7 +160,7 @@ namespace FileCabinetApp
             {
                 try
                 {
-                    if (record.Id <= this.GetStat())
+                    if (this.GetRecords().Any(x => x.Id == record.Id))
                     {
                         this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                     }
@@ -202,41 +204,11 @@ namespace FileCabinetApp
             };
 
             this.list.Add(record);
-            this.AddRecordToFirstNameDictionary(record.FirstName, record);
-            this.AddRecordToLastNameDictionary(record.LastName, record);
-            this.AddRecordToDateOfBirthDictionary(record.DateOfBirth, record);
+            ServiceHelper.AddRecordToDictionary(record.FirstName, record, this.firstNameDictionary);
+            ServiceHelper.AddRecordToDictionary(record.LastName, record, this.lastNameDictionary);
+            ServiceHelper.AddRecordToDictionary(record.DateOfBirth, record, this.dateOfBirthDictionary);
 
             return record.Id;
-        }
-
-        private void AddRecordToFirstNameDictionary(string firstName, FileCabinetRecord record)
-        {
-            if (!this.firstNameDictionary.ContainsKey(firstName))
-            {
-                this.firstNameDictionary.Add(firstName, new List<FileCabinetRecord>());
-            }
-
-            this.firstNameDictionary[firstName].Add(record);
-        }
-
-        private void AddRecordToLastNameDictionary(string lastName, FileCabinetRecord record)
-        {
-            if (!this.lastNameDictionary.ContainsKey(lastName))
-            {
-                this.lastNameDictionary.Add(lastName, new List<FileCabinetRecord>());
-            }
-
-            this.lastNameDictionary[lastName].Add(record);
-        }
-
-        private void AddRecordToDateOfBirthDictionary(DateTime dateOfBirth, FileCabinetRecord record)
-        {
-            if (!this.dateOfBirthDictionary.ContainsKey(dateOfBirth))
-            {
-                this.dateOfBirthDictionary.Add(dateOfBirth, new List<FileCabinetRecord>());
-            }
-
-            this.dateOfBirthDictionary[dateOfBirth].Add(record);
         }
 
         private void UpdateRecordInFirstNameDictionary(string newFirstName, FileCabinetRecord record, string resentFirstName)
