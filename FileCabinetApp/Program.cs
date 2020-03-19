@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Collections.ObjectModel;
 using System.IO;
+using FileCabinetGenerator;
 
 namespace FileCabinetApp
 {
@@ -46,6 +47,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
+            new Tuple<string, Action<string>>("import", Import),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -60,6 +62,7 @@ namespace FileCabinetApp
             new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
             new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
             new string[] { "export", "export all records in CSV", "The 'export' command export all records in CSV"},
+            new string[] { "import", "import records", "The 'import' import records from file." },
         };
 
         /// <summary>
@@ -189,23 +192,7 @@ namespace FileCabinetApp
             {
                 var data = GetData();
 
-                var record = new FileCabinetRecord
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    DateOfBirth = dateOfBirth,
-                };
-
-                try
-                {
-                    validator.ValidateParameter(record);
-                }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine(ex.Message + "Please try again and enter command create.");
-                }
-
-                fileCabinetService.CreateRecord(record);
+                fileCabinetService.CreateRecord(data);
 
                 var recordsCount = Program.fileCabinetService.GetStat();
                 Console.WriteLine($"Record #{recordsCount} is created.");
@@ -233,16 +220,7 @@ namespace FileCabinetApp
 
             var recordsCount = Program.fileCabinetService.GetStat();
 
-            try
-            {
-                validator.ValidateParameter(record);
-            }
-            catch (ArgumentException ex)
-            {
-                Console.WriteLine(ex.Message + "Please try again and enter command create.");
-            }
-
-            fileCabinetService.EditRecord(record);
+            fileCabinetService.EditRecord(id, data);
             Console.WriteLine($"Record #{id} is updated.");
             Console.WriteLine();
         }
@@ -407,31 +385,31 @@ namespace FileCabinetApp
                 {
                     snapshot.LoadFromCsv(stream);
                 }
-                catch (ImportFailedException ife)
+                catch (Exception ife)
                 {
                     Console.WriteLine($"Import error: {ife.InnerException.Message}");
                     return;
                 }
 
                 fileCabinetService.Restore(snapshot, out int failed);
-                Console.WriteLine($"{snapshot?.FileCabinetRecords.Count - failed} were imported from {path}.");
+                Console.WriteLine($"{snapshot?.Records.Count - failed} were imported from {path}.");
             }
 
             if (format.Equals("xml", StringComparison.InvariantCultureIgnoreCase))
             {
                 var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
-                try
-                {
+                //try
+                //{
                     snapshot.LoadFromXml(stream);
-                }
-                catch (ImportFailedException ife)
-                {
-                    Console.WriteLine($"Import error: {ife.InnerException.Message}");
-                    return;
-                }
+                //}
+                //catch (ImportFailedException ife)
+                //{
+                //    Console.WriteLine($"Import error: {ife.InnerException.Message}");
+                //    return;
+                //}
 
                 fileCabinetService.Restore(snapshot, out int failed);
-                Console.WriteLine($"{snapshot?.FileCabinetRecords.Count - failed} were imported from {path}.");
+                Console.WriteLine($"{snapshot?.Records.Count - failed} were imported from {path}.");
             }
         }
     }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
+using System.Collections.ObjectModel;
 using System.Xml;
+using System.IO;
+using System.Linq;
 
 namespace FileCabinetApp
 {
@@ -12,18 +13,9 @@ namespace FileCabinetApp
 
         public FileCabinetServiceSnapshot(FileCabinetRecord[] records) => this.records = records;
 
-        public FileCabinetRecord[] Records
-        {
-            get
-            {
-                if (this.records is null)
-                {
-                    throw new ArgumentNullException(nameof(records));
-                }
-
-                return records;
-            }
-            set => this.records = value;
+        public ReadOnlyCollection<FileCabinetRecord> Records 
+        { 
+            get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); 
         }
 
         public FileCabinetRecord[] GetRecords()
@@ -72,14 +64,33 @@ namespace FileCabinetApp
 
             var csvReader = new FileCabinetRecordCsvReader(reader);
 
-            try
+            //try
+            //{
+               this.records = csvReader.ReadAll().ToArray();
+            //}
+            //catch (InvalidOperationException ioe)
+            //{
+            //    throw new ImportFailedException("Import failed.", ioe);
+            //}
+        }
+
+        public void LoadFromXml(StreamReader reader)
+        {
+            if (reader is null)
             {
-                this.records = csvReader.ReadAll().ToArray();
+                throw new ArgumentNullException($"{nameof(reader)} cannot be null.");
             }
-            catch (InvalidOperationException ioe)
-            {
-                throw new ImportFailedException("Import failed.", ioe);
-            }
+
+            var xmlReader = new FileCabinetRecordXmlReader(reader);
+
+            //try
+            //{
+               this.records = xmlReader.ReadAll().ToArray();
+            //}
+            //catch (InvalidOperationException ioe)
+            //{
+            //    throw new ImportFailedException("Import failed.", ioe);
+            //}
         }
     }
 }

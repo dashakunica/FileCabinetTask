@@ -49,27 +49,17 @@ namespace FileCabinetApp
             this.validator = validator;
         }
 
-        public int CreateRecord(FileCabinetRecord record)
+        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            var byteRecord = RecordToBytes(record);
-            this.fileStream.Write(byteRecord, 0, byteRecord.Length);
-
-            this.fileStream.Flush();
-
-            return record.Id;
+            return this.CreateRecordWithSpecifiedId(null, data);
         }
 
-        public void EditRecord(FileCabinetRecord record)
+        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            if (record is null)
+            var record = new FileCabinetRecord
             {
-                throw new ArgumentNullException();
-            }
+
+            };
 
             int beginPossitin = record.Id * (int)SizeOfRecord;
             fileStream.Position = beginPossitin;
@@ -260,6 +250,70 @@ namespace FileCabinetApp
             }
 
             return list;
+        }
+
+        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed)
+        {
+            failed = 0;
+
+            if (snapshot is null)
+            {
+                throw new ArgumentNullException($"{nameof(snapshot)} cannot be null");
+            }
+
+            foreach (var record in snapshot.Records)
+            {
+                try
+                {
+                    if (record.Id <= this.GetStat())
+                    {
+                        this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    }
+                    else
+                    {
+                        this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    }
+                }
+                catch (IndexOutOfRangeException ioor)
+                {
+                    ++failed;
+                    Console.WriteLine($"Import record with id {record.Id} failed: {ioor.Message}");
+                }
+                catch (ArgumentException ae)
+                {
+                    ++failed;
+                    Console.WriteLine($"Import record with id {record.Id} failed: {ae.Message}");
+                }
+            }
+        }
+
+        private int CreateRecordWithSpecifiedId(int? id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        {
+            if (id.HasValue)
+            {
+                if (id.Value < 0)
+                {
+                    throw new IndexOutOfRangeException($"{id} cannot be less then 1.");
+                }
+            }
+
+            var record = new FileCabinetRecord()
+            {
+                Id = id != null ? id.Value : (int)(this.fileStream.Length / SizeOfRecord) + 1,
+                FirstName = data.firstName,
+                LastName = data.lastName,
+                DateOfBirth = data.dateOfBirth,
+                Bonuses = data.bonuses,
+                Salary = data.salary,
+                AccountType = data.accountType,
+            };
+
+            var byteRecord = RecordToBytes(record);
+            this.fileStream.Write(byteRecord, 0, byteRecord.Length);
+
+            this.fileStream.Flush();
+
+            return record.Id;
         }
     }
 }

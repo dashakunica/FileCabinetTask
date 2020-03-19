@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace FileCabinetApp
 {
@@ -13,32 +14,18 @@ namespace FileCabinetApp
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
 
-        private readonly Dictionary<int, string> firstNameDictionary = new Dictionary<int, string>();
-        private readonly Dictionary<int, string> lastNameDictionary = new Dictionary<int, string>();
-        private readonly Dictionary<int, DateTime> dateOfBirthDictionary = new Dictionary<int, DateTime>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
         /// <summary>
         /// Method which create new record.
         /// </summary>
         /// <param name="record">Record.</param>
         /// <returns>Id of record.</returns>
-        public int CreateRecord(FileCabinetRecord recordAddition)
+        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            var record = new FileCabinetRecord
-            {
-                Id = this.list.Count + 1,
-                FirstName = recordAddition.FirstName,
-                LastName = recordAddition.LastName,
-                DateOfBirth = recordAddition.DateOfBirth,
-            };
-
-            this.list.Add(record);
-
-            this.firstNameDictionary.Add(record.Id, record.FirstName);
-            this.lastNameDictionary.Add(record.Id, record.LastName);
-            this.dateOfBirthDictionary.Add(record.Id, record.DateOfBirth);
-
-            return record.Id;
+            return this.CreateRecordWithSpecifiedId(null, data);
         }
 
         /// <summary>
@@ -71,18 +58,24 @@ namespace FileCabinetApp
         /// Edit current record.
         /// </summary>
         /// <param name="record">Record.</param>
-        public void EditRecord(FileCabinetRecord record)
+        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            if (record.Id > this.list.Count)
-            {
-                throw new ArgumentException($"This {nameof(record.Id)} record does not exist.");
-            }
+            var editedRecord = this.list.First(x => x.Id == id);
 
-            this.list[record.Id - 1] = record;
+            var resentFirstName = editedRecord.FirstName;
+            var resentLastName = editedRecord.LastName;
+            var resentDateOfBirth = editedRecord.DateOfBirth;
 
-            this.firstNameDictionary[record.Id - 1] = record.FirstName;
-            this.lastNameDictionary[record.Id - 1] = record.LastName;
-            this.dateOfBirthDictionary[record.Id - 1] = record.DateOfBirth;
+            editedRecord.FirstName = data.firstName;
+            editedRecord.LastName = data.lastName;
+            editedRecord.DateOfBirth = data.dateOfBirth;
+            editedRecord.Bonuses = data.bonuses;
+            editedRecord.Salary = data.salary;
+            editedRecord.AccountType = data.accountType;
+
+            this.UpdateRecordInFirstNameDictionary(data.firstName, editedRecord, resentFirstName);
+            this.UpdateRecordInLastNameDictionary(data.lastName, editedRecord, resentLastName);
+            this.UpdateRecordInDateOfBirthDictionary(data.dateOfBirth, editedRecord, resentDateOfBirth);
         }
 
         /// <summary>
@@ -150,6 +143,142 @@ namespace FileCabinetApp
             FileCabinetServiceSnapshot snapshot = new FileCabinetServiceSnapshot(fileCabinetRecords);
 
             return snapshot;
+        }
+
+        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed)
+        {
+            failed = 0;
+
+            if (snapshot is null)
+            {
+                throw new ArgumentNullException($"{nameof(snapshot)} cannot be null.");
+            }
+
+            foreach (var record in snapshot.Records)
+            {
+                try
+                {
+                    if (record.Id <= this.GetStat())
+                    {
+                        this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    }
+                    else
+                    {
+                        this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    }
+                }
+                catch (IndexOutOfRangeException ioor)
+                {
+                    ++failed;
+                    Console.WriteLine($"Import record with id {record.Id} failed: {ioor.Message}");
+                }
+                catch (ArgumentException ae)
+                {
+                    ++failed;
+                    Console.WriteLine($"Import record with id {record.Id} failed: {ae.Message}");
+                }
+            }
+        }
+
+        private int CreateRecordWithSpecifiedId(int? id, (string fName, string lName, DateTime dob, short wpn, decimal salary, char department) data)
+        {
+            if (id.HasValue)
+            {
+                if (id.Value < 0)
+                {
+                    throw new IndexOutOfRangeException($"{id} cannot be less then 1.");
+                }
+            }
+
+            var record = new FileCabinetRecord()
+            {
+                Id = id != null ? id.Value : this.list.Count + 1,
+                FirstName = data.fName,
+                LastName = data.lName,
+                DateOfBirth = data.dob,
+                Bonuses = data.wpn,
+                Salary = data.salary,
+                AccountType = data.department,
+            };
+
+            this.list.Add(record);
+            this.AddRecordToFirstNameDictionary(record.FirstName, record);
+            this.AddRecordToLastNameDictionary(record.LastName, record);
+            this.AddRecordToDateOfBirthDictionary(record.DateOfBirth, record);
+
+            return record.Id;
+        }
+
+        private void AddRecordToFirstNameDictionary(string firstName, FileCabinetRecord record)
+        {
+            if (!this.firstNameDictionary.ContainsKey(firstName))
+            {
+                this.firstNameDictionary.Add(firstName, new List<FileCabinetRecord>());
+            }
+
+            this.firstNameDictionary[firstName].Add(record);
+        }
+
+        private void AddRecordToLastNameDictionary(string lastName, FileCabinetRecord record)
+        {
+            if (!this.lastNameDictionary.ContainsKey(lastName))
+            {
+                this.lastNameDictionary.Add(lastName, new List<FileCabinetRecord>());
+            }
+
+            this.lastNameDictionary[lastName].Add(record);
+        }
+
+        private void AddRecordToDateOfBirthDictionary(DateTime dateOfBirth, FileCabinetRecord record)
+        {
+            if (!this.dateOfBirthDictionary.ContainsKey(dateOfBirth))
+            {
+                this.dateOfBirthDictionary.Add(dateOfBirth, new List<FileCabinetRecord>());
+            }
+
+            this.dateOfBirthDictionary[dateOfBirth].Add(record);
+        }
+
+        private void UpdateRecordInFirstNameDictionary(string newFirstName, FileCabinetRecord record, string resentFirstName)
+        {
+            FileCabinetRecord updateItem = this.firstNameDictionary[resentFirstName].First(x => x.Id == record.Id);
+
+            this.firstNameDictionary[resentFirstName].Remove(updateItem);
+
+            if (!this.firstNameDictionary.ContainsKey(newFirstName))
+            {
+                this.firstNameDictionary.Add(newFirstName, new List<FileCabinetRecord>());
+            }
+
+            this.firstNameDictionary[newFirstName].Add(record);
+        }
+
+        private void UpdateRecordInLastNameDictionary(string newLastName, FileCabinetRecord record, string resentLastName)
+        {
+            FileCabinetRecord updateItem = this.lastNameDictionary[resentLastName].First(x => x.Id == record.Id);
+
+            this.lastNameDictionary[resentLastName].Remove(updateItem);
+
+            if (!this.lastNameDictionary.ContainsKey(newLastName))
+            {
+                this.lastNameDictionary.Add(newLastName, new List<FileCabinetRecord>());
+            }
+
+            this.lastNameDictionary[newLastName].Add(record);
+        }
+
+        private void UpdateRecordInDateOfBirthDictionary(DateTime newDateOfBirth, FileCabinetRecord record, DateTime resentDateOfBirth)
+        {
+            FileCabinetRecord updateItem = this.dateOfBirthDictionary[resentDateOfBirth].First(x => x.Id == record.Id);
+
+            this.dateOfBirthDictionary[resentDateOfBirth].Remove(updateItem);
+
+            if (!this.dateOfBirthDictionary.ContainsKey(newDateOfBirth))
+            {
+                this.dateOfBirthDictionary.Add(newDateOfBirth, new List<FileCabinetRecord>());
+            }
+
+            this.dateOfBirthDictionary[newDateOfBirth].Add(record);
         }
     }
 }

@@ -6,11 +6,11 @@ namespace FileCabinetApp
 {
     public interface IFileCabinetService
     {
-        int CreateRecord(FileCabinetRecord recordAddition);
+        int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
+
+        void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
 
         ReadOnlyCollection<FileCabinetRecord> GetRecords();
-
-        void EditRecord(FileCabinetRecord record);
 
         ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName);
 
@@ -21,5 +21,7 @@ namespace FileCabinetApp
         FileCabinetServiceSnapshot MakeSnapshot();
 
         int GetStat();
+
+        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed);
     }
 }
