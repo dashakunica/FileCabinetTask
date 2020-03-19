@@ -62,5 +62,24 @@ namespace FileCabinetApp
                 xmlWriter.WriteEndDocument();
             }
         }
+
+        public void LoadFromCsv(StreamReader reader)
+        {
+            if (reader is null)
+            {
+                throw new ArgumentNullException($"{nameof(reader)} cannot be null.");
+            }
+
+            var csvReader = new FileCabinetRecordCsvReader(reader);
+
+            try
+            {
+                this.records = csvReader.ReadAll().ToArray();
+            }
+            catch (InvalidOperationException ioe)
+            {
+                throw new ImportFailedException("Import failed.", ioe);
+            }
+        }
     }
 }

@@ -187,20 +187,7 @@ namespace FileCabinetApp
         {
             if (string.IsNullOrEmpty(parameters))
             {
-                Console.Write();
-                var firstName = ReadInput(Converter.StringConverter, validator);
-                Console.Write(("lastNameInputMessage", CultureInfo.InvariantCulture));
-                var lastName = ReadInput(Converter.StringConverter, validator.ValidateLastName);
-                Console.Write(Resource.GetString("sexInputMessage", CultureInfo.InvariantCulture));
-                var sex = ReadInput(Converter.SexConverter, validator.ValidateSex);
-                Console.Write(Resource.GetString("weightInputMessage", CultureInfo.InvariantCulture));
-                var weight = ReadInput(Converter.WeightConverter, validator.ValidateWeight);
-                Console.Write(Resource.GetString("heightInputMessage", CultureInfo.InvariantCulture));
-                var height = ReadInput(Converter.HeightConverter, validator.ValidateHeight);
-                Console.Write(Resource.GetString("dateOfBirthInputMessage", CultureInfo.InvariantCulture));
-                DateTime dateOfBirth = ReadInput(Converter.DateOfBirthConverter, validator.ValidateDateOfBirth);
-                int record = fileCabinetService.CreateRecord(height, weight, sex, firstName, lastName, dateOfBirth);
-                Console.WriteLine(Resource.GetString("recordCreateMessage", CultureInfo.InvariantCulture), record);
+                var data = GetData();
 
                 var record = new FileCabinetRecord
                 {
@@ -242,18 +229,9 @@ namespace FileCabinetApp
         {
             int id = Convert.ToInt32(parameters, NumberFormatInfo.InvariantInfo);
 
-            string firstName = EnterFirstName();
-            string lastName = EnterLastName();
-            DateTime dateOfBirth = EnterDateOfBirth();
+            var data = GetData();
 
             var recordsCount = Program.fileCabinetService.GetStat();
-            var record = new FileCabinetRecord
-            {
-                Id = id,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-            };
 
             try
             {
@@ -337,19 +315,19 @@ namespace FileCabinetApp
         private static (string, string, DateTime, short, decimal, char) GetData()
         {
             Console.Write("First Name: ");
-            var firstName = ReadInput<string>(Converter.StringConverter, dataInput.Validator.FirstNameValidator);
+            var firstName = ReadInput<string>(Converter.StringConverter, validator.ValidateFirstName);
             Console.Write("Last Name: ");
-            var lastName = ReadInput<string>(dataInput.Converter.StringConverter, dataInput.Validator.LastNameValidator);
+            var lastName = ReadInput<string>(Converter.StringConverter, validator.ValidateLastName);
             Console.Write("Date of birth: ");
-            var dateOfBirth = ReadInput<DateTime>(dataInput.Converter.DateTimeConverter, dataInput.Validator.DateOfBirthValidator);
-            Console.Write("Work place number: ");
-            var workPlaceNumber = ReadInput<short>(dataInput.Converter.ShortConverter, dataInput.Validator.WorkPlaceNumberValidator);
+            var dateOfBirth = ReadInput<DateTime>(Converter.DateOfBirthConverter, validator.ValidateDateOfBirth);
+            Console.Write("Bonuses: ");
+            var bonuses = ReadInput<short>(Converter.BonusesConverter, validator.ValidateBonuses);
             Console.Write("Salary: ");
-            var salary = ReadInput<decimal>(dataInput.Converter.DecimalConverter, dataInput.Validator.SalaryValidator);
-            Console.Write("Department: ");
-            var department = ReadInput<char>(dataInput.Converter.CharConverter, dataInput.Validator.DepartmentValidator);
+            var salary = ReadInput<decimal>(Converter.SalaryConverter, validator.ValidateSalary);
+            Console.Write("Account type: ");
+            var accountType = ReadInput<char>(Converter.AccountTypeConverter, validator.ValidateAccountType);
 
-            return (firstName, lastName, dateOfBirth, workPlaceNumber, salary, department);
+            return (firstName, lastName, dateOfBirth, bonuses, salary, accountType);
         }
 
         private static void Export(string parameter)
@@ -391,6 +369,70 @@ namespace FileCabinetApp
                 }
             }
 
+        }
+
+        private static void Import(string parameters)
+        {
+            var importParameters = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            if (importParameters.Length < 2)
+            {
+                Console.WriteLine("Import failed: invalid arguments.");
+                return;
+            }
+
+            if (importParameters[0].Equals("csv", StringComparison.InvariantCultureIgnoreCase) || importParameters[0].Equals("xml", StringComparison.InvariantCultureIgnoreCase))
+            {
+                ImportFromFormat(importParameters[0], importParameters[1]);
+                return;
+            }
+
+            Console.WriteLine("Import failed: invalid arguments.");
+        }
+
+        private static void ImportFromFormat(string format, string path)
+        {
+            if (!File.Exists(path))
+            {
+                Console.WriteLine($"Import error: file {path} is not exist.");
+                return;
+            }
+
+            using var stream = new StreamReader(File.OpenRead(path));
+
+            if (format.Equals("csv", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
+                try
+                {
+                    snapshot.LoadFromCsv(stream);
+                }
+                catch (ImportFailedException ife)
+                {
+                    Console.WriteLine($"Import error: {ife.InnerException.Message}");
+                    return;
+                }
+
+                fileCabinetService.Restore(snapshot, out int failed);
+                Console.WriteLine($"{snapshot?.FileCabinetRecords.Count - failed} were imported from {path}.");
+            }
+
+            if (format.Equals("xml", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
+                try
+                {
+                    snapshot.LoadFromXml(stream);
+                }
+                catch (ImportFailedException ife)
+                {
+                    Console.WriteLine($"Import error: {ife.InnerException.Message}");
+                    return;
+                }
+
+                fileCabinetService.Restore(snapshot, out int failed);
+                Console.WriteLine($"{snapshot?.FileCabinetRecords.Count - failed} were imported from {path}.");
+            }
         }
     }
 }

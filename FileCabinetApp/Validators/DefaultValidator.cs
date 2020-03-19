@@ -6,7 +6,7 @@ namespace FileCabinetApp
 {
     public class DefaultValidator : IRecordValidator
     {
-        public void ValidateParameters(FileCabinetRecord record)
+        public void ValidateParameter(FileCabinetRecord record)
         {
             if (record.FirstName is null)
             {
@@ -71,7 +71,67 @@ namespace FileCabinetApp
                 AccountType = data.accountType,
             };
 
-            ValidateParameters(record);
+            ValidateParameter(record);
+        }
+
+        public Tuple<bool, string> ValidateFirstName(string firstName)
+        {
+            if (firstName == null || firstName.Length < 3 || firstName.Length > 70 || firstName.Trim(' ').Length < 1)
+            {
+                return new Tuple<bool, string>(false, firstName);
+            }
+
+            return new Tuple<bool, string>(true, firstName);
+        }
+
+        public Tuple<bool, string> ValidateLastName(string lastName)
+        {
+            if (lastName == null || lastName.Length < 3 || lastName.Length > 70 || lastName.Trim(' ').Length == 0)
+            {
+                return new Tuple<bool, string>(false, lastName);
+            }
+
+            return new Tuple<bool, string>(true, lastName);
+        }
+
+        public Tuple<bool, string> ValidateDateOfBirth(DateTime dateOfBirth)
+        {
+            if (dateOfBirth == null || dateOfBirth < new DateTime(1918, 03, 25) || dateOfBirth > DateTime.Now)
+            {
+                return new Tuple<bool, string>(false, "Wrong date");
+            }
+
+            return new Tuple<bool, string>(true, null);
+        }
+
+        public Tuple<bool, string> ValidateAccountType(char accountType)
+        {
+            if (accountType == 'F')
+            {
+                return new Tuple<bool, string>(false, "Wrong account type.");
+            }
+
+            return new Tuple<bool, string>(true, null);
+        }
+
+        public Tuple<bool, string> ValidateSalary(decimal salary)
+        {
+            if (salary < 60)
+            {
+                return new Tuple<bool, string>(false, "Wrong input salary.");
+            }
+
+            return new Tuple<bool, string>(true, null);
+        }
+
+        public Tuple<bool, string> ValidateBonuses(short bonuses)
+        {
+            if (bonuses < 146)
+            {
+                return new Tuple<bool, string>(false, "Wrong input bonuses.");
+            }
+
+            return new Tuple<bool, string>(true, null);
         }
     }
 }

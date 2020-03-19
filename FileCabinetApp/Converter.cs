@@ -22,7 +22,7 @@ namespace FileCabinetApp
             return new Tuple<bool, string, DateTime>(false, source, result);
         }
 
-        public static Tuple<bool, string, char> SexConverter(string source)
+        public static Tuple<bool, string, char> AccountTypeConverter(string source)
         {
             char result;
             if (char.TryParse(source, out result))
@@ -44,7 +44,7 @@ namespace FileCabinetApp
             return new Tuple<bool, string, decimal>(false, source, result);
         }
 
-        public static Tuple<bool, string, short> Bonuses(string source)
+        public static Tuple<bool, string, short> BonusesConverter(string source)
         {
             short result;
             if (short.TryParse(source, out result))
