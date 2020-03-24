@@ -32,10 +32,10 @@ namespace FileCabinetApp
             "-s",
         };
 
-        private static bool isRunning = true;
+        public static bool isRunning = true;
 
-        private static IFileCabinetService fileCabinetService = new FileCabinetFilesystemService();
-        private static IRecordValidator validator = new DefaultValidator();
+        public static IFileCabinetService fileCabinetService = new FileCabinetFilesystemService();
+        public static IRecordValidator validator = new DefaultValidator();
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
@@ -143,6 +143,28 @@ namespace FileCabinetApp
             while (isRunning);
         }
 
+        private static ICommandHandler CreateCommandHandler()
+        {
+            var helpHandler = new HelpCommandHandler();
+            var importHandler = new ImportCommandHandler(fileCabinetService);
+            var exportHandler = new ExportCommandHandler(fileCabinetService);
+            var findHandler = new FindCommandHandler(fileCabinetService, Print);
+            var listHandler = new ListCommandHandler(fileCabinetService, Print);
+            var purgeHandler = new PurgeCommandHandler(fileCabinetService);
+            var removeHandler = new RemoveCommandHandler(fileCabinetService);
+            var statHandler = new StatCommandHandler(fileCabinetService);
+            var exitHandler = new ExitCommandHandler(IsRunning);
+            var createHandler = new CreateCommandHandler(inputValidator, fileCabinetService);
+            var editHandler = new EditCommandHandler(inputValidator, fileCabinetService);
+
+            helpHandler.SetNext(importHandler).SetNext(exportHandler).
+                SetNext(findHandler).SetNext(listHandler).SetNext(purgeHandler).
+                SetNext(removeHandler).SetNext(statHandler).SetNext(exitHandler).
+                SetNext(createHandler).SetNext(editHandler);
+
+            return helpHandler;
+        }
+
         private static void PrintMissedCommandInfo(string command)
         {
             Console.WriteLine($"There is no '{command}' command.");
@@ -186,21 +208,6 @@ namespace FileCabinetApp
         {
             var recordsCount = Program.fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
-        }
-
-        private static void Create(string parameters)
-        {
-            if (string.IsNullOrEmpty(parameters))
-            {
-                var data = GetData();
-
-                fileCabinetService.CreateRecord(data);
-
-                var recordsCount = Program.fileCabinetService.GetStat();
-                Console.WriteLine($"Record #{recordsCount} is created.");
-            }
-
-            Console.WriteLine();
         }
 
         private static void List(string parameters)
@@ -263,52 +270,7 @@ namespace FileCabinetApp
             Console.WriteLine();
         }
 
-        private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<T, Tuple<bool, string>> validator)
-        {
-            do
-            {
-                T value;
 
-                var input = Console.ReadLine();
-                var conversionResult = converter(input);
-
-                if (!conversionResult.Item1)
-                {
-                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
-                    continue;
-                }
-
-                value = conversionResult.Item3;
-
-                var validationResult = validator(value);
-                if (!validationResult.Item1)
-                {
-                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
-                    continue;
-                }
-
-                return value;
-            }
-            while (true);
-        }
-
-        private static (string, string, DateTime, short, decimal, char) GetData()
-        {
-            Console.Write("First Name: ");
-            var firstName = ReadInput<string>(Converter.StringConverter, validator.ValidateFirstName);
-            Console.Write("Last Name: ");
-            var lastName = ReadInput<string>(Converter.StringConverter, validator.ValidateLastName);
-            Console.Write("Date of birth: ");
-            var dateOfBirth = ReadInput<DateTime>(Converter.DateOfBirthConverter, validator.ValidateDateOfBirth);
-            Console.Write("Bonuses: ");
-            var bonuses = ReadInput<short>(Converter.BonusesConverter, validator.ValidateBonuses);
-            Console.Write("Salary: ");
-            var salary = ReadInput<decimal>(Converter.SalaryConverter, validator.ValidateSalary);
-            Console.Write("Account type: ");
-            var accountType = ReadInput<char>(Converter.AccountTypeConverter, validator.ValidateAccountType);
-
-            return (firstName, lastName, dateOfBirth, bonuses, salary, accountType);
-        }
 
         private static void Export(string parameter)
         {
