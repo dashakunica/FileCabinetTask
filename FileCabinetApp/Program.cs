@@ -198,12 +198,6 @@ namespace FileCabinetApp
             Console.WriteLine();
         }
 
-        private static void Exit(string parameters)
-        {
-            Console.WriteLine("Exiting an application...");
-            isRunning = false;
-        }
-
         private static void Stat(string parameters)
         {
             var recordsCount = Program.fileCabinetService.GetStat();
@@ -218,19 +212,6 @@ namespace FileCabinetApp
                 Console.WriteLine(record.ToString());
             }
 
-            Console.WriteLine();
-        }
-
-        private static void Edit(string parameters)
-        {
-            int id = Convert.ToInt32(parameters, NumberFormatInfo.InvariantInfo);
-
-            var data = GetData();
-
-            var recordsCount = Program.fileCabinetService.GetStat();
-
-            fileCabinetService.EditRecord(id, data);
-            Console.WriteLine($"Record #{id} is updated.");
             Console.WriteLine();
         }
 
@@ -269,8 +250,6 @@ namespace FileCabinetApp
 
             Console.WriteLine();
         }
-
-
 
         private static void Export(string parameter)
         {
