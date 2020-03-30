@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FileCabinetApp
@@ -36,9 +37,9 @@ namespace FileCabinetApp
             return this;
         }
 
-        public ValidatorBuilder ValidateWorkPlaceNumber(short min, short max)
+        public ValidatorBuilder ValidateBonuses(short min, short max)
         {
-            this.validators.Add(new WorkPlaceNumberValidator(min, max));
+            this.validators.Add(new BonusesValidator(min, max));
             return this;
         }
 
@@ -48,9 +49,9 @@ namespace FileCabinetApp
             return this;
         }
 
-        public ValidatorBuilder ValidateDepartment()
+        public ValidatorBuilder ValidateAccountType()
         {
-            this.validators.Add(new DepartmentValidator());
+            this.validators.Add(new AccountTypeValidator());
             return this;
         }
 

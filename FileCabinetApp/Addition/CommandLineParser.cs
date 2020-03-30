@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FileCabinetApp
 {
-    public class CommandLineParser
+    public static class CommandLineParser
     {
         private const string Dash = "-";
         private const string DoubleDash = "--";

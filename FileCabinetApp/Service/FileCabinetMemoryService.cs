@@ -18,6 +18,11 @@ namespace FileCabinetApp
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
 
+        public FileCabinetMemoryService(IRecordValidator validator) => this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
+
+        public static IFileCabinetService Create(IRecordValidator recordValidator)
+            => new FileCabinetMemoryService(recordValidator ?? throw new ArgumentNullException(nameof(recordValidator)));
+
         /// <summary>
         /// Method which create new record.
         /// </summary>
@@ -88,7 +93,7 @@ namespace FileCabinetApp
         public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
             var fileCabinetRecords = this.list.FindAll(
-                delegate(FileCabinetRecord name)
+                delegate (FileCabinetRecord name)
                 {
                     return name.FirstName.Equals(firstName, StringComparison.InvariantCultureIgnoreCase);
                 });
@@ -106,7 +111,7 @@ namespace FileCabinetApp
         public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
             var fileCabinetRecords = this.list.FindAll(
-                delegate(FileCabinetRecord name)
+                delegate (FileCabinetRecord name)
                 {
                     return name.LastName.Equals(lastName, StringComparison.InvariantCultureIgnoreCase);
                 });
@@ -124,7 +129,7 @@ namespace FileCabinetApp
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
             var fileCabinetRecords = this.list.FindAll(
-                delegate(FileCabinetRecord name)
+                delegate (FileCabinetRecord name)
                 {
                     return name.DateOfBirth.Equals(dateOfBirth);
                 });
@@ -157,15 +162,14 @@ namespace FileCabinetApp
             foreach (var record in snapshot.Records)
             {
 
-                    if (this.GetRecords().Any(x => x.Id == record.Id))
-                    {
-                        this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
-                    }
-                    else
-                    {
-                        this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
-                    }
-                
+                if (this.GetRecords().Any(x => x.Id == record.Id))
+                {
+                    this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                }
+                else
+                {
+                    this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                }
             }
         }
 

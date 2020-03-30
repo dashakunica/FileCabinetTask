@@ -7,12 +7,10 @@ namespace FileCabinetApp
     public class CreateCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "create";
-        private IInputValidator recordValidator;
 
-        public CreateCommandHandler(IInputValidator recordValidator, IFileCabinetService fileCabinetService)
+        public CreateCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
-            this.recordValidator = recordValidator;
         }
 
         public override void Handle(AppCommandRequest commandRequest)

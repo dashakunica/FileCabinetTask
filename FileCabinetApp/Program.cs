@@ -49,20 +49,6 @@ namespace FileCabinetApp
             "-s",
         };
 
-        private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
-        {
-            new Tuple<string, Action<string>>("help", PrintHelp),
-            new Tuple<string, Action<string>>("exit", Exit),
-            new Tuple<string, Action<string>>("stat", Stat),
-            new Tuple<string, Action<string>>("create", Create),
-            new Tuple<string, Action<string>>("list", List),
-            new Tuple<string, Action<string>>("edit", Edit),
-            new Tuple<string, Action<string>>("find", Find),
-            new Tuple<string, Action<string>>("export", Export),
-            new Tuple<string, Action<string>>("import", Import),
-            new Tuple<string, Action<string>>("remove", Remove),
-        };
-
         /// <summary>
         /// Entry poin of app.
         /// </summary>
@@ -88,20 +74,21 @@ namespace FileCabinetApp
                 const int commandIndex = 0;
                 var command = inputs[commandIndex];
 
+                var commandHandler = CreateCommandHandler();
+
                 if (string.IsNullOrEmpty(command))
                 {
                     Console.WriteLine(Program.HintMessage);
                     continue;
                 }
 
-                var index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
-                if (index >= 0)
+                const int parametersIndex = 1;
+                string parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
+                try
                 {
-                    const int parametersIndex = 1;
-                    var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
-                    commands[index].Item2(parameters);
+                    commandHandler.Handle(new AppCommandRequest(command, parameters));
                 }
-                else
+                catch (NullReferenceException)
                 {
                     PrintMissedCommandInfo(command);
                 }
@@ -116,48 +103,46 @@ namespace FileCabinetApp
             validationRules = parameters[parameterKey[0]];
             serviceRules = parameters[parameterKey[1]];
 
-            if (validationRules.Equals(DefaultValidationRules, StringComparison.InvariantCultureIgnoreCase))
-            {
-                recordValidator = new ValidatorBuilder().CreateDefault();
-                inputValidator = new DefaultInputValidator();
-            }
-            else if (opts.Rule.Equals(CustomValidationRules, StringComparison.InvariantCultureIgnoreCase))
-            {
-                recordValidator = new ValidatorBuilder().CreateCustom();
-                inputValidator = new CustomInputValidator();
-            }
-            else
-            {
-                throw new ArgumentException(Source.Resource.GetString("invalidRule", CultureInfo.InvariantCulture));
-            }
+            SetValidators(validationRules);
+            SetService(serviceRules);
+        }
 
+        private static void SetService(string serviceRules)
+        {
             var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
-            fileStream = isFileService ? CreateFileStream(DataFilePath) : null;
+            fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
             fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
+        }
 
-            var isCustomRules = o.Validation.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase);
+        private static void SetValidators(string validationRules)
+        {
+            var isCustomRules = validationRules.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase);
             recordValidator = isCustomRules ? ValidatorBuilder.CreateCustom() : ValidatorBuilder.CreateDefault();
         }
 
         private static FileStream CreateFileStream(string dataFilePath)
         {
-            var fileMode = File.Exists(dataFilePath) ? FileMode.Open : FileMode.Create;
+            var path = Path.Combine(DefaultRootDirectory, dataFilePath);
+            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
             return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
         }
 
         private static ICommandHandler CreateCommandHandler()
         {
+            static void Runner(bool x) => isRunning = x;
+            static void Printer(IEnumerable<FileCabinetRecord> x) => Print(x);
+
             var helpHandler = new HelpCommandHandler();
             var importHandler = new ImportCommandHandler(fileCabinetService);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
-            var findHandler = new FindCommandHandler(fileCabinetService, Print);
-            var listHandler = new ListCommandHandler(fileCabinetService, Print);
+            var findHandler = new FindCommandHandler(fileCabinetService, Printer);
+            var listHandler = new ListCommandHandler(fileCabinetService, Printer);
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
             var removeHandler = new RemoveCommandHandler(fileCabinetService);
             var statHandler = new StatCommandHandler(fileCabinetService);
-            var exitHandler = new ExitCommandHandler(IsRunning);
-            var createHandler = new CreateCommandHandler(inputValidator, fileCabinetService);
-            var editHandler = new EditCommandHandler(inputValidator, fileCabinetService);
+            var exitHandler = new ExitCommandHandler(Runner);
+            var createHandler = new CreateCommandHandler(fileCabinetService);
+            var editHandler = new EditCommandHandler(fileCabinetService);
 
             helpHandler.SetNext(importHandler).SetNext(exportHandler).
                 SetNext(findHandler).SetNext(listHandler).SetNext(purgeHandler).
@@ -171,6 +156,19 @@ namespace FileCabinetApp
         {
             Console.WriteLine($"There is no '{command}' command.");
             Console.WriteLine();
+        }
+
+        private static void Print(IEnumerable<FileCabinetRecord> records)
+        {
+            if (records is null)
+            {
+                throw new ArgumentNullException(nameof(records));
+            }
+
+            foreach (var record in records)
+            {
+                Console.WriteLine($"#{record.ToString()}");
+            }
         }
     }
 }
