@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using FileCabinetApp;
 
-namespace FileCabinet.Writers
+namespace FileCabinetGenerator
 {
     public class CsvWriter
     {

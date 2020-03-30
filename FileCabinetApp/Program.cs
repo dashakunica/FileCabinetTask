@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FileCabinetGenerator;
 
 namespace FileCabinetApp
@@ -17,8 +19,23 @@ namespace FileCabinetApp
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
 
+        private const string CustomValidationRules = "Custom";
+        private const string FileServiceType = "File";
+        private const string DefaultValidationRules = "Default";
+        private const string MemoryServiceType = "Memory";
+
+        private static string validationRules = string.Empty;
+        private static string serviceRules = string.Empty;
+
+        private static IFileCabinetService fileCabinetService;
+        private static IRecordValidator recordValidator;
+        private static IInputValidator inputValidator;
+        private static FileStream fileStream;
+
+        private static bool isRunning = true;
+
         private static string DefaultRootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static string BinaryFileName = "cabinet-records.db";
+        private static string BinaryFileName = @"cabinet-records.db";
 
         private static string[] commandLineParameters = new string[]
         {
@@ -31,11 +48,6 @@ namespace FileCabinetApp
             "-v",
             "-s",
         };
-
-        public static bool isRunning = true;
-
-        public static IFileCabinetService fileCabinetService = new FileCabinetFilesystemService();
-        public static IRecordValidator validator = new DefaultValidator();
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
@@ -51,66 +63,20 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("remove", Remove),
         };
 
-        private static string[][] helpMessages = new string[][]
-        {
-            new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
-            new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
-            new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
-            new string[] { "create", "create new records", "The 'create' command create new records." },
-            new string[] { "list", "shows list of records", "The 'list' command shows list of records." },
-            new string[] { "edit", "edit current records", "The 'edit' command edit current record." },
-            new string[] { "find firstname", "find all records with current firstname", "The 'find firstname' command shows all records with current firstname." },
-            new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
-            new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
-            new string[] { "export", "export all records in CSV", "The 'export' command export all records in CSV"},
-            new string[] { "import", "import records", "The 'import' import records from file." },
-            new string[] { "remove", "remove record", "The 'remove' remove specified record." },
-        };
-
         /// <summary>
         /// Entry poin of app.
         /// </summary>
         /// <param name="args">Args.</param>
         public static void Main(string[] args)
         {
-            Console.Write("$ FileCabinetApp.exe ");
-            var inputConsoleParameters = Console.ReadLine().Split(' ', 2);
-            if (inputConsoleParameters[0].Equals(commandLineParameters[0], StringComparison.InvariantCultureIgnoreCase)
-                || inputConsoleParameters[0].Equals(shortCommandLineParameters[0], StringComparison.InvariantCultureIgnoreCase))
+            if (args is null)
             {
-                string parameter = inputConsoleParameters[1];
-                switch (parameter.ToLower())
-                {
-                    case "default":
-                        validator = new DefaultValidator();
-                        break;
-
-                    case "custom":
-                        validator = new CustomValidator();
-                        break;
-                }
+                throw new ArgumentNullException($"{nameof(args)} cannot be null.");
             }
 
-            if (inputConsoleParameters[0].Equals(commandLineParameters[1], StringComparison.InvariantCultureIgnoreCase)
-                || inputConsoleParameters[0].Equals(shortCommandLineParameters[1], StringComparison.InvariantCultureIgnoreCase))
-            {
-                string parameter = inputConsoleParameters[1];
-                switch (parameter.ToLower())
-                {
-                    case "memory":
-                        fileCabinetService = new FileCabinetMemoryService();
-                        Console.WriteLine("memory service");
-                        break;
+            var commandParameters = CommandLineParser.GetCommandLineArguments(args);
 
-                    case "file":
-                        string fullPath = Path.Combine(DefaultRootDirectory, BinaryFileName);
-                        FileStream fileStream = File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-                        fileCabinetService = new FileCabinetFilesystemService(fileStream);
-                        Console.WriteLine("file service");
-                        break;
-                }
-            }
-
+            Console.WriteLine($"Using {validationRules} validation rules.");
             Console.WriteLine($"File Cabinet Application, developed by {DeveloperName}");
             Console.WriteLine(HintMessage);
             Console.WriteLine();
@@ -143,6 +109,42 @@ namespace FileCabinetApp
             while (isRunning);
         }
 
+        private static void SetParameters(Dictionary<string, string> parameters, string[] args)
+        {
+            var parameterKey = (args[0].Trim().StartsWith("-")) ? shortCommandLineParameters : commandLineParameters;
+
+            validationRules = parameters[parameterKey[0]];
+            serviceRules = parameters[parameterKey[1]];
+
+            if (validationRules.Equals(DefaultValidationRules, StringComparison.InvariantCultureIgnoreCase))
+            {
+                recordValidator = new ValidatorBuilder().CreateDefault();
+                inputValidator = new DefaultInputValidator();
+            }
+            else if (opts.Rule.Equals(CustomValidationRules, StringComparison.InvariantCultureIgnoreCase))
+            {
+                recordValidator = new ValidatorBuilder().CreateCustom();
+                inputValidator = new CustomInputValidator();
+            }
+            else
+            {
+                throw new ArgumentException(Source.Resource.GetString("invalidRule", CultureInfo.InvariantCulture));
+            }
+
+            var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
+            fileStream = isFileService ? CreateFileStream(DataFilePath) : null;
+            fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
+
+            var isCustomRules = o.Validation.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase);
+            recordValidator = isCustomRules ? ValidatorBuilder.CreateCustom() : ValidatorBuilder.CreateDefault();
+        }
+
+        private static FileStream CreateFileStream(string dataFilePath)
+        {
+            var fileMode = File.Exists(dataFilePath) ? FileMode.Open : FileMode.Create;
+            return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
+        }
+
         private static ICommandHandler CreateCommandHandler()
         {
             var helpHandler = new HelpCommandHandler();
@@ -169,208 +171,6 @@ namespace FileCabinetApp
         {
             Console.WriteLine($"There is no '{command}' command.");
             Console.WriteLine();
-        }
-
-        private static void PrintHelp(string parameters)
-        {
-            if (!string.IsNullOrEmpty(parameters))
-            {
-                var index = Array.FindIndex(helpMessages, 0, helpMessages.Length, i => string.Equals(i[Program.CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
-                if (index >= 0)
-                {
-                    Console.WriteLine(helpMessages[index][Program.ExplanationHelpIndex]);
-                }
-                else
-                {
-                    Console.WriteLine($"There is no explanation for '{parameters}' command.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Available commands:");
-
-                foreach (var helpMessage in helpMessages)
-                {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
-                }
-            }
-
-            Console.WriteLine();
-        }
-
-        private static void Stat(string parameters)
-        {
-            var recordsCount = Program.fileCabinetService.GetStat();
-            Console.WriteLine($"{recordsCount} record(s).");
-        }
-
-        private static void List(string parameters)
-        {
-            var records = Program.fileCabinetService.GetRecords();
-            foreach (var record in records)
-            {
-                Console.WriteLine(record.ToString());
-            }
-
-            Console.WriteLine();
-        }
-
-        private static void Find(string parameter)
-        {
-            var inputs = parameter.Split(' ', 2);
-            int indexPropertie = 0;
-            int indexParameter = 1;
-
-            ReadOnlyCollection<FileCabinetRecord> records;
-
-            if (inputs[indexPropertie].Equals("firstName", StringComparison.InvariantCultureIgnoreCase))
-            {
-                records = fileCabinetService.FindByFirstName(inputs[indexParameter]);
-                foreach (var record in records)
-                {
-                    Console.WriteLine(record.ToString());
-                }
-            }
-            else if (inputs[indexPropertie].Equals("lastName", StringComparison.InvariantCultureIgnoreCase))
-            {
-                records = fileCabinetService.FindByLastName(inputs[indexParameter]);
-                foreach (var record in records)
-                {
-                    Console.WriteLine(record.ToString());
-                }
-            }
-            else if (inputs[indexPropertie].Equals("date Of birth", StringComparison.InvariantCultureIgnoreCase))
-            {
-                records = fileCabinetService.FindByDateOfBirth(Convert.ToDateTime(inputs[indexParameter], CultureInfo.CreateSpecificCulture("en-US")));
-                foreach (var record in records)
-                {
-                    Console.WriteLine(record.ToString());
-                }
-            }
-
-            Console.WriteLine();
-        }
-
-        private static void Export(string parameter)
-        {
-            var inputs = parameter.Split(' ', 2);
-            int indexPropertie = 0;
-            int indexParameter = 1;
-
-            FileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot();
-            if (inputs[indexPropertie].Equals("csv", StringComparison.InvariantCultureIgnoreCase))
-            {
-                try
-                {
-                    snapshot.SaveToCsv(new StreamWriter(inputs[indexParameter], false, System.Text.Encoding.Unicode));
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine($"Export failed: can't open file {inputs[indexParameter]}.");
-                }
-                finally
-                {
-                    Console.WriteLine($"All records are exported to file {inputs[indexParameter]}");
-                }
-            }
-
-            if (inputs[indexPropertie].Equals("xml", StringComparison.InvariantCultureIgnoreCase))
-            {
-                try
-                {
-                    snapshot.SaveToXml(new StreamWriter(inputs[indexParameter], false, System.Text.Encoding.Unicode));
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine($"Export failed: can't open file {inputs[indexParameter]}.");
-                }
-                finally
-                {
-                    Console.WriteLine($"All records are exported to file {inputs[indexParameter]}");
-                }
-            }
-
-        }
-
-        private static void Import(string parameters)
-        {
-            var importParameters = parameters.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            if (importParameters.Length < 2)
-            {
-                Console.WriteLine("Import failed: invalid arguments.");
-                return;
-            }
-
-            if (importParameters[0].Equals("csv", StringComparison.InvariantCultureIgnoreCase) || importParameters[0].Equals("xml", StringComparison.InvariantCultureIgnoreCase))
-            {
-                ImportFromFormat(importParameters[0], importParameters[1]);
-                return;
-            }
-
-            Console.WriteLine("Import failed: invalid arguments.");
-        }
-
-        private static void ImportFromFormat(string format, string path)
-        {
-            if (!File.Exists(path))
-            {
-                Console.WriteLine($"Import error: file {path} is not exist.");
-                return;
-            }
-
-            using var stream = new StreamReader(File.OpenRead(path));
-
-            if (format.Equals("csv", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
-                try
-                {
-                    snapshot.LoadFromCsv(stream);
-                }
-                catch (Exception ife)
-                {
-                    Console.WriteLine($"Import error: {ife.InnerException.Message}");
-                    return;
-                }
-
-                fileCabinetService.Restore(snapshot, out int failed);
-                Console.WriteLine($"{snapshot?.Records.Count - failed} were imported from {path}.");
-            }
-
-            if (format.Equals("xml", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
-                //try
-                //{
-                    snapshot.LoadFromXml(stream);
-                //}
-                //catch (ImportFailedException ife)
-                //{
-                //    Console.WriteLine($"Import error: {ife.InnerException.Message}");
-                //    return;
-                //}
-
-                fileCabinetService.Restore(snapshot, out int failed);
-                Console.WriteLine($"{snapshot?.Records.Count - failed} were imported from {path}.");
-            }
-        }
-
-        private static void Remove(string parameters)
-        {
-            var id = int.Parse(parameters, CultureInfo.InvariantCulture);
-            fileCabinetService.RemoveRecord(id);
-            Console.WriteLine($"Record #{id} is removed.");
-        }
-
-        private static void Purge(string parameters)
-        {
-            if (fileCabinetService is FileCabinetFilesystemService)
-            {
-                var (active, removed) = fileCabinetService.GetStat();
-                fileCabinetService.Purge();
-                Console.WriteLine($"Data file processing is completed: {removed} of {removed + active} records were purged.");
-            }
         }
     }
 }

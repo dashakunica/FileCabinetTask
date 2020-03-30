@@ -20,7 +20,7 @@ namespace FileCabinetApp
 
         FileCabinetServiceSnapshot MakeSnapshot();
 
-        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed);
+        public void Restore(FileCabinetServiceSnapshot snapshot);
 
         void RemoveRecord(int id);
 

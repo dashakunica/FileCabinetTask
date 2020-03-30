@@ -147,10 +147,8 @@ namespace FileCabinetApp
             return snapshot;
         }
 
-        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed)
+        public void Restore(FileCabinetServiceSnapshot snapshot)
         {
-            failed = 0;
-
             if (snapshot is null)
             {
                 throw new ArgumentNullException($"{nameof(snapshot)} cannot be null.");
@@ -158,8 +156,7 @@ namespace FileCabinetApp
 
             foreach (var record in snapshot.Records)
             {
-                try
-                {
+
                     if (this.GetRecords().Any(x => x.Id == record.Id))
                     {
                         this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
@@ -168,17 +165,7 @@ namespace FileCabinetApp
                     {
                         this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                     }
-                }
-                catch (IndexOutOfRangeException ioor)
-                {
-                    ++failed;
-                    Console.WriteLine($"Import record with id {record.Id} failed: {ioor.Message}");
-                }
-                catch (ArgumentException ae)
-                {
-                    ++failed;
-                    Console.WriteLine($"Import record with id {record.Id} failed: {ae.Message}");
-                }
+                
             }
         }
 

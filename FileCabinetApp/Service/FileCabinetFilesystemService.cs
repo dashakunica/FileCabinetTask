@@ -63,6 +63,31 @@ namespace FileCabinetApp
             this.validator = validator;
         }
 
+        public FileCabinetFilesystemService(FileStream fileStream, IRecordValidator validator)
+        {
+            this.fileStream = fileStream ?? throw new ArgumentNullException(nameof(fileStream));
+            this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
+            this.binaryReader = new BinaryReader(fileStream);
+            this.binaryWriter = new BinaryWriter(fileStream);
+            this.InitializeChaches();
+            this.InitializeDictionaries();
+        }
+
+        public static IFileCabinetService Create(FileStream fileStream, IRecordValidator validator)
+        {
+            if (fileStream is null)
+            {
+                throw new ArgumentNullException(nameof(fileStream));
+            }
+
+            if (validator is null)
+            {
+                throw new ArgumentNullException(nameof(validator));
+            }
+
+            return new FileCabinetFilesystemService(fileStream, validator);
+        }
+
         public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
             return this.CreateRecordWithSpecifiedId(null, data);
@@ -260,10 +285,8 @@ namespace FileCabinetApp
             return list;
         }
 
-        public void Restore(FileCabinetServiceSnapshot snapshot, out int failed)
+        public void Restore(FileCabinetServiceSnapshot snapshot)
         {
-            failed = 0;
-
             if (snapshot is null)
             {
                 throw new ArgumentNullException($"{nameof(snapshot)} cannot be null");
@@ -271,26 +294,14 @@ namespace FileCabinetApp
 
             foreach (var record in snapshot.Records)
             {
-                try
+
+                if (this.GetRecords().Any(x => x.Id == record.Id))
                 {
-                    if (this.GetRecords().Any(x => x.Id == record.Id))
-                    {
-                        this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
-                    }
-                    else
-                    {
-                        this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
-                    }
+                    this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                 }
-                catch (IndexOutOfRangeException ioor)
+                else
                 {
-                    ++failed;
-                    Console.WriteLine($"Import record with id {record.Id} failed: {ioor.Message}");
-                }
-                catch (ArgumentException ae)
-                {
-                    ++failed;
-                    Console.WriteLine($"Import record with id {record.Id} failed: {ae.Message}");
+                    this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                 }
             }
         }

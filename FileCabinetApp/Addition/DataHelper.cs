@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
@@ -34,7 +35,7 @@ namespace FileCabinetApp
             data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < MinDate || x > MaxDate
                                                                     ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
                                                                     : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
-            Console.Write("Work place number: ");
+            Console.Write("Bonuses: ");
             data.Bonuses = ReadInput<short>(Convert<short>, x => x < MinWorkPlaceNumber || x > MaxWorkPlaceNumber
                                                                     ? new Tuple<bool, string>(false, nameof(data.Bonuses))
                                                                     : new Tuple<bool, string>(true, nameof(data.Bonuses)));
@@ -42,7 +43,7 @@ namespace FileCabinetApp
             data.Salary = ReadInput<decimal>(Convert<decimal>, x => x < MinSalary || x > MaxSalary
                                                                     ? new Tuple<bool, string>(false, nameof(data.Salary))
                                                                     : new Tuple<bool, string>(true, nameof(data.Salary)));
-            Console.Write("Department: ");
+            Console.Write("Account type: ");
             data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetterOrDigit(x)
                                                                     ? new Tuple<bool, string>(true, nameof(data.AccountType))
                                                                     : new Tuple<bool, string>(false, nameof(data.AccountType)));
