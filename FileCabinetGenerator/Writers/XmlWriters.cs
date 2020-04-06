@@ -1,7 +1,6 @@
-﻿using System.Xml.Serialization;
-using FileCabinetApp;
+﻿using System.Collections.Generic;
 using System.Xml;
-using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace FileCabinet.Writers
 {

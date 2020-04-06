@@ -1,10 +1,9 @@
-﻿using System;
+﻿using FileCabinet.Writers;
 using FileCabinetApp;
-using System.IO;
-using System.Text;
-using System.Linq;
+using System;
 using System.Collections.Generic;
-using FileCabinet.Writers;
+using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace FileCabinetGenerator
@@ -39,7 +38,7 @@ namespace FileCabinetGenerator
             int recordsAmount = Int32.Parse(parameters[parameterKey[2]]);
             int startId = Int32.Parse(parameters[parameterKey[3]]);
 
-            if (!fileType.Equals("csv", StringComparison.InvariantCultureIgnoreCase) && 
+            if (!fileType.Equals("csv", StringComparison.InvariantCultureIgnoreCase) &&
                 !fileType.Equals("xml", StringComparison.InvariantCultureIgnoreCase))
             {
                 Console.WriteLine("U can only export records into *.csv or *.xml format.");

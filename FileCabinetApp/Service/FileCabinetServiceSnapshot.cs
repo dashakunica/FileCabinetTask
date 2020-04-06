@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Xml;
 using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace FileCabinetApp
 {
@@ -13,9 +13,9 @@ namespace FileCabinetApp
 
         public FileCabinetServiceSnapshot(FileCabinetRecord[] records) => this.records = records;
 
-        public ReadOnlyCollection<FileCabinetRecord> Records 
-        { 
-            get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); 
+        public ReadOnlyCollection<FileCabinetRecord> Records
+        {
+            get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records));
         }
 
         public FileCabinetRecord[] GetRecords()
@@ -66,7 +66,7 @@ namespace FileCabinetApp
 
             //try
             //{
-               this.records = csvReader.ReadAll().ToArray();
+            this.records = csvReader.ReadAll().ToArray();
             //}
             //catch (InvalidOperationException ioe)
             //{
@@ -85,7 +85,7 @@ namespace FileCabinetApp
 
             //try
             //{
-               this.records = xmlReader.ReadAll().ToArray();
+            this.records = xmlReader.ReadAll().ToArray();
             //}
             //catch (InvalidOperationException ioe)
             //{

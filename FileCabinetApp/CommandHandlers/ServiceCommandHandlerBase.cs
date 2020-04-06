@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FileCabinetApp
-{ 
+﻿namespace FileCabinetApp
+{
     public abstract class ServiceCommandHandlerBase : CommandHandlerBase
     {
         protected ServiceCommandHandlerBase(IFileCabinetService fileCabinetService)

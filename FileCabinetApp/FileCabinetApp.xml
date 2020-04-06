@@ -4,56 +4,8 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
-        <member name="T:FileCabinetApp.FileCabinetMemoryService">
-            <summary>
-            Service for working with file cabinet.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Method which create new record.
-            </summary>
-            <param name="record">Record.</param>
-            <returns>Id of record.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">
-            <summary>
-            Get all records.
-            </summary>
-            <returns>All records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
-            <summary>
-            Get amount of record.
-            </summary>
-            <returns>Amount of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.EditRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Edit current record.
-            </summary>
-            <param name="record">Record.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFirstName(System.String)">
-            <summary>
-            Methods for finding first name.
-            </summary>
-            <param name="firstName">First name.</param>
-            <returns>Records with this first name.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByLastName(System.String)">
-            <summary>
-            Methods for finding last name.
-            </summary>
-            <param name="lastName">Last name.</param>
-            <returns>Records with this last name.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByDateOfBirth(System.DateTime)">
-            <summary>
-            Methods for finding date of birth.
-            </summary>
-            <param name="dateOfBirth">Date of birth.</param>
-            <returns>Record with this date of birth.</returns>
+        <member name="M:FileCabinetApp.ExportCommandHandler.Handle(FileCabinetApp.AppCommandRequest)">
+            <inheritdoc/>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>
@@ -92,7 +44,7 @@
             DateOfBirth.
             </value>
         </member>
-        <member name="P:FileCabinetApp.FileCabinetRecord.Status">
+        <member name="P:FileCabinetApp.FileCabinetRecord.Bonuses">
             <summary>
             Gets or sets Propertie1 of record.
             </summary>
@@ -100,7 +52,7 @@
             Popertie1.
             </value>
         </member>
-        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie2">
+        <member name="P:FileCabinetApp.FileCabinetRecord.Salary">
             <summary>
             Gets or sets Propertie2 of record.
             </summary>
@@ -108,7 +60,7 @@
             Propertie2.
             </value>
         </member>
-        <member name="P:FileCabinetApp.FileCabinetRecord.Propertie3">
+        <member name="P:FileCabinetApp.FileCabinetRecord.AccountType">
             <summary>
             Gets or sets Propertie3 of record.
             </summary>
@@ -132,6 +84,66 @@
             Entry poin of app.
             </summary>
             <param name="args">Args.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXmlReader.#ctor(System.IO.StreamReader)">
+            <summary>Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXmlReader"/> class.</summary>
+            <param name="reader">The reader.</param>
+            <exception cref="T:System.ArgumentNullException">Argument cannot be null.</exception>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordXmlReader.ReadAll">
+            <summary>Reads all.</summary>
+            <returns>List of records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetMemoryService">
+            <summary>
+            Service for working with file cabinet.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(System.ValueTuple{System.String,System.String,System.DateTime,System.Int16,System.Decimal,System.Char})">
+            <summary>
+            Method which create new record.
+            </summary>
+            <param name="record">Record.</param>
+            <returns>Id of record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">
+            <summary>
+            Get all records.
+            </summary>
+            <returns>All records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
+            <summary>
+            Get amount of record.
+            </summary>
+            <returns>Amount of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.EditRecord(System.Int32,System.ValueTuple{System.String,System.String,System.DateTime,System.Int16,System.Decimal,System.Char})">
+            <summary>
+            Edit current record.
+            </summary>
+            <param name="record">Record.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFirstName(System.String)">
+            <summary>
+            Methods for finding first name.
+            </summary>
+            <param name="firstName">First name.</param>
+            <returns>Records with this first name.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByLastName(System.String)">
+            <summary>
+            Methods for finding last name.
+            </summary>
+            <param name="lastName">Last name.</param>
+            <returns>Records with this last name.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByDateOfBirth(System.DateTime)">
+            <summary>
+            Methods for finding date of birth.
+            </summary>
+            <param name="dateOfBirth">Date of birth.</param>
+            <returns>Record with this date of birth.</returns>
         </member>
     </members>
 </doc>

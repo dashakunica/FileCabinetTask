@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Globalization;
+using System.IO;
 
 namespace FileCabinetApp
 {
@@ -40,27 +40,24 @@ namespace FileCabinetApp
 
         private static FileCabinetRecord CreateRecord(string[] paramaters)
         {
-                var id = int.Parse(paramaters[0].Trim(), CultureInfo.InvariantCulture);
-                var firstName = paramaters[1].Trim();
-                var lastName = paramaters[2].Trim();
-                var dateOfBirth = DateTime.Parse(paramaters[3].Trim(), CultureInfo.InvariantCulture);
-                var workPlaceNumber = short.Parse(paramaters[4].Trim(), CultureInfo.InvariantCulture);
-                var salary = decimal.Parse(paramaters[5].Trim(), CultureInfo.InvariantCulture);
-                var department = char.Parse(paramaters[6].Trim());
+            var id = int.Parse(paramaters[0].Trim(), CultureInfo.InvariantCulture);
+            var firstName = paramaters[1].Trim();
+            var lastName = paramaters[2].Trim();
+            var dateOfBirth = DateTime.Parse(paramaters[3].Trim(), CultureInfo.InvariantCulture);
+            var workPlaceNumber = short.Parse(paramaters[4].Trim(), CultureInfo.InvariantCulture);
+            var salary = decimal.Parse(paramaters[5].Trim(), CultureInfo.InvariantCulture);
+            var department = char.Parse(paramaters[6].Trim());
 
-                return new FileCabinetRecord()
-                {
-                    Id = id,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    DateOfBirth = dateOfBirth,
-                    Bonuses = workPlaceNumber,
-                    Salary = salary,
-                    AccountType = department,
-                };
-            
-
-            return null;
+            return new FileCabinetRecord()
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dateOfBirth,
+                Bonuses = workPlaceNumber,
+                Salary = salary,
+                AccountType = department,
+            };
         }
     }
 }

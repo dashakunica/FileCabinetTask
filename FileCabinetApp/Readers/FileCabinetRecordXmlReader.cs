@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FileCabinetGenerator;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using FileCabinetGenerator;
 
 namespace FileCabinetApp
 {
@@ -11,9 +11,6 @@ namespace FileCabinetApp
     {
         private readonly StreamReader reader;
 
-        /// <summary>Initializes a new instance of the <see cref="FileCabinetRecordXmlReader"/> class.</summary>
-        /// <param name="reader">The reader.</param>
-        /// <exception cref="ArgumentNullException">Argument cannot be null.</exception>
         public FileCabinetRecordXmlReader(StreamReader reader)
         {
             if (reader is null)
@@ -24,8 +21,6 @@ namespace FileCabinetApp
             this.reader = reader;
         }
 
-        /// <summary>Reads all.</summary>
-        /// <returns>List of records.</returns>
         public IList<FileCabinetRecord> ReadAll()
         {
             var listOfRecords = new List<FileCabinetRecord>();

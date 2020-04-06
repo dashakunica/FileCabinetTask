@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
@@ -24,7 +22,7 @@ namespace FileCabinetGenerator
             foreach (var record in this.records)
             {
                 var result = new StringBuilder();
-                result.AppendLine(string.Format(CultureInfo.InvariantCulture, 
+                result.AppendLine(string.Format(CultureInfo.InvariantCulture,
                     $"{record.Id}," +
                     $"{record.Name.FirstName}," +
                     $"{record.Name.LastName}," +
