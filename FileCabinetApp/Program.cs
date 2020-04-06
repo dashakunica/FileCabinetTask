@@ -37,6 +37,8 @@ namespace FileCabinetApp
         {
             "--validation-rules",
             "--storage",
+            "--use-stopwatch",
+            "",
         };
 
         private static string[] shortCommandLineParameters = new string[]
@@ -99,6 +101,7 @@ namespace FileCabinetApp
             validationRules = parameters[parameterKey[0]];
             serviceRules = parameters[parameterKey[1]];
 
+
             SetValidators(validationRules);
             SetService(serviceRules);
         }
@@ -108,6 +111,8 @@ namespace FileCabinetApp
             var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
             fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
             fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
+            fileCabinetService = o.UseStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
+            fileCabinetService = o.UseLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
         }
 
         private static void SetValidators(string validationRules)
