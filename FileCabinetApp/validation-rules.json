@@ -1,0 +1,46 @@
+{
+  "custom": {
+    "dateOfBirth": {
+      "from": "1/1/1900",
+      "to": "1/5/2020"
+    },
+    "firstName": {
+      "min": 2,
+      "max": 50
+    },
+    "lastName": {
+      "min": 2,
+      "max": 50
+    },
+    "salary": {
+      "min": 1000,
+      "max": 100000
+    },
+    "bonuses": {
+      "min": 0,
+      "max": 25000
+    }
+  },
+  "default": {
+    "firstName": {
+      "min": 2,
+      "max": 60
+    },
+    "lastName": {
+      "min": 2,
+      "max": 60
+    },
+    "dateOfBirth": {
+      "from": "1/1/1900",
+      "to": "1/5/2020"
+    },
+    "bonuses": {
+      "min": 0,
+      "max": 30000
+    },
+    "salary": {
+      "min": 3000,
+      "max": 10000
+    }
+  }
+}
