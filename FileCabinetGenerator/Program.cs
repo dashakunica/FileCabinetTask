@@ -116,7 +116,7 @@ namespace FileCabinetGenerator
                         record.Salary = random.Next(30, 200);
                         record.Bonuses = Convert.ToInt16(random.Next(120, 240));
 
-                        validation.ValidateParameters((record.Name.FirstName, record.Name.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                        validation.ValidateParameters(record);
                         isValid = true;
                     }
                     catch

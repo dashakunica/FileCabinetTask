@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace FileCabinet.Writers
+namespace FileCabinetGenerator
 {
     [XmlRoot("records")]
     public sealed class FileCabinetRecords
