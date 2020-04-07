@@ -38,21 +38,19 @@ namespace FileCabinetApp
 
         public void SaveToXml(StreamWriter streamWriter)
         {
-            using (XmlWriter xmlWriter = XmlWriter.Create(streamWriter))
+            using XmlWriter xmlWriter = XmlWriter.Create(streamWriter);
+            FileCabinetRecordXmlWriter fileCabinetRecordXmlWriter = new FileCabinetRecordXmlWriter(xmlWriter);
+
+            xmlWriter.WriteStartDocument();
+            xmlWriter.WriteStartElement("Records");
+
+            foreach (var record in this.records)
             {
-                FileCabinetRecordXmlWriter fileCabinetRecordXmlWriter = new FileCabinetRecordXmlWriter(xmlWriter);
-
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteStartElement("Records");
-
-                foreach (var record in this.records)
-                {
-                    fileCabinetRecordXmlWriter.Write(record);
-                }
-
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndDocument();
+                fileCabinetRecordXmlWriter.Write(record);
             }
+
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndDocument();
         }
 
         public void LoadFromCsv(StreamReader reader)
@@ -64,14 +62,7 @@ namespace FileCabinetApp
 
             var csvReader = new FileCabinetRecordCsvReader(reader);
 
-            //try
-            //{
             this.records = csvReader.ReadAll().ToArray();
-            //}
-            //catch (InvalidOperationException ioe)
-            //{
-            //    throw new ImportFailedException("Import failed.", ioe);
-            //}
         }
 
         public void LoadFromXml(StreamReader reader)
@@ -86,11 +77,6 @@ namespace FileCabinetApp
             //try
             //{
             this.records = xmlReader.ReadAll().ToArray();
-            //}
-            //catch (InvalidOperationException ioe)
-            //{
-            //    throw new ImportFailedException("Import failed.", ioe);
-            //}
         }
     }
 }

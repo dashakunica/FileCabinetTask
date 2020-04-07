@@ -368,7 +368,6 @@ namespace FileCabinetApp
         public void Purge()
         {
             var records = this.GetRecords();
-            var removed = this.GetStat().removed;
             this.fileStream.Position = 0;
             foreach (var record in records)
             {

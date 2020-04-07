@@ -11,6 +11,12 @@ namespace FileCabinetApp
 
         static Startup()
         {
+            if (!File.Exists(Path.Combine(DefaultRootDirectory, ValidationFileName)))
+            {
+                Console.WriteLine("missingJsonFile");
+                Environment.Exit(1488);
+            }
+
             Configuration = new ConfigurationBuilder().AddJsonFile(ValidationRules).Build();
         }
 

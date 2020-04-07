@@ -18,13 +18,23 @@ namespace FileCabinetApp
             char delimeter = arguments.Trim().StartsWith(Dash) ? WhiteSpace : Colon;
             string dash = arguments.Trim().StartsWith(Dash) ? Dash : DoubleDash;
 
-            var parsed = from item in arguments.Split()
-                         let z = item.Split(new char[] { delimeter })
+            var parsedPair = from item in arguments.Split()
+                         let z = item.Split(delimeter)
                          where z.Length >= 2 && z[0][0].Equals(dash)
                          select new KeyValuePair<string, string>(z[0], z[1]);
 
+            var parsedParam = from item in arguments.Split()
+                         let z = item.Split(delimeter)
+                         where z.Length == 1 && z[0][0].Equals(dash)
+                         select new KeyValuePair<string, string>(z[0], "default");
+
             Dictionary<string, string> consoleParams = new Dictionary<string, string>();
-            foreach (var item in parsed)
+            foreach (var item in parsedPair)
+            {
+                consoleParams.Add(item.Key, item.Value);
+            }
+
+            foreach (var item in parsedParam)
             {
                 consoleParams.Add(item.Key, item.Value);
             }

@@ -22,6 +22,8 @@ namespace FileCabinetApp
 
         private static string validationRules = string.Empty;
         private static string serviceRules = string.Empty;
+        private static string stopwatchRules = string.Empty;
+        private static string loggerRules = string.Empty;
 
         private static IFileCabinetService fileCabinetService;
         private static IRecordValidator recordValidator;
@@ -32,6 +34,7 @@ namespace FileCabinetApp
 
         private static string DefaultRootDirectory = AppDomain.CurrentDomain.BaseDirectory;
         private static string BinaryFileName = @"cabinet-records.db";
+        private const string LoggingPath = @"log.txt";
 
         private static string[] commandLineParameters = new string[]
         {
@@ -59,6 +62,7 @@ namespace FileCabinetApp
             }
 
             var commandParameters = CommandLineParser.GetCommandLineArguments(args);
+            SetParameters(commandParameters, args);
 
             Console.WriteLine($"Using {validationRules} validation rules.");
             Console.WriteLine($"File Cabinet Application, developed by {DeveloperName}");
@@ -100,19 +104,23 @@ namespace FileCabinetApp
 
             validationRules = parameters[parameterKey[0]];
             serviceRules = parameters[parameterKey[1]];
+            stopwatchRules = parameters[commandLineParameters[3]];
+            loggerRules = parameters[commandLineParameters[4]];
 
+            bool isStopwatch = stopwatchRules != null;
+            bool isLogger = loggerRules != null;
 
             SetValidators(validationRules);
-            SetService(serviceRules);
+            SetService(serviceRules, isStopwatch, isLogger);
         }
 
-        private static void SetService(string serviceRules)
+        private static void SetService(string serviceRules, bool isStopwatch, bool isLogger)
         {
             var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
             fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
             fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
-            fileCabinetService = o.UseStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
-            fileCabinetService = o.UseLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
+            fileCabinetService = isStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
+            fileCabinetService = isLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
         }
 
         private static void SetValidators(string validationRules)
