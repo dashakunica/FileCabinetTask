@@ -36,7 +36,7 @@ namespace FileCabinetApp
         /// Get all records.
         /// </summary>
         /// <returns>All records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
             FileCabinetRecord[] fileCabinetRecords = new FileCabinetRecord[this.list.Count];
             for (int i = 0; i < this.list.Count; i++)
@@ -89,7 +89,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">First name.</param>
         /// <returns>Records with this first name.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             var fileCabinetRecords = this.list.FindAll(
                 delegate (FileCabinetRecord name)
@@ -107,7 +107,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Last name.</param>
         /// <returns>Records with this last name.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             var fileCabinetRecords = this.list.FindAll(
                 delegate (FileCabinetRecord name)
@@ -125,7 +125,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Date of birth.</param>
         /// <returns>Record with this date of birth.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
             var fileCabinetRecords = this.list.FindAll(
                 delegate (FileCabinetRecord name)

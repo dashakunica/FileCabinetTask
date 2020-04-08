@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
@@ -24,86 +24,79 @@ namespace FileCabinetApp
             this.writer = new StreamWriter(stream);
         }
 
-        private enum LogMessageType
-        {
-            CallMethodWithArguments,
-            CallMethodWithoutArguments,
-            ReturnValue,
-        }
-
         public string Name => nameof(ServiceLogger);
 
         public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.CreateRecord), data.ToString());
+            this.Print(nameof(this.CreateRecord), data.ToString());
             var value = this.fileCabinetService.CreateRecord(data);
-            this.Print(LogMessageType.ReturnValue, nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
+            this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
             return value;
         }
 
         public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.EditRecord), $"{nameof(id)} = '{id.ToString(CultureInfo.InvariantCulture)}', {data.ToString()}");
+            this.Print(nameof(this.EditRecord), $"{nameof(id)} = '{id.ToString(CultureInfo.InvariantCulture)}', {data.ToString()}");
             this.fileCabinetService.EditRecord(id, data);
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.FindByDateOfBirth), $"{nameof(dateOfBirth)} = '{dateOfBirth.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture)}'");
+            this.Print(nameof(this.FindByDateOfBirth), $"{nameof(dateOfBirth)} = '{dateOfBirth.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture)}'");
             var value = this.fileCabinetService.FindByDateOfBirth(dateOfBirth);
-            this.Print(LogMessageType.ReturnValue, nameof(this.FindByDateOfBirth), $"{value.GetType().Name} with {value.Count} elements.");
+            this.Print(nameof(this.FindByDateOfBirth), $"{(value == null ? string.Empty : value.GetType().Name)}.");
             return value;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.FindByDateOfBirth), $"{nameof(firstName)} = '{firstName}'");
+            this.Print(nameof(this.FindByDateOfBirth), $"{nameof(firstName)} = '{firstName}'");
             var value = this.fileCabinetService.FindByFirstName(firstName);
-            this.Print(LogMessageType.ReturnValue, nameof(this.FindByFirstName), $"{value.GetType().Name} with {value.Count} elements.");
+            this.Print(nameof(this.FindByFirstName), $"{(value == null ? string.Empty : value.GetType().Name)}.");
             return value;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.FindByLastName), $"{nameof(lastName)} = '{lastName}'");
+            this.Print(nameof(this.FindByLastName), $"{nameof(lastName)} = '{lastName}'");
             var value = this.fileCabinetService.FindByLastName(lastName);
-            this.Print(LogMessageType.ReturnValue, nameof(this.FindByLastName), $"{value.GetType().Name} with {value.Count} elements.");
+            this.Print(nameof(this.FindByLastName), $"{(value == null ? string.Empty : value.GetType().Name)}");
             return value;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
-            this.Print(LogMessageType.CallMethodWithoutArguments, nameof(this.GetRecords), string.Empty);
+            this.Print(nameof(this.GetRecords), string.Empty);
             var value = this.fileCabinetService.GetRecords();
-            this.Print(LogMessageType.ReturnValue, nameof(this.GetRecords), $"{value.GetType().Name} with {value.Count} elements.");
+            this.Print(nameof(this.GetRecords), $"{(value == null ? string.Empty : value.GetType().Name)}");
             return value;
         }
 
         public (int active, int removed) GetStat()
         {
-            this.Print(LogMessageType.CallMethodWithoutArguments, nameof(this.GetStat), string.Empty);
+            this.Print(nameof(this.GetStat), string.Empty);
             var value = this.fileCabinetService.GetStat();
-            this.Print(LogMessageType.ReturnValue, nameof(this.GetStat), $"({value.active}, {value.removed})");
+            this.Print(nameof(this.GetStat), $"({value.active}, {value.removed})");
             return value;
         }
 
         public FileCabinetServiceSnapshot MakeSnapshot()
         {
-            this.Print(LogMessageType.CallMethodWithoutArguments, nameof(this.MakeSnapshot), string.Empty);
+            this.Print(nameof(this.MakeSnapshot), string.Empty);
             var value = this.fileCabinetService.MakeSnapshot();
-            this.Print(LogMessageType.ReturnValue, nameof(this.GetStat), $"snapshot with {value.Records.Count} elements.");
+            this.Print(nameof(this.GetStat), $"snapshot with {value.Records.Count} elements.");
             return value;
         }
 
         public void Purge()
         {
-            this.Print(LogMessageType.CallMethodWithoutArguments, nameof(this.Purge), string.Empty);
+            this.Print(nameof(this.Purge), string.Empty);
             this.fileCabinetService.Purge();
         }
 
         public void RemoveRecord(int id)
         {
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.RemoveRecord), $"{nameof(id)} = '{id}'");
+            this.Print(nameof(this.RemoveRecord), $"{nameof(id)} = '{id}'");
             this.fileCabinetService.RemoveRecord(id);
         }
 
@@ -114,7 +107,7 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
-            this.Print(LogMessageType.CallMethodWithArguments, nameof(this.Restore), $"snapshot wich contains {snapshot?.Records.Count} elemetns.");
+            this.Print(nameof(this.Restore), $"snapshot wich contains {snapshot?.Records.Count} elemetns.");
             this.fileCabinetService.Restore(snapshot);
         }
 
@@ -139,29 +132,9 @@ namespace FileCabinetApp
             this.disposed = true;
         }
 
-        private void Print(LogMessageType messageType, string method, string parameters)
+        private void Print(string method, string parameters)
         {
-            string message = string.Empty;
-            switch (messageType)
-            {
-                case LogMessageType.CallMethodWithArguments:
-                    {
-                        message = $"Calling {method} with {parameters}.";
-                        break;
-                    }
-
-                case LogMessageType.CallMethodWithoutArguments:
-                    {
-                        message = $"Calling {method}.";
-                        break;
-                    }
-
-                case LogMessageType.ReturnValue:
-                    {
-                        message = $"{method} return {parameters}";
-                        break;
-                    }
-            }
+            string message = $"Calling {method} with {parameters}.";
 
             this.writer.WriteLine($"{DateTime.Now} : {message}");
             Console.WriteLine(message);

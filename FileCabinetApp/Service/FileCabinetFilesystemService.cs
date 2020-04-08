@@ -109,7 +109,7 @@ namespace FileCabinetApp
             this.fileStream.Flush();
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
         {
             var fileCabinetRecords = this.BinaryRecordsToList();
 
@@ -124,7 +124,7 @@ namespace FileCabinetApp
             return readOnlyRecords;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             var fileCabinetRecords = this.BinaryRecordsToList();
 
@@ -139,7 +139,7 @@ namespace FileCabinetApp
             return readOnlyRecords;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             var fileCabinetRecords = BinaryRecordsToList();
 
@@ -154,7 +154,7 @@ namespace FileCabinetApp
             return readOnlyRecords;
         }
 
-        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
+        public IEnumerable<FileCabinetRecord> GetRecords()
         {
             var list = this.BinaryRecordsToList();
             ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(list);
