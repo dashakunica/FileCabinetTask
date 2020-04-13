@@ -50,7 +50,7 @@ namespace FileCabinetApp
             int indexPropertie = 0;
             int indexParameter = 1;
 
-            ReadOnlyCollection<FileCabinetRecord> records;
+            IEnumerable<FileCabinetRecord> records;
 
             if (inputs[indexPropertie].Equals(FirstNameString, StringComparison.InvariantCultureIgnoreCase))
             {

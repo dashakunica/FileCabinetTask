@@ -18,6 +18,20 @@ namespace FileCabinetApp
 
         private static DateTime MaxDate => DateTime.Now;
 
+        public static FileCabinetRecord CreateRecordFromData(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        {
+            return new FileCabinetRecord()
+            {
+                Id = id,
+                FirstName = data.firstName,
+                LastName = data.lastName,
+                DateOfBirth = data.dateOfBirth,
+                Bonuses = data.bonuses,
+                Salary = data.salary,
+                AccountType = data.accountType,
+            };
+        }
+
         public static FileCabinetRecord GetData()
         {
             var data = new FileCabinetRecord();

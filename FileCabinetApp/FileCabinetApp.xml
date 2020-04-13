@@ -4,9 +4,6 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
-        <member name="M:FileCabinetApp.ExportCommandHandler.Handle(FileCabinetApp.AppCommandRequest)">
-            <inheritdoc/>
-        </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>
             Class for cabinet record type.
@@ -84,15 +81,6 @@
             Entry poin of app.
             </summary>
             <param name="args">Args.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXmlReader.#ctor(System.IO.StreamReader)">
-            <summary>Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordXmlReader"/> class.</summary>
-            <param name="reader">The reader.</param>
-            <exception cref="T:System.ArgumentNullException">Argument cannot be null.</exception>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetRecordXmlReader.ReadAll">
-            <summary>Reads all.</summary>
-            <returns>List of records.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>

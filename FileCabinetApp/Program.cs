@@ -19,11 +19,12 @@ namespace FileCabinetApp
         private const string FileServiceType = "File";
         private const string DefaultValidationRules = "Default";
         private const string MemoryServiceType = "Memory";
+        private const string LoggString = "Logging";
+        private const string StopwatchString = "Stopwatch";
 
         private static string validationRules = string.Empty;
         private static string serviceRules = string.Empty;
-        private static string stopwatchRules = string.Empty;
-        private static string loggerRules = string.Empty;
+        private static string loggingRules = string.Empty;
 
         private static IFileCabinetService fileCabinetService;
         private static IRecordValidator recordValidator;
@@ -40,8 +41,7 @@ namespace FileCabinetApp
         {
             "--validation-rules",
             "--storage",
-            "--use-stopwatch",
-            "",
+            "--use",
         };
 
         private static string[] shortCommandLineParameters = new string[]
@@ -62,6 +62,17 @@ namespace FileCabinetApp
             }
 
             var commandParameters = CommandLineParser.GetCommandLineArguments(args);
+            foreach (var item in args)
+            {
+                Console.WriteLine(item);
+            }
+
+            Console.WriteLine();
+            foreach (var item in commandParameters)
+            {
+                Console.WriteLine("Key:" + item.Key + ". Value:" + item.Value);
+            }
+
             SetParameters(commandParameters, args);
 
             Console.WriteLine($"Using {validationRules} validation rules.");
@@ -76,7 +87,7 @@ namespace FileCabinetApp
                 const int commandIndex = 0;
                 var command = inputs[commandIndex];
 
-                var commandHandler = CreateCommandHandler();
+                var commandHandler = CreateCommandHandlers();
 
                 if (string.IsNullOrEmpty(command))
                 {
@@ -100,15 +111,26 @@ namespace FileCabinetApp
 
         private static void SetParameters(Dictionary<string, string> parameters, string[] args)
         {
-            var parameterKey = (args[0].Trim().StartsWith("-")) ? shortCommandLineParameters : commandLineParameters;
+            validationRules = DefaultValidationRules;
+            serviceRules = FileServiceType;
+            loggingRules = LoggString;
 
-            validationRules = parameters[parameterKey[0]];
-            serviceRules = parameters[parameterKey[1]];
-            stopwatchRules = parameters[commandLineParameters[3]];
-            loggerRules = parameters[commandLineParameters[4]];
+            if (!parameters.TryGetValue(shortCommandLineParameters[0], out validationRules))
+            {
+                parameters.TryGetValue(commandLineParameters[0], out validationRules);
+            }
 
-            bool isStopwatch = stopwatchRules != null;
-            bool isLogger = loggerRules != null;
+            if (!parameters.TryGetValue(shortCommandLineParameters[1], out serviceRules))
+            {
+                parameters.TryGetValue(commandLineParameters[1], out serviceRules);
+            }
+
+            parameters.TryGetValue(commandLineParameters[2], out loggingRules);
+
+            var isStopwatch = true;
+            var isLogger = false;
+            //var isStopwatch = loggingRules.Equals(StopwatchString, StringComparison.InvariantCultureIgnoreCase);
+            //var isLogger = loggingRules.Equals(LoggString, StringComparison.InvariantCultureIgnoreCase);
 
             SetValidators(validationRules);
             SetService(serviceRules, isStopwatch, isLogger);
@@ -136,29 +158,34 @@ namespace FileCabinetApp
             return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
         }
 
-        private static ICommandHandler CreateCommandHandler()
+        private static ICommandHandler CreateCommandHandlers()
         {
             static void Runner(bool x) => isRunning = x;
-            static void Printer(IEnumerable<FileCabinetRecord> x) => Print(x);
 
-            var helpHandler = new HelpCommandHandler();
-            var importHandler = new ImportCommandHandler(fileCabinetService);
+            var createHandler = new CreateCommandHandler(fileCabinetService);
+            var editHandler = new EditCommandHandler(fileCabinetService);
+            var exitHandler = new ExitCommandHandler(Runner);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
-            var findHandler = new FindCommandHandler(fileCabinetService, Printer);
-            var listHandler = new ListCommandHandler(fileCabinetService, Printer);
+            var findHandler = new FindCommandHandler(fileCabinetService, Print);
+            var importHandler = new ImportCommandHandler(fileCabinetService);
+            var listHandler = new ListCommandHandler(fileCabinetService, Print);
+            var printHelpHandler = new HelpCommandHandler();
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
             var removeHandler = new RemoveCommandHandler(fileCabinetService);
             var statHandler = new StatCommandHandler(fileCabinetService);
-            var exitHandler = new ExitCommandHandler(Runner);
-            var createHandler = new CreateCommandHandler(fileCabinetService);
-            var editHandler = new EditCommandHandler(fileCabinetService);
 
-            helpHandler.SetNext(importHandler).SetNext(exportHandler).
-                SetNext(findHandler).SetNext(listHandler).SetNext(purgeHandler).
-                SetNext(removeHandler).SetNext(statHandler).SetNext(exitHandler).
-                SetNext(createHandler).SetNext(editHandler);
+            createHandler.SetNext(editHandler);
+            editHandler.SetNext(exitHandler);
+            exitHandler.SetNext(exportHandler);
+            exportHandler.SetNext(findHandler);
+            findHandler.SetNext(importHandler);
+            importHandler.SetNext(listHandler);
+            listHandler.SetNext(printHelpHandler);
+            printHelpHandler.SetNext(purgeHandler);
+            purgeHandler.SetNext(removeHandler);
+            removeHandler.SetNext(statHandler);
 
-            return helpHandler;
+            return createHandler;
         }
 
         private static void PrintMissedCommandInfo(string command)

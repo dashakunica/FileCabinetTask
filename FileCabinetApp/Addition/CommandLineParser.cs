@@ -6,37 +6,20 @@ namespace FileCabinetApp
 {
     public static class CommandLineParser
     {
-        private const string Dash = "-";
+        private const char Dash = '-';
         private const string DoubleDash = "--";
-        private const char WhiteSpace = ' ';
         private const char Colon = ':';
+        private const char Equal = '=';
+        private const string Use = "--use";
 
         public static Dictionary<string, string> GetCommandLineArguments(string[] args)
         {
-            string arguments = JoinArguments(args);
-
-            char delimeter = arguments.Trim().StartsWith(Dash) ? WhiteSpace : Colon;
-            string dash = arguments.Trim().StartsWith(Dash) ? Dash : DoubleDash;
-
-            var parsedPair = from item in arguments.Split()
-                         let z = item.Split(delimeter)
-                         where z.Length >= 2 && z[0][0].Equals(dash)
-                         select new KeyValuePair<string, string>(z[0], z[1]);
-
-            var parsedParam = from item in arguments.Split()
-                         let z = item.Split(delimeter)
-                         where z.Length == 1 && z[0][0].Equals(dash)
-                         select new KeyValuePair<string, string>(z[0], "default");
-
             Dictionary<string, string> consoleParams = new Dictionary<string, string>();
-            foreach (var item in parsedPair)
+            foreach (var arg in args)
             {
-                consoleParams.Add(item.Key, item.Value);
-            }
-
-            foreach (var item in parsedParam)
-            {
-                consoleParams.Add(item.Key, item.Value);
+                var delimeter = arg.StartsWith(Use) ? Dash : (arg.StartsWith(DoubleDash) ? Equal : Colon);
+                var splitParam = arg.Split(delimeter, 2);
+                consoleParams.Add(splitParam[0], splitParam[1]);
             }
 
             return consoleParams;

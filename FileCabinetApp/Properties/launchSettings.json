@@ -2,6 +2,7 @@
   "profiles": {
     "FileCabinetApp": {
       "commandName": "Project",
+      "commandLineArgs": "-v:default --storage=memory --use-logging",
       "environmentVariables": {
         "": ""
       }
