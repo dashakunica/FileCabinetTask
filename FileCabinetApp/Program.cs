@@ -28,7 +28,6 @@ namespace FileCabinetApp
 
         private static IFileCabinetService fileCabinetService;
         private static IRecordValidator recordValidator;
-        private static IInputValidator inputValidator;
         private static FileStream fileStream;
 
         private static bool isRunning = true;
@@ -173,6 +172,7 @@ namespace FileCabinetApp
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
             var removeHandler = new RemoveCommandHandler(fileCabinetService);
             var statHandler = new StatCommandHandler(fileCabinetService);
+            var insertHandler = new InsertCommandHandler(fileCabinetService);
 
             createHandler.SetNext(editHandler);
             editHandler.SetNext(exitHandler);
@@ -184,6 +184,7 @@ namespace FileCabinetApp
             printHelpHandler.SetNext(purgeHandler);
             purgeHandler.SetNext(removeHandler);
             removeHandler.SetNext(statHandler);
+            statHandler.SetNext(insertHandler);
 
             return createHandler;
         }

@@ -281,7 +281,7 @@ namespace FileCabinetApp
             }
         }
 
-        private int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
             var record = DataHelper.CreateRecordFromData(id, data);
 

@@ -10,6 +10,9 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
+        private const int Empty = 0;
+        private const int MinIdentificator = 1;
+
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
 
@@ -29,7 +32,7 @@ namespace FileCabinetApp
         /// <returns>Id of record.</returns>
         public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            return this.CreateRecordWithSpecifiedId(null, data);
+            return this.CreateRecordWithSpecifiedId(Empty, data);
         }
 
         /// <summary>
@@ -172,26 +175,10 @@ namespace FileCabinetApp
             }
         }
 
-        private int CreateRecordWithSpecifiedId(int? id, (string fName, string lName, DateTime dob, short wpn, decimal salary, char department) data)
+        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
-            if (id.HasValue)
-            {
-                if (id.Value < 0)
-                {
-                    throw new IndexOutOfRangeException($"{id} cannot be less then 1.");
-                }
-            }
-
-            var record = new FileCabinetRecord()
-            {
-                Id = id != null ? id.Value : this.list.Count + 1,
-                FirstName = data.fName,
-                LastName = data.lName,
-                DateOfBirth = data.dob,
-                Bonuses = data.wpn,
-                Salary = data.salary,
-                AccountType = data.department,
-            };
+            var record = DataHelper.CreateRecordFromData(id != int.MinValue ? id : this.GenerateId(), data);
+            this.validator.ValidateParameters(record);
 
             this.list.Add(record);
             ServiceHelper.AddRecordToDictionary(record.FirstName, record, this.firstNameDictionary);
@@ -268,6 +255,27 @@ namespace FileCabinetApp
             this.firstNameDictionary[record.FirstName].Remove(record);
             this.lastNameDictionary[record.LastName].Remove(record);
             this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
+        }
+
+        private int GenerateId()
+        {
+            for (int i = MinIdentificator; i <= int.MaxValue; i++)
+            {
+                if (this.list.Count == 0)
+                {
+                    return MinIdentificator;
+                }
+
+                foreach (var record in this.GetRecords())
+                {
+                    if (record.Id == i)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            throw new IndexOutOfRangeException($"Does'n exist available id.");
         }
     }
 }

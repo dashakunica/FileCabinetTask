@@ -34,6 +34,14 @@ namespace FileCabinetApp
             return value;
         }
 
+        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        {
+            this.Print(nameof(this.CreateRecord), data.ToString());
+            var value = this.fileCabinetService.CreateRecordWithSpecifiedId(id, data);
+            this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
+            return value;
+        }
+
         public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
         {
             this.Print(nameof(this.EditRecord), $"{nameof(id)} = '{id.ToString(CultureInfo.InvariantCulture)}', {data.ToString()}");

@@ -16,10 +16,10 @@
 
         Day = 254,
 
-        WorkPlaceNumber = 258,
+        Bonuses = 258,
 
         Salary = 260,
 
-        Department = 276,
+        AccountType = 276,
     }
 }

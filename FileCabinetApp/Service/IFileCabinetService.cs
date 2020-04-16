@@ -7,6 +7,8 @@ namespace FileCabinetApp
     {
         int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
 
+        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
+
         void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
 
         IEnumerable<FileCabinetRecord> GetRecords();

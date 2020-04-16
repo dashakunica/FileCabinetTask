@@ -32,6 +32,16 @@ namespace FileCabinetApp
             };
         }
 
+        public static (int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data) CreateDataFromRecord(FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            return (record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+        }
+
         public static FileCabinetRecord GetData()
         {
             var data = new FileCabinetRecord();
