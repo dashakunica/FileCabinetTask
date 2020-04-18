@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Text;
 
-namespace FileCabinetApp.CommandHandlers.Handlers
+namespace FileCabinetApp
 {
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
@@ -12,6 +12,9 @@ namespace FileCabinetApp.CommandHandlers.Handlers
         private const string FirstName = "FirstName";
         private const string LastName = "LastName";
         private const string DateOfBirth = "DateOfBirth";
+
+        private const char WhiteSpace = ' ';
+        private const char Comma = ',';
 
         public DeleteCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
@@ -57,10 +60,13 @@ namespace FileCabinetApp.CommandHandlers.Handlers
             }
 
             var records = GetRecords(field, value);
+            var builder = GetId(records);
+
+            string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
             this.Service.Delete(records);
         }
 
-        public IEnumerable<FileCabinetRecord> GetRecords(string field, string value)
+        private IEnumerable<FileCabinetRecord> GetRecords(string field, string value)
         {
             IEnumerable<FileCabinetRecord> records = default;
 
@@ -88,6 +94,17 @@ namespace FileCabinetApp.CommandHandlers.Handlers
             }
 
             return records;
+        }
+
+        private StringBuilder GetId(IEnumerable<FileCabinetRecord> records)
+        {
+            var builder = new StringBuilder();
+            foreach (var item in records)
+            {
+                builder.Append($"#{item.Id}, ");
+            }
+
+            return builder;
         }
     }
 }

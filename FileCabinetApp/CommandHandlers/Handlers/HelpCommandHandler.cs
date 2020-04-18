@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FileCabinetApp
 {
@@ -25,6 +27,8 @@ namespace FileCabinetApp
             new string[] { "import", "import records", "The 'import' import records from file." },
             new string[] { "remove", "remove record", "The 'remove' remove specified record." },
         };
+
+        public static IEnumerable<string> Commands => HelpMessages.Select(x => x[0]);
 
         public override void Handle(AppCommandRequest commandRequest)
         {

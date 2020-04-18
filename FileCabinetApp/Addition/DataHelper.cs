@@ -156,5 +156,64 @@ namespace FileCabinetApp
 
             return new Tuple<bool, string, T>(converted, arg, result);
         }
+
+        public static double CalculateSimilarity(string source, string target)
+        {
+            if ((source == null) || (target == null))
+            {
+                return 0;
+            }
+
+            if ((source.Length == 0) || (target.Length == 0))
+            {
+                return 0;
+            }
+
+            if (source == target)
+            {
+                return 1;
+            }
+
+            int stepsToSame = LevenshteinDistance(source, target);
+            return 1 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length));
+        }
+
+        private static int LevenshteinDistance(string source, string target)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (target is null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            int diff;
+            var m = new int[source.Length][];
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                m[i] = new int[target.Length];
+                m[i][0] = i;
+            }
+
+            for (int j = 0; j < target.Length; j++)
+            {
+                m[0][j] = j;
+            }
+
+            for (int i = 1; i < source.Length; i++)
+            {
+                for (int j = 1; j < target.Length; j++)
+                {
+                    diff = (source[i - 1] == target[j - 1]) ? 0 : 1;
+                    m[i][j] = Math.Min(Math.Min(m[i - 1][j] + 1, m[i][j - 1] + 1), m[i - 1][j - 1] + diff);
+                }
+            }
+
+            return m[source.Length - 1][target.Length - 1];
+        }
     }
 }
