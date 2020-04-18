@@ -36,9 +36,40 @@ namespace FileCabinetApp
 
                 fields.RemoveAll(x => x.Trim(RightBracket, LeftBracket, WhiteSpace).Length == 0);
                 values.RemoveAll(x => x.Trim().Length == 0);
+
+                for (int i = 0; i < values.Count; i++)
+                {
+                    values[i] = values[i].Trim('\'', ' ');
+                }
             }
 
             return (fields, values);
+        }
+
+        public static (string, string) DeleteParser(string parameters)
+        {
+            if (parameters is null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            var arguments = parameters.Split("where ", 2);
+
+            string field = string.Empty;
+            string value = string.Empty;
+
+            if (arguments.Length < 2)
+            {
+                Console.WriteLine("Invalid delete query. Please enter delete command in exampel:[delete where id = '1']");
+            }
+            else if (arguments.Length == 2)
+            {
+                var valuesPair = arguments[1].Split(Equal).ToList();
+                field = arguments[0].Trim(WhiteSpace);
+                value = arguments[1].Trim(WhiteSpace, SingleQuote);
+            }
+
+            return (field, value);
         }
     }
 }

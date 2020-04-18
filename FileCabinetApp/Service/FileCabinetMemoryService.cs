@@ -63,6 +63,19 @@ namespace FileCabinetApp
             throw new NotImplementedException();
         }
 
+        public void Delete(IEnumerable<FileCabinetRecord> records)
+        {
+            if (records is null)
+            {
+                throw new ArgumentNullException(nameof(records));
+            }
+
+            foreach (var record in records)
+            {
+                this.RemoveRecord(record.Id);
+            }
+        }
+
         /// <summary>
         /// Edit current record.
         /// </summary>

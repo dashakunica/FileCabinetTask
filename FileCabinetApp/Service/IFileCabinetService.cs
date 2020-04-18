@@ -25,6 +25,8 @@ namespace FileCabinetApp
 
         void RemoveRecord(int id);
 
+        public void Delete(IEnumerable<FileCabinetRecord> records)
+
         public void Purge();
 
         public (int active, int removed) GetStat();
