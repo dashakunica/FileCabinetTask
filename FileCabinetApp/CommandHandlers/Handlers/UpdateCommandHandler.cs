@@ -30,6 +30,15 @@ namespace FileCabinetApp.CommandHandlers.Handlers
             }
         }
 
+        private void Update(string parameters)
+        {
+            if (parameters is null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            (string field, string value) = QueryParser.UpdateParser(parameters);
+        }
 
     }
 }
