@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FileCabinetApp.CommandHandlers.Handlers
+namespace FileCabinetApp
 {
     public class UpdateCommandHandler : ServiceCommandHandlerBase
     {

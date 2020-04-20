@@ -168,7 +168,6 @@ namespace FileCabinetApp
             static void Runner(bool x) => isRunning = x;
 
             var createHandler = new CreateCommandHandler(fileCabinetService);
-            var editHandler = new EditCommandHandler(fileCabinetService);
             var exitHandler = new ExitCommandHandler(Runner);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
             var findHandler = new FindCommandHandler(fileCabinetService, Print);
@@ -176,20 +175,21 @@ namespace FileCabinetApp
             var listHandler = new ListCommandHandler(fileCabinetService, Print);
             var printHelpHandler = new HelpCommandHandler();
             var purgeHandler = new PurgeCommandHandler(fileCabinetService);
-            var removeHandler = new RemoveCommandHandler(fileCabinetService);
             var statHandler = new StatCommandHandler(fileCabinetService);
             var insertHandler = new InsertCommandHandler(fileCabinetService);
+            var deleteHandler = new DeleteCommandHandler(fileCabinetService);
+            var updateHandler = new UpdateCommandHandler(fileCabinetService);
 
-            createHandler.SetNext(editHandler);
-            editHandler.SetNext(exitHandler);
+            createHandler.SetNext(updateHandler);
+            updateHandler.SetNext(exitHandler);
             exitHandler.SetNext(exportHandler);
             exportHandler.SetNext(findHandler);
             findHandler.SetNext(importHandler);
             importHandler.SetNext(listHandler);
             listHandler.SetNext(printHelpHandler);
             printHelpHandler.SetNext(purgeHandler);
-            purgeHandler.SetNext(removeHandler);
-            removeHandler.SetNext(statHandler);
+            purgeHandler.SetNext(deleteHandler);
+            deleteHandler.SetNext(statHandler);
             statHandler.SetNext(insertHandler);
 
             return createHandler;
