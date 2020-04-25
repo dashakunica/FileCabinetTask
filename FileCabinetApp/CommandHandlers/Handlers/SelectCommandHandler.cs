@@ -48,9 +48,6 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            (var fields, var values) = QueryParser.
         }
-
-
     }
 }

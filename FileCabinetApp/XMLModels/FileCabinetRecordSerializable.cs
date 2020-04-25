@@ -23,7 +23,7 @@ namespace FileCabinetGenerator
             set { this.DateOfBirth = DateTime.Parse(value, CultureInfo.InvariantCulture); }
         }
 
-        [XmlElement("accountType")]
+        [XmlElement("AccountType")]
         public char AccountType { get; set; }
 
         [XmlElement("Salary")]

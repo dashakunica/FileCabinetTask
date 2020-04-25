@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace FileCabinetApp
 {
-    public class FileCabinetRecordXmlReader
+    public class FileCabinetRecordXmlReader : IFileCabinetReader
     {
         private readonly StreamReader reader;
 
@@ -24,7 +24,6 @@ namespace FileCabinetApp
         public IList<FileCabinetRecord> ReadAll()
         {
             var listOfRecords = new List<FileCabinetRecord>();
-            var validator = new DefaultValidator();
 
             this.reader.BaseStream.Position = 0;
 

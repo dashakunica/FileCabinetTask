@@ -18,9 +18,9 @@ namespace FileCabinetApp
 
         public IList<string> Logger { get; } = new List<string>();
 
-        public ReadOnlyCollection<FileCabinetRecord> FileCabinetRecords { get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); }
+        public ReadOnlyCollection<FileCabinetRecord> Records { get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); }
 
-        public void LoadFrom(IRecordReader reader)
+        public void LoadFrom(IFileCabinetReader reader)
         {
             if (reader is null)
             {
@@ -33,11 +33,10 @@ namespace FileCabinetApp
             }
             catch (Exception e)
             {
-                throw new ImportFailedException(e.Message);
             }
         }
 
-        public void SaveTo(IRecordWriter writer)
+        public void SaveTo(IFileCabinetWriter writer)
         {
             if (writer is null)
             {

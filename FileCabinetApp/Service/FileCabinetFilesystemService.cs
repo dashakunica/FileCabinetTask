@@ -25,7 +25,8 @@ namespace FileCabinetApp
         private readonly BinaryWriter binaryWriter;
         private IRecordValidator validator;
         private string path;
-        private int lastId = 0;
+        private const int MinId = 0;
+        private int lastId = MinId;
 
         private readonly Dictionary<int, long> idStorage = new Dictionary<int, long>();
         private readonly Dictionary<int, long> removedStorage = new Dictionary<int, long>();
@@ -60,21 +61,57 @@ namespace FileCabinetApp
 
         public int CreateRecord(ValidateParametersData data)
         {
-            this.lastId++;
-            int id = this.lastId;
-            return this.CreateRecordWithId(id, data);
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            return this.CreateRecordWithId(this.GenerateId(), data);
+        }
+
+        public int CreateRecordWithId(int id, ValidateParametersData data)
+        {
+            if (id < MinId)
+            {
+                throw new ArgumentException();
+            }
+
+            if (this.idStorage.ContainsKey(id))
+            {
+                throw new ArgumentException();
+            }
+
+            this.validator.ValidateParameters(data);
+            var record = DataHelper.CreateRecordFromArgs(id, data);
+            long position = this.fileStream.Length;
+
+            if (this.removedStorage.ContainsKey(id))
+            {
+                position = this.removedStorage[id];
+                this.removedStorage.Remove(id);
+            }
+
+            this.WriteToFileStream(position, record);
+            this.idStorage.Add(id, position);
+            return record.Id;
         }
 
         public void EditRecord(int id, ValidateParametersData data)
         {
-            if (!this.ExistRecord(id))
+            if (data is null)
             {
-                throw new InvalidOperationException($"Record #{id} doesn't exists.");
+                throw new ArgumentNullException(nameof(data));
             }
 
-            var record = DataHelper.CreateRecordFromData(id, data);
-            this.validator.ValidateParameters(record);
-            this.WriteToFileStream(this.identificatorCache[id], record);
+            if (!this.idStorage.ContainsKey(id))
+            {
+                throw new ArgumentException(nameof(id));
+            }
+
+            this.validator.ValidateParameters(data);
+            var current = DataHelper.CreateRecordFromArgs(id, data);
+            DataHelper.UpdateRecordFromData(current.Id, data, current);
+            this.WriteToFileStream(this.idStorage[id], current);
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -87,7 +124,7 @@ namespace FileCabinetApp
 
         public (int active, int removed) GetStat()
         {
-            return (this.identificatorCache.Count, this.removedCache.Count);
+            return (this.idStorage.Count, this.removedStorage.Count);
         }
 
         public FileCabinetServiceSnapshot MakeSnapshot()
@@ -239,35 +276,17 @@ namespace FileCabinetApp
 
             foreach (var record in snapshot.Records)
             {
+                var data = DataHelper.CreateValidateData(record);
 
                 if (this.GetRecords().Any(x => x.Id == record.Id))
                 {
-                    this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    this.EditRecord(record.Id, data);
                 }
                 else
                 {
-                    this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    this.CreateRecordWithId(record.Id, data);
                 }
             }
-        }
-
-        public int CreateRecordWithId(int id, ValidateParametersData data)
-        {
-            var record = DataHelper.CreateRecordFromData(id, data);
-
-            this.validator.ValidateParameters(record);
-            var position = this.fileStream.Length;
-            this.WriteToFileStream(position, record);
-
-            this.AddToDictionary(record.FirstName, position, this.firstNameDictionary);
-            this.AddToDictionary(record.LastName, position, this.lastNameDictionary);
-            this.AddToDictionary(record.DateOfBirth, position, this.dateOfBirthDictionary);
-
-            var byteRecord = RecordToBytes(record);
-
-            this.fileStream.Flush();
-
-            return record.Id;
         }
 
         private void WriteToFileStream(long position, FileCabinetRecord record)
@@ -287,32 +306,17 @@ namespace FileCabinetApp
 
         public void RemoveRecord(int id)
         {
-            if (!this.ExistRecord(id))
+            if (!this.idStorage.ContainsKey(id))
             {
                 throw new InvalidOperationException($"Record #{id} doesn't exists.");
             }
 
-            var removedPoition = this.MarkRecordAsRemoved(id);
-            this.removedCache.Add(id, removedPoition);
-            this.identificatorCache.Remove(id);
-        }
-
-        private long MarkRecordAsRemoved(int id)
-        {
-            var position = this.identificatorCache[id];
-            this.binaryReader.BaseStream.Position = position;
+            var removedPoition = this.idStorage[id];
+            this.binaryReader.BaseStream.Position = removedPoition;
             this.binaryWriter.Write(RemovedFlag);
-            return position;
-        }
 
-        private bool ExistRecord(int id)
-        {
-            if (this.identificatorCache.ContainsKey(id))
-            {
-                return true;
-            }
-
-            return false;
+            this.removedStorage.Add(id, removedPoition);
+            this.idStorage.Remove(id);
         }
 
         public void Purge()
@@ -325,8 +329,8 @@ namespace FileCabinetApp
             }
 
             this.fileStream.SetLength(this.fileStream.Position);
-            this.identificatorCache.Clear();
-            this.removedCache.Clear();
+            this.idStorage.Clear();
+            this.removedStorage.Clear();
             this.InitializeDictionaries();
         }
 
@@ -373,7 +377,7 @@ namespace FileCabinetApp
             this.lastNameDictionary.Clear();
             this.dateOfBirthDictionary.Clear();
 
-            foreach (var item in this.identificatorCache)
+            foreach (var item in this.idStorage)
             {
                 var record = this.ReadRecordFromFileStream(item.Value);
                 this.AddToDictionary(record.FirstName, item.Value, this.firstNameDictionary);
@@ -398,23 +402,15 @@ namespace FileCabinetApp
             dictionary[key].Add(value);
         }
 
-        private void RemoveFromDictionary<T>(T key, long value, Dictionary<T, List<long>> dictionary)
-        {
-            if (dictionary.ContainsKey(key))
-            {
-                dictionary[key].Remove(value);
-            }
-        }
-
         private int GenerateId()
         {
-            var start = this.lastAssigned != int.MaxValue - 1 ? this.lastAssigned : MinIdentificator;
+            var start = lastId != int.MaxValue - 1 ? this.lastId : MinId;
 
             for (int i = start; i < int.MaxValue; i++)
             {
-                if (!this.identificatorValideCache.ContainsKey(i))
+                if (!this.idStorage.ContainsKey(i))
                 {
-                    this.lastAssigned = i;
+                    this.lastId = i;
                     return i;
                 }
             }
