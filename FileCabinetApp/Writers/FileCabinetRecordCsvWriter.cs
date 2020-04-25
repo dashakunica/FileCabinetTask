@@ -1,16 +1,25 @@
 ﻿using System.IO;
+using System;
 
 namespace FileCabinetApp
 {
-    public class FileCabinetRecordCsvWriter
+    public class FileCabinetRecordCsvWriter : IFileCabinetWriter
     {
-        private TextWriter textWriter;
+        private readonly StreamWriter writer;
 
-        public FileCabinetRecordCsvWriter(TextWriter textWriter) => this.textWriter = textWriter;
+        public FileCabinetRecordCsvWriter(StreamWriter writer)
+        {
+            this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
+        }
 
         public void Write(FileCabinetRecord record)
         {
-            this.textWriter.Write(record.ToString());
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
+            this.writer.WriteLine(record.ToString());
         }
     }
 }

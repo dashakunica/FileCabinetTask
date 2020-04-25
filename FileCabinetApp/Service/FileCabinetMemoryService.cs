@@ -10,11 +10,13 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
-        private const int Empty = 0;
-        private const int MinIdentificator = 1;
+        private const int Zero = 0;
+        private const int MinId = 1;
 
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
+
+        private readonly Dictionary<string, List<FileCabinetRecord>> memoization = new Dictionary<string, List<FileCabinetRecord>>();
 
         private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
@@ -30,9 +32,9 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="record">Record.</param>
         /// <returns>Id of record.</returns>
-        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecord(ValidateParametersData data)
         {
-            return this.CreateRecordWithSpecifiedId(Empty, data);
+            return this.CreateRecordWithId(Zero, data);
         }
 
         /// <summary>
@@ -41,22 +43,19 @@ namespace FileCabinetApp
         /// <returns>All records.</returns>
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
-            FileCabinetRecord[] fileCabinetRecords = new FileCabinetRecord[this.list.Count];
-            for (int i = 0; i < this.list.Count; i++)
+            var records = this.list;
+
+            foreach (var item in records)
             {
-                fileCabinetRecords[i] = this.list[i];
+                yield return item;
             }
-
-            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
-
-            return readOnlyRecords;
         }
 
         /// <summary>
         /// Get amount of record.
         /// </summary>
         /// <returns>Amount of records.</returns>
-        public (int active, int removed) GetStat() => (this.list.Count, 0);
+        public (int active, int removed) GetStat() => (this.list.Count, Zero);
 
         public void Purge()
         {
@@ -76,82 +75,19 @@ namespace FileCabinetApp
             }
         }
 
-        /// <summary>
-        /// Edit current record.
-        /// </summary>
-        /// <param name="record">Record.</param>
-        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public void EditRecord(int id, ValidateParametersData data)
         {
-            var editedRecord = this.list.First(x => x.Id == id);
-
-            var resentFirstName = editedRecord.FirstName;
-            var resentLastName = editedRecord.LastName;
-            var resentDateOfBirth = editedRecord.DateOfBirth;
-
-            editedRecord.FirstName = data.firstName;
-            editedRecord.LastName = data.lastName;
-            editedRecord.DateOfBirth = data.dateOfBirth;
-            editedRecord.Bonuses = data.bonuses;
-            editedRecord.Salary = data.salary;
-            editedRecord.AccountType = data.accountType;
-
-            this.UpdateRecordInFirstNameDictionary(data.firstName, editedRecord, resentFirstName);
-            this.UpdateRecordInLastNameDictionary(data.lastName, editedRecord, resentLastName);
-            this.UpdateRecordInDateOfBirthDictionary(data.dateOfBirth, editedRecord, resentDateOfBirth);
-        }
-
-        /// <summary>
-        /// Methods for finding first name.
-        /// </summary>
-        /// <param name="firstName">First name.</param>
-        /// <returns>Records with this first name.</returns>
-        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
-        {
-            var fileCabinetRecords = this.list.FindAll(
-                delegate (FileCabinetRecord name)
-                {
-                    return name.FirstName.Equals(firstName, StringComparison.InvariantCultureIgnoreCase);
-                });
-
-            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
-
-            return readOnlyRecords;
-        }
-
-        /// <summary>
-        /// Methods for finding last name.
-        /// </summary>
-        /// <param name="lastName">Last name.</param>
-        /// <returns>Records with this last name.</returns>
-        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
-        {
-            var fileCabinetRecords = this.list.FindAll(
-                delegate (FileCabinetRecord name)
-                {
-                    return name.LastName.Equals(lastName, StringComparison.InvariantCultureIgnoreCase);
-                });
-
-            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
-
-            return readOnlyRecords;
-        }
-
-        /// <summary>
-        /// Methods for finding date of birth.
-        /// </summary>
-        /// <param name="dateOfBirth">Date of birth.</param>
-        /// <returns>Record with this date of birth.</returns>
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
-        {
-            var fileCabinetRecords = this.list.FindAll(
-                delegate (FileCabinetRecord name)
-                {
-                    return name.DateOfBirth.Equals(dateOfBirth);
-                });
-
-            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(fileCabinetRecords);
-
-            return readOnlyRecords;
+            try
+            {
+                var current = this.GetRecords().First(x => x.Id == id);
+                this.validator.ValidateParameters(data ?? throw new ArgumentNullException(nameof(data)));
+                this.memoization.Clear();
+                DataHelper.UpdateRecordFromData(current.Id, data, current);
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException(nameof(id));
+            }
         }
 
         public FileCabinetServiceSnapshot MakeSnapshot()
@@ -171,7 +107,7 @@ namespace FileCabinetApp
         {
             if (snapshot is null)
             {
-                throw new ArgumentNullException($"{nameof(snapshot)} cannot be null.");
+                throw new ArgumentNullException(nameof(snapshot));
             }
 
             foreach (var record in snapshot.Records)
@@ -179,104 +115,47 @@ namespace FileCabinetApp
 
                 if (this.GetRecords().Any(x => x.Id == record.Id))
                 {
-                    this.EditRecord(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    this.EditRecord(record.Id, ValidateParametersData);
                 }
                 else
                 {
-                    this.CreateRecordWithSpecifiedId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    this.CreateRecordWithId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
                 }
             }
         }
 
-        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecordWithId(int id, ValidateParametersData data)
         {
-            var record = DataHelper.CreateRecordFromData(id != int.MinValue ? id : this.GenerateId(), data);
-            this.validator.ValidateParameters(record);
+            if (id < MinIdentificator)
+            {
+                throw new ServiceArgumentException($"Invalid id: {id}.");
+            }
 
+            if (this.ExistId(id))
+            {
+                throw new ServiceArgumentException($"Record with #{id} exist.", nameof(id));
+            }
+
+            this.validator.ValidateParameters(data ?? throw new ServiceArgumentException(nameof(data)));
+            this.memoization.Clear();
+            var record = ServiceHelper.CreateRecordFromData(id != default ? id : this.GenerateId(), data);
             this.list.Add(record);
-            ServiceHelper.AddRecordToDictionary(record.FirstName, record, this.firstNameDictionary);
-            ServiceHelper.AddRecordToDictionary(record.LastName, record, this.lastNameDictionary);
-            ServiceHelper.AddRecordToDictionary(record.DateOfBirth, record, this.dateOfBirthDictionary);
-
             return record.Id;
-        }
-
-        private void UpdateRecordInFirstNameDictionary(string newFirstName, FileCabinetRecord record, string resentFirstName)
-        {
-            FileCabinetRecord updateItem = this.firstNameDictionary[resentFirstName].First(x => x.Id == record.Id);
-
-            this.firstNameDictionary[resentFirstName].Remove(updateItem);
-
-            if (!this.firstNameDictionary.ContainsKey(newFirstName))
-            {
-                this.firstNameDictionary.Add(newFirstName, new List<FileCabinetRecord>());
-            }
-
-            this.firstNameDictionary[newFirstName].Add(record);
-        }
-
-        private void UpdateRecordInLastNameDictionary(string newLastName, FileCabinetRecord record, string resentLastName)
-        {
-            FileCabinetRecord updateItem = this.lastNameDictionary[resentLastName].First(x => x.Id == record.Id);
-
-            this.lastNameDictionary[resentLastName].Remove(updateItem);
-
-            if (!this.lastNameDictionary.ContainsKey(newLastName))
-            {
-                this.lastNameDictionary.Add(newLastName, new List<FileCabinetRecord>());
-            }
-
-            this.lastNameDictionary[newLastName].Add(record);
-        }
-
-        private void UpdateRecordInDateOfBirthDictionary(DateTime newDateOfBirth, FileCabinetRecord record, DateTime resentDateOfBirth)
-        {
-            FileCabinetRecord updateItem = this.dateOfBirthDictionary[resentDateOfBirth].First(x => x.Id == record.Id);
-
-            this.dateOfBirthDictionary[resentDateOfBirth].Remove(updateItem);
-
-            if (!this.dateOfBirthDictionary.ContainsKey(newDateOfBirth))
-            {
-                this.dateOfBirthDictionary.Add(newDateOfBirth, new List<FileCabinetRecord>());
-            }
-
-            this.dateOfBirthDictionary[newDateOfBirth].Add(record);
         }
 
         public void RemoveRecord(int id)
         {
-            FileCabinetRecord temp = null;
-
-            foreach (var record in this.list)
-            {
-                if (record.Id == id)
-                {
-                    temp = record;
-                    this.list.Remove(record);
-                    break;
-                }
-            }
-
-            if (temp != null)
-            {
-                this.RemoveRecordFromDictionaries(temp);
-            }
-        }
-
-        private void RemoveRecordFromDictionaries(FileCabinetRecord record)
-        {
-            this.firstNameDictionary[record.FirstName].Remove(record);
-            this.lastNameDictionary[record.LastName].Remove(record);
-            this.dateOfBirthDictionary[record.DateOfBirth].Remove(record);
+            this.memoization.Clear();
+            this.list.Remove(this.GetRecords().First(x => x.Id == id));
         }
 
         private int GenerateId()
         {
-            for (int i = MinIdentificator; i <= int.MaxValue; i++)
+            for (int i = MinId; i <= int.MaxValue; i++)
             {
                 if (this.list.Count == 0)
                 {
-                    return MinIdentificator;
+                    return MinId;
                 }
 
                 foreach (var record in this.GetRecords())
@@ -288,7 +167,7 @@ namespace FileCabinetApp
                 }
             }
 
-            throw new IndexOutOfRangeException($"Does'n exist available id.");
+            throw new IndexOutOfRangeException();
         }
     }
 }

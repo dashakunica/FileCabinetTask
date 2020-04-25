@@ -18,7 +18,7 @@ namespace FileCabinetApp
             this.validators = new List<IRecordValidator>(validators ?? throw new ArgumentNullException(nameof(validators)));
         }
 
-        public void ValidateParameters(FileCabinetRecord data)
+        public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)
             {

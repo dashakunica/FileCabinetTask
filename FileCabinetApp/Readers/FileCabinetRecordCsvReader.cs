@@ -5,7 +5,7 @@ using System.IO;
 
 namespace FileCabinetApp
 {
-    public class FileCabinetRecordCsvReader
+    public class FileCabinetRecordCsvReader 
     {
         private readonly StreamReader reader;
 

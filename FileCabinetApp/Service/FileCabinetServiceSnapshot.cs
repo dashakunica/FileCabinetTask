@@ -11,72 +11,43 @@ namespace FileCabinetApp
     {
         private FileCabinetRecord[] records;
 
-        public FileCabinetServiceSnapshot(FileCabinetRecord[] records) => this.records = records;
-
-        public ReadOnlyCollection<FileCabinetRecord> Records
+        public FileCabinetServiceSnapshot(FileCabinetRecord[] records)
         {
-            get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records));
+            this.records = records;
         }
 
-        public FileCabinetRecord[] GetRecords()
-        {
-            return (FileCabinetRecord[])this.records.Clone();
-        }
+        public IList<string> Logger { get; } = new List<string>();
 
-        public void SaveToCsv(StreamWriter streamWriter)
-        {
-            TextWriter textWriter = streamWriter;
+        public ReadOnlyCollection<FileCabinetRecord> FileCabinetRecords { get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); }
 
-            textWriter.Write("Id,First Name,Last Name,Date of Birth");
-            FileCabinetRecordCsvWriter fileCabinetRecordCsvWriter = new FileCabinetRecordCsvWriter(textWriter);
-
-            foreach (var record in this.records)
-            {
-                fileCabinetRecordCsvWriter.Write(record);
-            }
-        }
-
-        public void SaveToXml(StreamWriter streamWriter)
-        {
-            using XmlWriter xmlWriter = XmlWriter.Create(streamWriter);
-            FileCabinetRecordXmlWriter fileCabinetRecordXmlWriter = new FileCabinetRecordXmlWriter(xmlWriter);
-
-            xmlWriter.WriteStartDocument();
-            xmlWriter.WriteStartElement("Records");
-
-            foreach (var record in this.records)
-            {
-                fileCabinetRecordXmlWriter.Write(record);
-            }
-
-            xmlWriter.WriteEndElement();
-            xmlWriter.WriteEndDocument();
-        }
-
-        public void LoadFromCsv(StreamReader reader)
+        public void LoadFrom(IRecordReader reader)
         {
             if (reader is null)
             {
-                throw new ArgumentNullException($"{nameof(reader)} cannot be null.");
+                throw new ArgumentNullException(nameof(reader));
             }
 
-            var csvReader = new FileCabinetRecordCsvReader(reader);
-
-            this.records = csvReader.ReadAll().ToArray();
+            try
+            {
+                this.records = reader.ReadAll().ToArray();
+            }
+            catch (Exception e)
+            {
+                throw new ImportFailedException(e.Message);
+            }
         }
 
-        public void LoadFromXml(StreamReader reader)
+        public void SaveTo(IRecordWriter writer)
         {
-            if (reader is null)
+            if (writer is null)
             {
-                throw new ArgumentNullException($"{nameof(reader)} cannot be null.");
+                throw new ArgumentNullException(nameof(writer));
             }
 
-            var xmlReader = new FileCabinetRecordXmlReader(reader);
-
-            //try
-            //{
-            this.records = xmlReader.ReadAll().ToArray();
+            foreach (var record in this.records)
+            {
+                writer.Write(record);
+            }
         }
     }
 }

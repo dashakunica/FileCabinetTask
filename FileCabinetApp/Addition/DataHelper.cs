@@ -18,33 +18,41 @@ namespace FileCabinetApp
 
         private static DateTime MaxDate => DateTime.Now;
 
-        public static FileCabinetRecord CreateRecordFromData(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public static ValidateParametersData CreateValidateData(FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
+            return new ValidateParametersData()
+            {
+                FirstName = record.FirstName is null ? null : record.FirstName,
+                LastName = record.LastName is null ? null : record.LastName,
+                DateOfBirth = record.DateOfBirth,
+                Bonuses = record.Bonuses,
+                Salary = record.Salary,
+                AccountType = record.AccountType,
+            };
+        }
+
+        public static FileCabinetRecord CreateRecordFromArgs(int id, ValidateParametersData data)
         {
             return new FileCabinetRecord()
             {
                 Id = id,
-                FirstName = data.firstName,
-                LastName = data.lastName,
-                DateOfBirth = data.dateOfBirth,
-                Bonuses = data.bonuses,
-                Salary = data.salary,
-                AccountType = data.accountType,
+                FirstName = data.FirstName,
+                LastName = data.LastName,
+                DateOfBirth = data.DateOfBirth,
+                Bonuses = data.Bonuses,
+                Salary = data.Salary,
+                AccountType = data.AccountType,
             };
         }
 
-        public static (int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data) CreateDataFromRecord(FileCabinetRecord record)
+        public static ValidateParametersData GetData()
         {
-            if (record is null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            return (record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
-        }
-
-        public static FileCabinetRecord GetData()
-        {
-            var data = new FileCabinetRecord();
+            var data = new ValidateParametersData();
             Console.Write("First Name: ");
             data.FirstName = ReadInput<string>(Convert<string>, x => x.Length < MinNameLength || x.Length > MaxNameLength
                                                                     ? new Tuple<bool, string>(false, nameof(data.FirstName))
@@ -137,19 +145,7 @@ namespace FileCabinetApp
 
                 result = (T)System.Convert.ChangeType(arg, typeof(T), CultureInfo.InvariantCulture);
             }
-            catch (InvalidCastException)
-            {
-                converted = false;
-            }
-            catch (FormatException)
-            {
-                converted = false;
-            }
-            catch (OverflowException)
-            {
-                converted = false;
-            }
-            catch (ArgumentNullException)
+            catch (Exception)
             {
                 converted = false;
             }
@@ -214,6 +210,27 @@ namespace FileCabinetApp
             }
 
             return m[source.Length - 1][target.Length - 1];
+        }
+
+        public static void UpdateRecordFromData(int id, ValidateParametersData data, FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            record.Id = id;
+            record.FirstName = data.FirstName;
+            record.LastName = data.LastName;
+            record.DateOfBirth = data.DateOfBirth;
+            record.Bonuses = data.Bonuses;
+            record.Salary = data.Salary;
+            record.AccountType = data.AccountType;
         }
     }
 }

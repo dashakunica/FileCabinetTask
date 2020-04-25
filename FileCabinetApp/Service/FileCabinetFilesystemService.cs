@@ -27,8 +27,8 @@ namespace FileCabinetApp
         private string path;
         private int lastId = 0;
 
-        private readonly Dictionary<int, long> identificatorCache = new Dictionary<int, long>();
-        private readonly Dictionary<int, long> removedCache = new Dictionary<int, long>();
+        private readonly Dictionary<int, long> idStorage = new Dictionary<int, long>();
+        private readonly Dictionary<int, long> removedStorage = new Dictionary<int, long>();
 
         private readonly Dictionary<string, List<long>> firstNameDictionary = new Dictionary<string, List<long>>();
         private readonly Dictionary<string, List<long>> lastNameDictionary = new Dictionary<string, List<long>>();
@@ -58,14 +58,14 @@ namespace FileCabinetApp
             return new FileCabinetFilesystemService(fileStream, validator);
         }
 
-        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecord(ValidateParametersData data)
         {
             this.lastId++;
             int id = this.lastId;
-            return this.CreateRecordWithSpecifiedId(id, data);
+            return this.CreateRecordWithId(id, data);
         }
 
-        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public void EditRecord(int id, ValidateParametersData data)
         {
             if (!this.ExistRecord(id))
             {
@@ -75,49 +75,6 @@ namespace FileCabinetApp
             var record = DataHelper.CreateRecordFromData(id, data);
             this.validator.ValidateParameters(record);
             this.WriteToFileStream(this.identificatorCache[id], record);
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
-        {
-            if (firstName is null)
-            {
-                throw new ArgumentNullException(nameof(firstName));
-            }
-
-            if (this.firstNameDictionary.TryGetValue(firstName, out var list))
-            {
-                foreach (var item in list)
-                {
-                    yield return this.ReadRecordFromFileStream(item);
-                }
-            }
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
-        {
-            if (lastName is null)
-            {
-                throw new ArgumentNullException(nameof(lastName));
-            }
-
-            if (this.lastNameDictionary.TryGetValue(lastName, out var list))
-            {
-                foreach (var item in list)
-                {
-                    yield return this.ReadRecordFromFileStream(item);
-                }
-            }
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
-        {
-            if (this.dateOfBirthDictionary.TryGetValue(dateOfBirth, out var list))
-            {
-                foreach (var item in list)
-                {
-                    yield return this.ReadRecordFromFileStream(item);
-                }
-            }
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -294,7 +251,7 @@ namespace FileCabinetApp
             }
         }
 
-        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecordWithId(int id, ValidateParametersData data)
         {
             var record = DataHelper.CreateRecordFromData(id, data);
 
@@ -447,6 +404,22 @@ namespace FileCabinetApp
             {
                 dictionary[key].Remove(value);
             }
+        }
+
+        private int GenerateId()
+        {
+            var start = this.lastAssigned != int.MaxValue - 1 ? this.lastAssigned : MinIdentificator;
+
+            for (int i = start; i < int.MaxValue; i++)
+            {
+                if (!this.identificatorValideCache.ContainsKey(i))
+                {
+                    this.lastAssigned = i;
+                    return i;
+                }
+            }
+
+            throw new ArgumentException($"Does'n exist available id.");
         }
     }
 }

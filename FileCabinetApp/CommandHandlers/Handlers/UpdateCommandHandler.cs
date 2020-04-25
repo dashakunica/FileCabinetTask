@@ -37,8 +37,12 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            (string field, string value) = QueryParser.UpdateParser(parameters);
-        }
+            var items = QueryParser.UpdateParser(parameters);
 
+            var set = items.propNewValuesPair;
+            var where = items.propWhereValuesPair;
+
+
+        }
     }
 }

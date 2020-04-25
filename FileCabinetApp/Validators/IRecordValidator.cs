@@ -2,6 +2,6 @@
 {
     public interface IRecordValidator
     {
-        void ValidateParameters(FileCabinetRecord data);
+        void ValidateParameters(ValidateParametersData data);
     }
 }

@@ -5,19 +5,13 @@ namespace FileCabinetApp
 {
     public interface IFileCabinetService
     {
-        int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
+        int CreateRecord(ValidateParametersData data);
 
-        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
+        public int CreateRecordWithId(int id, ValidateParametersData data);
 
-        void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data);
+        void EditRecord(int id, ValidateParametersData data);
 
         IEnumerable<FileCabinetRecord> GetRecords();
-
-        IEnumerable<FileCabinetRecord> FindByFirstName(string firstName);
-
-        IEnumerable<FileCabinetRecord> FindByLastName(string lastName);
-
-        IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth);
 
         FileCabinetServiceSnapshot MakeSnapshot();
 
@@ -25,7 +19,7 @@ namespace FileCabinetApp
 
         void RemoveRecord(int id);
 
-        public void Delete(IEnumerable<FileCabinetRecord> records)
+        public void Delete(IEnumerable<FileCabinetRecord> records);
 
         public void Purge();
 
