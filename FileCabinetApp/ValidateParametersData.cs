@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FileCabinetApp
 {
-    public class ValidateParametersData
+    public class ValidateParametersData : ICloneable
     {
         public string FirstName { get; set; }
 
@@ -17,6 +17,18 @@ namespace FileCabinetApp
         public decimal Salary { get; set; }
 
         public char AccountType { get; set; }
+
+        public ValidateParametersData Clone() => new ValidateParametersData()
+        {
+            FirstName = this.FirstName,
+            LastName = this.LastName,
+            DateOfBirth = this.DateOfBirth,
+            Bonuses = this.Bonuses,
+            Salary = this.Salary,
+            AccountType = this.AccountType,
+        };
+
+        object ICloneable.Clone() => this.Clone();
 
         public override string ToString()
         {

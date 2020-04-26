@@ -51,6 +51,20 @@ namespace FileCabinetApp
             }
         }
 
+        public IEnumerable<FileCabinetRecord> FindRecords(string method, )
+        {
+            var key = string.Empty;
+            List<FileCabinetRecord> records;
+
+            key = filter?.Name;
+
+            if (!this.memoization.TryGetValue(key, out records))
+            {
+                records = this.list.Where(x => filter.Delegate(x)).ToList();
+                this.memoization.Add(key, records);
+            }
+        }
+
         /// <summary>
         /// Get amount of record.
         /// </summary>
@@ -110,35 +124,38 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(snapshot));
             }
 
+            snapshot.Logger.Clear();
+
             foreach (var record in snapshot.Records)
             {
+                var data = DataHelper.CreateValidateData(record);
 
                 if (this.GetRecords().Any(x => x.Id == record.Id))
                 {
-                    this.EditRecord(record.Id, ValidateParametersData);
+                    this.EditRecord(record.Id, data);
                 }
                 else
                 {
-                    this.CreateRecordWithId(record.Id, (record.FirstName, record.LastName, record.DateOfBirth, record.Bonuses, record.Salary, record.AccountType));
+                    this.CreateRecordWithId(record.Id, data);
                 }
             }
         }
 
         public int CreateRecordWithId(int id, ValidateParametersData data)
         {
-            if (id < MinIdentificator)
+            if (id < MinId)
             {
-                throw new ServiceArgumentException($"Invalid id: {id}.");
+                throw new ArgumentException();
             }
 
-            if (this.ExistId(id))
+            if (this.GetRecords().Any(x => x.Id == id))
             {
-                throw new ServiceArgumentException($"Record with #{id} exist.", nameof(id));
+                throw new ArgumentException();
             }
 
-            this.validator.ValidateParameters(data ?? throw new ServiceArgumentException(nameof(data)));
+            this.validator.ValidateParameters(data ?? throw new ArgumentException(nameof(data)));
             this.memoization.Clear();
-            var record = ServiceHelper.CreateRecordFromData(id != default ? id : this.GenerateId(), data);
+            var record = DataHelper.CreateRecordFromArgs(id != default ? id : this.GenerateId(), data);
             this.list.Add(record);
             return record.Id;
         }

@@ -32,9 +32,9 @@ namespace FileCabinetApp
             }
         }
 
-        private void Insert(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        private void Insert(int id, ValidateParametersData data)
         {
-            id = id == 0 ? this.Service.CreateRecord(data) : this.Service.CreateRecordWithSpecifiedId(id, data);
+            id = id == 0 ? this.Service.CreateRecord(data) : this.Service.CreateRecordWithId(id, data);
             Console.WriteLine($"Record #{id} is created.");
         }
 
@@ -62,8 +62,8 @@ namespace FileCabinetApp
                 }
             }
 
-            var (id, data) = DataHelper.CreateDataFromRecord(record);
-            this.Insert(id, data);
+            var data = DataHelper.CreateValidateData(record);
+            this.Insert(record.Id, data);
         }
     }
 }
