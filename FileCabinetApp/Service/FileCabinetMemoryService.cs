@@ -51,17 +51,19 @@ namespace FileCabinetApp
             }
         }
 
-        public IEnumerable<FileCabinetRecord> FindRecords(string method, )
+        public IEnumerable<FileCabinetRecord> FindRecordsByPredicate(string query, List<FileCabinetRecord> predicate)
         {
-            var key = string.Empty;
-            List<FileCabinetRecord> records;
+            List<FileCabinetRecord> records = null;
 
-            key = filter?.Name;
-
-            if (!this.memoization.TryGetValue(key, out records))
+            if (!this.memoization.TryGetValue(query, out records))
             {
-                records = this.list.Where(x => filter.Delegate(x)).ToList();
-                this.memoization.Add(key, records);
+                this.memoization.Add(query, predicate);
+                records = predicate;
+            }
+
+            foreach (var item in records)
+            {
+                yield return item;
             }
         }
 

@@ -48,14 +48,19 @@ namespace FileCabinetApp
             var set = items.propNewValuesPair;
             var where = items.propWhereValuesPair;
 
-            var arg = CreateValidateArgs(set);
-            var updatedRecords = this.Service.GetRecords(where);
+            string type = where["type"];
+
+            var newValues = CreateValidateArgs(set);
+            var oldRecords = CreateValidateArgs(where);
+            var allRecords = this.Service.GetRecords();
+
+            var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, type);
             var builder = new StringBuilder();
 
             foreach (var item in updatedRecords)
             {
                 builder.Append($"#{item.Id}, ");
-                var current = CopyAndFillUnusedFields(arg, item);
+                var current = CopyAndFillUnusedFields(newValues, item);
                 this.Service.EditRecord(item.Id, current);
             }
 

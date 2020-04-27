@@ -125,8 +125,7 @@ namespace FileCabinetApp
                 var fieldsToReplace = arguments[0].Split(Comma);
                 set = GetDictionary(fieldsToReplace);
 
-                var records = AndOrParser(arguments[1]);
-                where = records.Item1;
+                where = AndOrParser(arguments[1]);
             }
 
             return (set, where);
@@ -160,6 +159,32 @@ namespace FileCabinetApp
             return (properties, where);
         }
 
+        public static IEnumerable<FileCabinetRecord> GetRecorgs(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords, string type)
+        {
+            IEnumerable<FileCabinetRecord> result = allRecords;
+
+            if (record is null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (allRecords is null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            if (type.Equals(And, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return SelectAnd(record, allRecords);
+            }
+            else
+            {
+                return SelectOr(record, allRecords);
+            }
+
+            return result;
+        }
+
         private static Dictionary<string, string> GetDictionary(string[] fieldsToReplace)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
@@ -175,7 +200,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        private static (Dictionary<string, string>, string) AndOrParser(string arguments)
+        private static Dictionary<string, string> AndOrParser(string arguments)
         {
             if (arguments is null)
             {
@@ -199,7 +224,82 @@ namespace FileCabinetApp
             }
 
             var valuesPairs = GetDictionary(values);
-            return (valuesPairs, type);
+            valuesPairs.Add("type", type);
+            return valuesPairs;
+        }
+
+        public static IEnumerable<FileCabinetRecord> SelectAnd(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var mustBeDeleted = allRecords.ToList();
+
+            if (string.IsNullOrEmpty(record.FirstName))
+            {
+                mustBeDeleted.RemoveAll(x => record.FirstName.Equals(x.FirstName, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            if (string.IsNullOrEmpty(record.FirstName))
+            {
+                mustBeDeleted.RemoveAll(x => record.FirstName.Equals(x.FirstName, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            if (record.DateOfBirth != null)
+            {
+                mustBeDeleted.RemoveAll(x => record.DateOfBirth.Equals(x.DateOfBirth));
+            }
+
+            if (record.Bonuses != null)
+            {
+                mustBeDeleted.RemoveAll(x => record.Bonuses.Equals(x.Bonuses));
+            }
+
+            if (record.Salary != null)
+            {
+                mustBeDeleted.RemoveAll(x => record.Salary.Equals(x.Salary));
+            }
+
+            if (record.AccountType != null)
+            {
+                mustBeDeleted.RemoveAll(x => record.AccountType.Equals(x.AccountType));
+            }
+
+            return mustBeDeleted;
+        }
+
+        public static IEnumerable<FileCabinetRecord> SelectOr(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var mustBeDeleted = new List<FileCabinetRecord>();
+
+            if (record.FirstName != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.FirstName.Equals(x.FirstName)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            if (record.LastName != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.LastName.Equals(x.LastName)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            if (record.DateOfBirth != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.DateOfBirth.Equals(x.DateOfBirth)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            if (record.Bonuses != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.Bonuses.Equals(x.Bonuses)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            if (record.Salary != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.Salary.Equals(x.Salary)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            if (record.AccountType != null)
+            {
+                mustBeDeleted.AddRange(allRecords.Where(x => record.AccountType.Equals(x.AccountType)).Where(y => !mustBeDeleted.Contains(y)));
+            }
+
+            return mustBeDeleted;
         }
     }
 }
