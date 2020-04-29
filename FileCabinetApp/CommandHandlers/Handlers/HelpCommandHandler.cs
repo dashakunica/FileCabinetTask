@@ -58,7 +58,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    Console.WriteLine($"There is no explanation for '{parameters}' command.");
+                    Console.WriteLine($"This command'{parameters}' does not exist.");
                 }
             }
             else

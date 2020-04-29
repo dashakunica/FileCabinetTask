@@ -87,7 +87,7 @@
             Service for working with file cabinet.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(System.ValueTuple{System.String,System.String,System.DateTime,System.Int16,System.Decimal,System.Char})">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.ValidateParametersData)">
             <summary>
             Method which create new record.
             </summary>
@@ -105,33 +105,6 @@
             Get amount of record.
             </summary>
             <returns>Amount of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.EditRecord(System.Int32,System.ValueTuple{System.String,System.String,System.DateTime,System.Int16,System.Decimal,System.Char})">
-            <summary>
-            Edit current record.
-            </summary>
-            <param name="record">Record.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFirstName(System.String)">
-            <summary>
-            Methods for finding first name.
-            </summary>
-            <param name="firstName">First name.</param>
-            <returns>Records with this first name.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByLastName(System.String)">
-            <summary>
-            Methods for finding last name.
-            </summary>
-            <param name="lastName">Last name.</param>
-            <returns>Records with this last name.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByDateOfBirth(System.DateTime)">
-            <summary>
-            Methods for finding date of birth.
-            </summary>
-            <param name="dateOfBirth">Date of birth.</param>
-            <returns>Record with this date of birth.</returns>
         </member>
     </members>
 </doc>

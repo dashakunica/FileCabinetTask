@@ -56,5 +56,15 @@ namespace FileCabinetApp
                 AccountType = item.AccountType,
             };
         }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
     }
 }

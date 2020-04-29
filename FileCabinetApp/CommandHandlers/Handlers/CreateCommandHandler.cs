@@ -42,35 +42,13 @@ namespace FileCabinetApp
                 try
                 {
                     var record = DataHelper.GetData();
-                    id = this.Service.CreateRecord((
-                        record.FirstName,
-                        record.LastName,
-                        record.DateOfBirth,
-                        record.Bonuses,
-                        record.Salary,
-                        record.AccountType));
+                    id = this.Service.CreateRecord(record);
 
                     isValid = true;
                 }
-                catch (InvalidOperationException ioe)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(ioe.Message);
-                }
-                catch (FormatException fe)
-                {
-                    Console.WriteLine(fe.Message);
-                }
-                catch (OverflowException oe)
-                {
-                    Console.WriteLine(oe.Message);
-                }
-                catch (ArgumentNullException ane)
-                {
-                    Console.WriteLine(ane.Message);
-                }
-                catch (ArgumentException ae)
-                {
-                    Console.WriteLine(ae.Message);
+                    Console.WriteLine(ex.Message);
                 }
             }
             while (!isValid);

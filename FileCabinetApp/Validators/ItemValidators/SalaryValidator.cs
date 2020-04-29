@@ -14,7 +14,7 @@ namespace FileCabinetApp
 
         private decimal Max { get; set; }
 
-        public void ValidateParameters(FileCabinetRecord data)
+        public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)
             {
@@ -23,7 +23,7 @@ namespace FileCabinetApp
 
             if (data.Salary < this.Min || data.Salary > this.Max)
             {
-                throw new ArgumentException(nameof(data.Salary), $"{nameof(data.Salary)} cannot be less then {this.Min} and more then {this.Max}");
+                throw new ArgumentException(nameof(data.Salary), $"{nameof(data.Salary)} cannot be less than {this.Min} and more than {this.Max}");
             }
         }
     }

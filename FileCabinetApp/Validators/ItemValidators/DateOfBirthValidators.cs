@@ -14,7 +14,7 @@ namespace FileCabinetApp
 
         private DateTime To { get; set; }
 
-        public void ValidateParameters(FileCabinetRecord data)
+        public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)
             {

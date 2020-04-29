@@ -17,7 +17,7 @@ namespace FileCabinetApp
 
         public string Name => nameof(ServiceMeter);
 
-        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecord(ValidateParametersData data)
         {
             this.stopwatch.Restart();
             var value = this.fileCabinetService.CreateRecord(data);
@@ -26,48 +26,21 @@ namespace FileCabinetApp
             return value;
         }
 
-        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecordWithId(int id, ValidateParametersData data)
         {
             this.stopwatch.Restart();
-            var value = this.fileCabinetService.CreateRecordWithSpecifiedId(id, data);
+            var value = this.fileCabinetService.CreateRecordWithId(id, data);
             this.stopwatch.Stop();
             Print(nameof(this.CreateRecord), this.stopwatch.ElapsedTicks);
             return value;
         }
 
-        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public void EditRecord(int id, ValidateParametersData data)
         {
             this.stopwatch.Restart();
             this.fileCabinetService.EditRecord(id, data);
             this.stopwatch.Stop();
             Print(nameof(this.EditRecord), this.stopwatch.ElapsedTicks);
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
-        {
-            this.stopwatch.Restart();
-            var value = this.fileCabinetService.FindByDateOfBirth(dateOfBirth);
-            this.stopwatch.Stop();
-            Print(nameof(this.FindByDateOfBirth), this.stopwatch.ElapsedTicks);
-            return value;
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
-        {
-            this.stopwatch.Restart();
-            var value = this.fileCabinetService.FindByFirstName(firstName);
-            this.stopwatch.Stop();
-            Print(nameof(this.FindByFirstName), this.stopwatch.ElapsedTicks);
-            return value;
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
-        {
-            this.stopwatch.Restart();
-            var value = this.fileCabinetService.FindByLastName(lastName);
-            this.stopwatch.Stop();
-            Print(nameof(this.FindByLastName), this.stopwatch.ElapsedTicks);
-            return value;
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -119,6 +92,14 @@ namespace FileCabinetApp
             this.fileCabinetService.Restore(snapshot ?? throw new ArgumentNullException(nameof(snapshot)));
             this.stopwatch.Stop();
             Print(nameof(this.Restore), this.stopwatch.ElapsedTicks);
+        }
+
+        public void Delete(IEnumerable<FileCabinetRecord> records)
+        {
+            this.stopwatch.Restart();
+            this.fileCabinetService.Delete(records);
+            this.stopwatch.Stop();
+            Print(nameof(this.Delete), this.stopwatch.ElapsedTicks);
         }
 
         private static void Print(string name, long elapsedticks)

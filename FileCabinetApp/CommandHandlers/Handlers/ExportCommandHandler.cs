@@ -60,30 +60,30 @@ namespace FileCabinetApp
 
             if (isCanceled) message = "Export canceled by the user.";
 
+            FileStream filestream = default;
+            try
+            {
+                filestream = File.Create(path);
+            }
+            catch (FileNotFoundException)
+            {
+                message = $"Export failed: can't open file {path}.";
+            }
+
+            using var stream = new StreamWriter(filestream);
+
             if (format.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase))
             {
-                try
-                {
-                    snapshot.SaveToCsv(new StreamWriter(path, false, System.Text.Encoding.Unicode));
-                    message = $"All records are exported to file {path}";
-                }
-                catch (FileNotFoundException)
-                {
-                    message = $"Export failed: can't open file {path}.";
-                }
+                using var writer = new FileCabinetRecordCsvWriter(stream);
+                snapshot.SaveTo(writer);
+                message = $"All records export into CSV file {path}";
             }
 
             if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
             {
-                try
-                {
-                    snapshot.SaveToXml(new StreamWriter(path, false, System.Text.Encoding.Unicode));
-                    message = $"All records are exported to file {path}";
-                }
-                catch (FileNotFoundException)
-                {
-                    message = $"Export failed: can't open file {path}.";
-                }
+                using var writer = new FileCabinetRecordXmlWriter(stream);
+                snapshot.SaveTo(writer);
+                message = $"All record export into XML file {path}";
             }
 
             return message;

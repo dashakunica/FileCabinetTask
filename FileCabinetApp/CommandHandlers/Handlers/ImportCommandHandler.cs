@@ -52,7 +52,7 @@ namespace FileCabinetApp
             string message = string.Empty;
             if (!File.Exists(path))
             {
-                message = $"Import error: file {path} is not exist.";
+                message = $"Import error: file {path} not exist.";
             }
 
             using var stream = new StreamReader(File.OpenRead(path));
@@ -62,11 +62,12 @@ namespace FileCabinetApp
                 var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
                 try
                 {
-                    snapshot.LoadFromCsv(stream);
+                    using var reader = new FileCabinetRecordCsvReader(stream);
+                    snapshot.LoadFrom(reader);
                 }
-                catch (Exception ife)
+                catch (Exception ex)
                 {
-                    message = $"Import error: {ife.InnerException.Message}";
+                    message = $"Import failed: {ex.InnerException.Message}";
                 }
 
                 this.Service.Restore(snapshot);
@@ -78,11 +79,12 @@ namespace FileCabinetApp
                 var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
                 try
                 {
-                    snapshot.LoadFromXml(stream);
+                    using var reader = new FileCabinetRecordXmlReader(stream);
+                    snapshot.LoadFrom(reader);
                 }
-                catch (Exception ife)
+                catch (Exception ex)
                 {
-                    message = $"Import error: {ife.InnerException.Message}";
+                    message = $"Import failed: {ex.InnerException.Message}";
                 }
 
                 this.Service.Restore(snapshot);

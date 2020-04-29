@@ -1,6 +1,8 @@
-﻿namespace FileCabinetApp
+﻿using System;
+
+namespace FileCabinetApp
 {
-    public interface IFileCabinetWriter
+    public interface IFileCabinetWriter : IDisposable
     {
         void Write(FileCabinetRecord record);
     }

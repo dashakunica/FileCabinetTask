@@ -21,5 +21,15 @@ namespace FileCabinetApp
 
             this.writer.WriteLine(record.ToString());
         }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
     }
 }

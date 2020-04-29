@@ -85,7 +85,7 @@ namespace FileCabinetGenerator
 
         private static IEnumerable<FileCabinetRecordSerializable> Generate(int startId, int amount)
         {
-            var validation = new DefaultValidator();
+            var validation = ValidatorBuilder.CreateDefault();
 
             var list = new List<FileCabinetRecordSerializable>();
             var random = new Random();
@@ -115,10 +115,20 @@ namespace FileCabinetGenerator
                         record.Salary = random.Next(30, 200);
                         record.Bonuses = Convert.ToInt16(random.Next(120, 240));
 
-                        validation.ValidateParameters(record);
+                        var data = new ValidateParametersData
+                        {
+                            FirstName = record.Name.FirstName,
+                            LastName = record.Name.LastName,
+                            DateOfBirth = record.DateOfBirth,
+                            Bonuses = record.Bonuses,
+                            Salary = record.Salary,
+                            AccountType = record.AccountType,
+                        };
+
+                        validation.ValidateParameters(data);
                         isValid = true;
                     }
-                    catch
+                    catch(Exception)
                     {
                         isValid = false;
                     }

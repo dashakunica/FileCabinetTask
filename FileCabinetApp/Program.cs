@@ -58,17 +58,6 @@ namespace FileCabinetApp
             }
 
             var commandParameters = CommandLineParser.GetCommandLineArguments(args);
-            foreach (var item in args)
-            {
-                Console.WriteLine(item);
-            }
-
-            Console.WriteLine();
-            foreach (var item in commandParameters)
-            {
-                Console.WriteLine("Key:" + item.Key + ". Value:" + item.Value);
-            }
-
             SetParameters(commandParameters, args);
 
             Console.WriteLine($"Using {validationRules} validation rules.");
@@ -97,7 +86,7 @@ namespace FileCabinetApp
                 {
                     commandHandler.Handle(new AppCommandRequest(command, parameters));
                 }
-                catch (ArgumentException)
+                catch (Exception)
                 {
                     Console.WriteLine($"There is no explanation for '{command}' command." +
                                       $"{Environment.NewLine}The most similar commands are");
@@ -170,7 +159,7 @@ namespace FileCabinetApp
             var createHandler = new CreateCommandHandler(fileCabinetService);
             var exitHandler = new ExitCommandHandler(Runner);
             var exportHandler = new ExportCommandHandler(fileCabinetService);
-            var findHandler = new FindCommandHandler(fileCabinetService, Print);
+            var selectHandler = new SelectCommandHandler(fileCabinetService, Print);
             var importHandler = new ImportCommandHandler(fileCabinetService);
             var listHandler = new ListCommandHandler(fileCabinetService, Print);
             var printHelpHandler = new HelpCommandHandler();
@@ -183,8 +172,8 @@ namespace FileCabinetApp
             createHandler.SetNext(updateHandler);
             updateHandler.SetNext(exitHandler);
             exitHandler.SetNext(exportHandler);
-            exportHandler.SetNext(findHandler);
-            findHandler.SetNext(importHandler);
+            exportHandler.SetNext(selectHandler);
+            selectHandler.SetNext(importHandler);
             importHandler.SetNext(listHandler);
             listHandler.SetNext(printHelpHandler);
             printHelpHandler.SetNext(purgeHandler);
@@ -204,7 +193,7 @@ namespace FileCabinetApp
 
             foreach (var record in records)
             {
-                Console.WriteLine($"#{record.ToString()}");
+                Console.WriteLine(record.ToString());
             }
         }
     }

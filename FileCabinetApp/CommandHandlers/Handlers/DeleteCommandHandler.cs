@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
+using System.Linq;
+using System.ComponentModel;
 
 namespace FileCabinetApp
 {
@@ -9,12 +12,12 @@ namespace FileCabinetApp
         private const string Command = "delete";
 
         private const string Id = "Id";
-        private const string FirstName = "FirstName";
-        private const string LastName = "LastName";
-        private const string DateOfBirth = "DateOfBirth";
 
         private const char WhiteSpace = ' ';
         private const char Comma = ',';
+
+        private static readonly PropertyInfo[] FileCabinetRecordProperties = typeof(FileCabinetRecord).GetProperties();
+        private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
 
         public DeleteCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
@@ -45,55 +48,45 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            (string field, string value) = QueryParser.DeleteParser(parameters);
+            var where = QueryParser.DeleteParser(parameters);
 
-            var record = new FileCabinetRecord();
-            if (field.Equals(Id, StringComparison.InvariantCultureIgnoreCase))
+            string idValue;
+            if (where.TryGetValue(Id, out idValue))
             {
                 int temp;
-                if (!int.TryParse(value, out temp))
+                if (!int.TryParse(idValue, out temp))
                 {
-                    Console.WriteLine("idException");
+                    Console.WriteLine("Invalid Id value.");
                 }
 
                 this.Service.RemoveRecord(temp);
             }
 
-            var records = GetRecords(field, value);
+            string type = where["type"];
+            var whereRecord = CreateValidateArgs(where);
+            var allRecords = this.Service.GetRecords();
+
+            var records = QueryParser.GetRecorgs(whereRecord, allRecords, type);
+
             var builder = GetId(records);
 
             string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
             this.Service.Delete(records);
+            Memoization.RefreshMemoization();
+            Console.WriteLine(text);
         }
 
-        private IEnumerable<FileCabinetRecord> GetRecords(string field, string value)
+        private static ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
         {
-            IEnumerable<FileCabinetRecord> records = default;
-
-            if (field.Equals(FirstName, StringComparison.InvariantCultureIgnoreCase))
+            var arg = new ValidateParametersData();
+            foreach (var item in propNewValues)
             {
-                records = this.Service.FindByFirstName(value);
-            }
-            else if (field.Equals(LastName, StringComparison.InvariantCultureIgnoreCase))
-            {
-                records = this.Service.FindByLastName(value);
-            }
-            else if (field.Equals(DateOfBirth, StringComparison.InvariantCultureIgnoreCase))
-            {
-                DateTime temp;
-                if (!DateTime.TryParse(value, out temp))
-                {
-                    Console.WriteLine("dateOfBirthException");
-                }
-
-                records = this.Service.FindByDateOfBirth(temp);
-            }
-            else
-            {
-                Console.WriteLine("unknownArgument", field);
+                var prop = ValidateParametersProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
+                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
+                prop.SetValue(arg, converter.ConvertFromString(item.Value));
             }
 
-            return records;
+            return arg;
         }
 
         private StringBuilder GetId(IEnumerable<FileCabinetRecord> records)

@@ -26,7 +26,7 @@ namespace FileCabinetApp
 
         public string Name => nameof(ServiceLogger);
 
-        public int CreateRecord((string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecord(ValidateParametersData data)
         {
             this.Print(nameof(this.CreateRecord), data.ToString());
             var value = this.fileCabinetService.CreateRecord(data);
@@ -34,42 +34,18 @@ namespace FileCabinetApp
             return value;
         }
 
-        public int CreateRecordWithSpecifiedId(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public int CreateRecordWithId(int id, ValidateParametersData data)
         {
             this.Print(nameof(this.CreateRecord), data.ToString());
-            var value = this.fileCabinetService.CreateRecordWithSpecifiedId(id, data);
+            var value = this.fileCabinetService.CreateRecordWithId(id, data);
             this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
             return value;
         }
 
-        public void EditRecord(int id, (string firstName, string lastName, DateTime dateOfBirth, short bonuses, decimal salary, char accountType) data)
+        public void EditRecord(int id, ValidateParametersData data)
         {
             this.Print(nameof(this.EditRecord), $"{nameof(id)} = '{id.ToString(CultureInfo.InvariantCulture)}', {data.ToString()}");
             this.fileCabinetService.EditRecord(id, data);
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(DateTime dateOfBirth)
-        {
-            this.Print(nameof(this.FindByDateOfBirth), $"{nameof(dateOfBirth)} = '{dateOfBirth.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture)}'");
-            var value = this.fileCabinetService.FindByDateOfBirth(dateOfBirth);
-            this.Print(nameof(this.FindByDateOfBirth), $"{(value == null ? string.Empty : value.GetType().Name)}.");
-            return value;
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
-        {
-            this.Print(nameof(this.FindByDateOfBirth), $"{nameof(firstName)} = '{firstName}'");
-            var value = this.fileCabinetService.FindByFirstName(firstName);
-            this.Print(nameof(this.FindByFirstName), $"{(value == null ? string.Empty : value.GetType().Name)}.");
-            return value;
-        }
-
-        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
-        {
-            this.Print(nameof(this.FindByLastName), $"{nameof(lastName)} = '{lastName}'");
-            var value = this.fileCabinetService.FindByLastName(lastName);
-            this.Print(nameof(this.FindByLastName), $"{(value == null ? string.Empty : value.GetType().Name)}");
-            return value;
         }
 
         public IEnumerable<FileCabinetRecord> GetRecords()
@@ -117,6 +93,12 @@ namespace FileCabinetApp
 
             this.Print(nameof(this.Restore), $"snapshot wich contains {snapshot?.Records.Count} elemetns.");
             this.fileCabinetService.Restore(snapshot);
+        }
+
+        public void Delete(IEnumerable<FileCabinetRecord> records)
+        {
+            this.Print(nameof(this.Restore), string.Empty);
+            this.fileCabinetService.Delete(records);
         }
 
         public void Dispose()

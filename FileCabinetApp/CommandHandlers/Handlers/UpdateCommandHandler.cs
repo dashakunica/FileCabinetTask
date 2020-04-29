@@ -62,6 +62,7 @@ namespace FileCabinetApp
                 builder.Append($"#{item.Id}, ");
                 var current = CopyAndFillUnusedFields(newValues, item);
                 this.Service.EditRecord(item.Id, current);
+                Memoization.RefreshMemoization();
             }
 
             Console.WriteLine(builder.Length == 0 ? string.Empty : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.");

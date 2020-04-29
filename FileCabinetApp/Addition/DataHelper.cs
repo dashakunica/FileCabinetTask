@@ -114,7 +114,7 @@ namespace FileCabinetApp
 
                 if (!conversionResult.Item1)
                 {
-                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
+                    Console.WriteLine($"It is not valid parameter {conversionResult.Item2}. Please, correct your input.");
                     continue;
                 }
 
@@ -123,7 +123,7 @@ namespace FileCabinetApp
                 var validationResult = validator(value);
                 if (!validationResult.Item1)
                 {
-                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
+                    Console.WriteLine($"It is not valid parameter: {validationResult.Item2}. Please, correct your input.");
                     continue;
                 }
 

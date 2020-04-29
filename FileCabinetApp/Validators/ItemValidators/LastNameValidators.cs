@@ -14,7 +14,7 @@ namespace FileCabinetApp
 
         private int Max { get; set; }
 
-        public void ValidateParameters(FileCabinetRecord data)
+        public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)
             {
@@ -28,7 +28,7 @@ namespace FileCabinetApp
 
             if (data.LastName.Length < this.Min || data.LastName.Length > this.Max)
             {
-                throw new ArgumentException(nameof(data.LastName), $"{nameof(data.LastName)} cannot be less then {this.Min}, more then {this.Max}.");
+                throw new ArgumentException(nameof(data.LastName), $"{nameof(data.LastName)} cannot be less than {this.Min}, more than {this.Max}.");
             }
         }
     }
