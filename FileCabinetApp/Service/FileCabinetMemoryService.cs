@@ -68,7 +68,7 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Get amount of record.
+        /// Get amount of record and amount of removed records.
         /// </summary>
         /// <returns>Amount of records.</returns>
         public (int active, int removed) GetStat() => (this.list.Count, Zero);

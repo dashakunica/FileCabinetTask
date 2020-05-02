@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// File cabinet service interface.
+    /// </summary>
     public interface IFileCabinetService
     {
         int CreateRecord(ValidateParametersData data);
