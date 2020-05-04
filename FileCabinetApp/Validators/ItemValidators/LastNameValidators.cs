@@ -18,7 +18,7 @@ namespace FileCabinetApp
         {
             if (data is null)
             {
-                throw new ArgumentNullException(nameof(data), $"{nameof(data)} cannot be null.");
+                throw new ArgumentNullException($"{nameof(data)} cannot be null.");
             }
 
             if (string.IsNullOrWhiteSpace(data.LastName))
@@ -28,7 +28,7 @@ namespace FileCabinetApp
 
             if (data.LastName.Length < this.Min || data.LastName.Length > this.Max)
             {
-                throw new ArgumentException(nameof(data.LastName), $"{nameof(data.LastName)} cannot be less than {this.Min}, more than {this.Max}.");
+                throw new ArgumentException($"{nameof(data.LastName)} cannot be less than {this.Min}, more than {this.Max}.");
             }
         }
     }

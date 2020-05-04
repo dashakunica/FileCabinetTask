@@ -8,11 +8,6 @@ namespace FileCabinetApp
     {
         private readonly List<IRecordValidator> validators;
 
-        public CompositeValidator()
-            : this(Enumerable.Empty<IRecordValidator>())
-        {
-        }
-
         public CompositeValidator(IEnumerable<IRecordValidator> validators)
         {
             this.validators = new List<IRecordValidator>(validators ?? throw new ArgumentNullException(nameof(validators)));

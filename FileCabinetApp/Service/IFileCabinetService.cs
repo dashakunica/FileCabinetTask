@@ -7,9 +7,9 @@ namespace FileCabinetApp
     /// </summary>
     public interface IFileCabinetService
     {
-        int CreateRecord(ValidateParametersData data);
+        int CreateAndSetId(ValidateParametersData data);
 
-        public int CreateRecordWithId(int id, ValidateParametersData data);
+        public int CreateRecord(int id, ValidateParametersData data);
 
         void EditRecord(int id, ValidateParametersData data);
 

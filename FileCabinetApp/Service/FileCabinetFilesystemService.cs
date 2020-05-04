@@ -24,7 +24,6 @@ namespace FileCabinetApp
         private readonly BinaryReader binaryReader;
         private readonly BinaryWriter binaryWriter;
         private IRecordValidator validator;
-        private string path;
         private const int MinId = 0;
         private int lastId = MinId;
 
@@ -59,17 +58,17 @@ namespace FileCabinetApp
             return new FileCabinetFilesystemService(fileStream, validator);
         }
 
-        public int CreateRecord(ValidateParametersData data)
+        public int CreateAndSetId(ValidateParametersData data)
         {
             if (data is null)
             {
                 throw new ArgumentNullException(nameof(data));
             }
 
-            return this.CreateRecordWithId(this.GenerateId(), data);
+            return this.CreateRecord(this.GenerateId(), data);
         }
 
-        public int CreateRecordWithId(int id, ValidateParametersData data)
+        public int CreateRecord(int id, ValidateParametersData data)
         {
             if (id < MinId)
             {
@@ -284,7 +283,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    this.CreateRecordWithId(record.Id, data);
+                    this.CreateRecord(record.Id, data);
                 }
             }
         }

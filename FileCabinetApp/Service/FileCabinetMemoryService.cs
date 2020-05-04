@@ -16,11 +16,9 @@ namespace FileCabinetApp
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
 
-        private readonly Dictionary<string, List<FileCabinetRecord>> memoization = new Dictionary<string, List<FileCabinetRecord>>();
+        private int lastId = 1;
 
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<DateTime, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<DateTime, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> memoization = new Dictionary<string, List<FileCabinetRecord>>();
 
         public FileCabinetMemoryService(IRecordValidator validator) => this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
 
@@ -32,9 +30,28 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="record">Record.</param>
         /// <returns>Id of record.</returns>
-        public int CreateRecord(ValidateParametersData data)
+        public int CreateAndSetId(ValidateParametersData data)
         {
-            return this.CreateRecordWithId(Zero, data);
+            return this.CreateRecord(this.GenerateId(), data);
+        }
+
+        public int CreateRecord(int id, ValidateParametersData data)
+        {
+            if (id < MinId)
+            {
+                throw new ArgumentException();
+            }
+
+            if (this.GetRecords().Any(x => x.Id == id))
+            {
+                throw new ArgumentException();
+            }
+
+            this.validator.ValidateParameters(data ?? throw new ArgumentException(nameof(data)));
+            this.memoization.Clear();
+            var record = DataHelper.CreateRecordFromArgs(id != default ? id : this.GenerateId(), data);
+            this.list.Add(record);
+            return record.Id;
         }
 
         /// <summary>
@@ -138,28 +155,9 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    this.CreateRecordWithId(record.Id, data);
+                    this.CreateRecord(record.Id, data);
                 }
             }
-        }
-
-        public int CreateRecordWithId(int id, ValidateParametersData data)
-        {
-            if (id < MinId)
-            {
-                throw new ArgumentException();
-            }
-
-            if (this.GetRecords().Any(x => x.Id == id))
-            {
-                throw new ArgumentException();
-            }
-
-            this.validator.ValidateParameters(data ?? throw new ArgumentException(nameof(data)));
-            this.memoization.Clear();
-            var record = DataHelper.CreateRecordFromArgs(id != default ? id : this.GenerateId(), data);
-            this.list.Add(record);
-            return record.Id;
         }
 
         public void RemoveRecord(int id)
@@ -170,19 +168,14 @@ namespace FileCabinetApp
 
         private int GenerateId()
         {
-            for (int i = MinId; i <= int.MaxValue; i++)
-            {
-                if (this.list.Count == 0)
-                {
-                    return MinId;
-                }
+            var start = this.lastId != int.MaxValue - 1 ? this.lastId : MinId;
 
-                foreach (var record in this.GetRecords())
+            for (int i = start; i < int.MaxValue; i++)
+            {
+                if (!this.GetRecords().Any(x => x.Id == i))
                 {
-                    if (record.Id == i)
-                    {
-                        return i;
-                    }
+                    this.lastId = i;
+                    return i;
                 }
             }
 

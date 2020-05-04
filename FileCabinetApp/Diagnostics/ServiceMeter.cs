@@ -17,21 +17,21 @@ namespace FileCabinetApp
 
         public string Name => nameof(ServiceMeter);
 
-        public int CreateRecord(ValidateParametersData data)
+        public int CreateAndSetId(ValidateParametersData data)
         {
             this.stopwatch.Restart();
-            var value = this.fileCabinetService.CreateRecord(data);
+            var value = this.fileCabinetService.CreateAndSetId(data);
             this.stopwatch.Stop();
-            Print(nameof(this.CreateRecord), this.stopwatch.ElapsedTicks);
+            Print(nameof(this.CreateAndSetId), this.stopwatch.ElapsedTicks);
             return value;
         }
 
-        public int CreateRecordWithId(int id, ValidateParametersData data)
+        public int CreateRecord(int id, ValidateParametersData data)
         {
             this.stopwatch.Restart();
-            var value = this.fileCabinetService.CreateRecordWithId(id, data);
+            var value = this.fileCabinetService.CreateRecord(id, data);
             this.stopwatch.Stop();
-            Print(nameof(this.CreateRecord), this.stopwatch.ElapsedTicks);
+            Print(nameof(this.CreateAndSetId), this.stopwatch.ElapsedTicks);
             return value;
         }
 

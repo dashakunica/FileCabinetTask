@@ -42,7 +42,7 @@ namespace FileCabinetApp
                 try
                 {
                     var record = DataHelper.GetData();
-                    id = this.Service.CreateRecord(record);
+                    id = this.Service.CreateAndSetId(record);
 
                     isValid = true;
                 }

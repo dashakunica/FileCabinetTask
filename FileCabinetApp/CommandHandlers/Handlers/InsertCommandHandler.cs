@@ -34,7 +34,7 @@ namespace FileCabinetApp
 
         private void Insert(int id, ValidateParametersData data)
         {
-            id = id == 0 ? this.Service.CreateRecord(data) : this.Service.CreateRecordWithId(id, data);
+            id = id == 0 ? this.Service.CreateAndSetId(data) : this.Service.CreateRecord(id, data);
             Console.WriteLine($"Record #{id} is created.");
         }
 

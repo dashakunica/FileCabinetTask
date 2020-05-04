@@ -18,12 +18,12 @@ namespace FileCabinetApp
         {
             if (data is null)
             {
-                throw new ArgumentNullException(nameof(data), $"{nameof(data)} cannot be null.");
+                throw new ArgumentNullException($"{nameof(data)} cannot be null.");
             }
 
             if (data.Bonuses < this.Min || data.Bonuses > this.Max)
             {
-                throw new ArgumentException(nameof(data.Bonuses), $"{nameof(data.Bonuses)} cannot be less then {this.Min} and more then {this.Max}");
+                throw new ArgumentException($"{nameof(data.Bonuses)} cannot be less then {this.Min} and more then {this.Max}");
             }
         }
     }

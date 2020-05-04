@@ -26,19 +26,19 @@ namespace FileCabinetApp
 
         public string Name => nameof(ServiceLogger);
 
-        public int CreateRecord(ValidateParametersData data)
+        public int CreateAndSetId(ValidateParametersData data)
         {
-            this.Print(nameof(this.CreateRecord), data.ToString());
-            var value = this.fileCabinetService.CreateRecord(data);
-            this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
+            this.Print(nameof(this.CreateAndSetId), data.ToString());
+            var value = this.fileCabinetService.CreateAndSetId(data);
+            this.Print(nameof(this.CreateAndSetId), value.ToString(CultureInfo.InvariantCulture));
             return value;
         }
 
-        public int CreateRecordWithId(int id, ValidateParametersData data)
+        public int CreateRecord(int id, ValidateParametersData data)
         {
-            this.Print(nameof(this.CreateRecord), data.ToString());
-            var value = this.fileCabinetService.CreateRecordWithId(id, data);
-            this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
+            this.Print(nameof(this.CreateAndSetId), data.ToString());
+            var value = this.fileCabinetService.CreateRecord(id, data);
+            this.Print(nameof(this.CreateAndSetId), value.ToString(CultureInfo.InvariantCulture));
             return value;
         }
 

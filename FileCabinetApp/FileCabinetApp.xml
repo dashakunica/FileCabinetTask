@@ -71,6 +71,18 @@
             </summary>
             <returns>String representation of record.</returns>
         </member>
+        <member name="T:FileCabinetApp.CommandLineParser">
+            <summary>
+            Class which provides method for parsing command line.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandLineParser.GetCommandLineArguments(System.String[])">
+            <summary>
+            Method which get command line arguments in dictionary.
+            </summary>
+            <param name="args">Non parsing command line arguments.</param>
+            <returns>Dictionary with parsing command line parameters.</returns>
+        </member>
         <member name="T:FileCabinetApp.Program">
             <summary>
             API.
@@ -87,7 +99,7 @@
             Service for working with file cabinet.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.ValidateParametersData)">
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateAndSetId(FileCabinetApp.ValidateParametersData)">
             <summary>
             Method which create new record.
             </summary>
@@ -102,9 +114,14 @@
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
             <summary>
-            Get amount of record.
+            Get amount of record and amount of removed records.
             </summary>
             <returns>Amount of records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.IFileCabinetService">
+            <summary>
+            File cabinet service interface.
+            </summary>
         </member>
     </members>
 </doc>

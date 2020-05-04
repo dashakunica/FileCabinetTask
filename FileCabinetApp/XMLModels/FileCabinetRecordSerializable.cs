@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using System.Xml.Serialization;
 
 namespace FileCabinetGenerator
@@ -31,6 +32,19 @@ namespace FileCabinetGenerator
 
         [XmlElement("Bonuses")]
         public short Bonuses { get; set; }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.Append($"{this.Id}, ");
+            builder.Append($"{this.Name?.FirstName}, ");
+            builder.Append($"{this.Name?.LastName}, ");
+            builder.Append($"{this.DateOfBirth.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture)}, ");
+            builder.Append($"{this.Bonuses}, ");
+            builder.Append($"{this.Salary}, ");
+            builder.Append($"{this.AccountType}");
+            return builder.ToString();
+        }
     }
 
     public class Name

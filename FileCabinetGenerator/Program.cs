@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace FileCabinetGenerator
 {
     class Program
     {
+        private const string XmlString = "xml";
+        private const string CsvString = "csv";
 
         private static string[] commandLineParameters = new string[]
         {
@@ -30,17 +33,17 @@ namespace FileCabinetGenerator
         {
             var parameters = CommandLineParser.GetCommandLineArguments(args);
 
-            var parameterKey = (args[0].Trim().StartsWith("-")) ? shortCommandLineParameters : commandLineParameters;
+            var parameterKey = (args[0].Trim().StartsWith("--")) ? commandLineParameters : shortCommandLineParameters;
 
             string fileType = parameters[parameterKey[0]];
             string filePath = parameters[parameterKey[1]];
             int recordsAmount = Int32.Parse(parameters[parameterKey[2]]);
             int startId = Int32.Parse(parameters[parameterKey[3]]);
 
-            if (!fileType.Equals("csv", StringComparison.InvariantCultureIgnoreCase) &&
-                !fileType.Equals("xml", StringComparison.InvariantCultureIgnoreCase))
+            if (!fileType.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase) &&
+                !fileType.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
             {
-                Console.WriteLine("U can only export records into *.csv or *.xml format.");
+                Console.WriteLine("You can only export records into *.csv or *.xml format.");
                 return;
             }
 
@@ -49,93 +52,87 @@ namespace FileCabinetGenerator
                 File.Delete(filePath);
             }
 
-            using var stream = File.Create(filePath);
+            var stream = File.Create(filePath);
             using var writer = new StreamWriter(stream);
             var records = Generate(startId, recordsAmount);
 
-            if (fileType.Equals("csv", StringComparison.CurrentCultureIgnoreCase))
+            if (fileType.Equals(CsvString, StringComparison.CurrentCultureIgnoreCase))
             {
-                var fileWriter = new StreamWriter(filePath);
-                var csvWriter = new CsvWriter(fileWriter, records);
-                csvWriter.Write();
-                fileWriter.Close();
-            }
-
-            if (fileType.Equals("xml", StringComparison.CurrentCultureIgnoreCase))
-            {
-                XmlWriterSettings settings = new XmlWriterSettings
+                foreach (var record in records)
                 {
-                    Indent = true
-                };
-                using (var fileWriter = XmlWriter.Create(filePath, settings))
-                {
-                    var xmlWriter = new XmlWriters(fileWriter, records.ToArray());
-                    xmlWriter.Write();
+                    writer.WriteLine(record.ToString());
                 }
             }
-        }
 
-        private static void ExportAsCsv(IEnumerable<FileCabinetRecordSerializable> records, StreamWriter writer)
-        {
-            foreach (var record in records)
+            if (fileType.Equals(XmlString, StringComparison.CurrentCultureIgnoreCase))
             {
-                writer.WriteLine(record.ToString());
+                var xmlSerializedRecords = new FileCabinetRecordsSerializable(records);
+
+                var ns = new XmlSerializerNamespaces();
+                ns.Add(string.Empty, string.Empty);
+
+                var serializer = new XmlSerializer(typeof(FileCabinetRecordsSerializable));
+                serializer.Serialize(writer, xmlSerializedRecords, ns);
             }
+
+            Console.WriteLine($"{recordsAmount} records were written to {filePath}");
         }
 
         private static IEnumerable<FileCabinetRecordSerializable> Generate(int startId, int amount)
         {
             var validation = ValidatorBuilder.CreateDefault();
+            int id = 0;
 
-            var list = new List<FileCabinetRecordSerializable>();
             var random = new Random();
-            for (int i = 0; i < amount; i++)
+            for (int i = startId; i <= startId + amount; i++)
             {
-                var record = new FileCabinetRecordSerializable();
+                var data = new ValidateParametersData();
                 bool isValid;
 
                 do
                 {
                     try
                     {
-                        record.Id = startId;
-                        startId++;
-
-                        record.Name.FirstName = RandomString(random.Next(4, 60));
-                        record.Name.LastName = RandomString(random.Next(4, 60));
+                        id = i;
 
                         var day = random.Next(1, 30);
                         var month = random.Next(1, 12);
                         var year = random.Next(1950, 2020);
-                        record.DateOfBirth = record.DateOfBirth.AddDays(day - 1);
-                        record.DateOfBirth = record.DateOfBirth.AddMonths(month - 1);
-                        record.DateOfBirth = record.DateOfBirth.AddYears(year - 1);
+                        var date = new DateTime(year, month, day);
 
-                        record.AccountType = (char)random.Next(64, 100);
-                        record.Salary = random.Next(30, 200);
-                        record.Bonuses = Convert.ToInt16(random.Next(120, 240));
-
-                        var data = new ValidateParametersData
+                        data = new ValidateParametersData
                         {
-                            FirstName = record.Name.FirstName,
-                            LastName = record.Name.LastName,
-                            DateOfBirth = record.DateOfBirth,
-                            Bonuses = record.Bonuses,
-                            Salary = record.Salary,
-                            AccountType = record.AccountType,
+                            FirstName = RandomString(random.Next(2, 60)),
+                            LastName = RandomString(random.Next(2, 60)),
+                            DateOfBirth = date,
+                            Bonuses = Convert.ToInt16(random.Next(0, 30_000)),
+                            Salary = random.Next(3_000, 10_000),
+                            AccountType = (char)random.Next('a', 'z'),
                         };
 
                         validation.ValidateParameters(data);
                         isValid = true;
                     }
-                    catch(Exception)
+                    catch (ArgumentException)
                     {
                         isValid = false;
                     }
                 }
                 while (!isValid);
 
-                yield return record;
+                yield return new FileCabinetRecordSerializable
+                {
+                    Id = id,
+                    Name = new Name() 
+                    { 
+                        FirstName = data.FirstName,
+                        LastName = data.LastName
+                    },
+                    DateOfBirth = data.DateOfBirth,
+                    Bonuses = data.Bonuses,
+                    Salary = data.Salary,
+                    AccountType = data.AccountType,
+                }; 
             }
         }
 

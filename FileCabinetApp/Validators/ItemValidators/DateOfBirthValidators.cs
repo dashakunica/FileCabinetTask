@@ -18,12 +18,12 @@ namespace FileCabinetApp
         {
             if (data is null)
             {
-                throw new ArgumentNullException(nameof(data), $"{nameof(data)} cannot be null.");
+                throw new ArgumentNullException($"{nameof(data)} cannot be null.");
             }
 
             if (data.DateOfBirth < this.From || data.DateOfBirth > this.To)
             {
-                throw new ArgumentException(nameof(data.DateOfBirth), $"{nameof(data.DateOfBirth)} cannot be less then {this.From.Date} and more then {this.To.Date}.");
+                throw new ArgumentException($"{nameof(data.DateOfBirth)} cannot be less then {this.From.Date} and more then {this.To.Date}.");
             }
         }
     }
