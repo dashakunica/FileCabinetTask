@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.Linq;
 using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Delete command handle.
+    /// </summary>
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "delete";
@@ -16,14 +19,19 @@ namespace FileCabinetApp
         private const char WhiteSpace = ' ';
         private const char Comma = ',';
 
-        private static readonly PropertyInfo[] FileCabinetRecordProperties = typeof(FileCabinetRecord).GetProperties();
         private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteCommandHandler"/> class.
+        /// Delete command handler.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public DeleteCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)
@@ -50,11 +58,11 @@ namespace FileCabinetApp
 
             var where = QueryParser.DeleteParser(parameters);
 
-            string idValue;
-            if (where.TryGetValue(Id, out idValue))
+            string id;
+            if (where.TryGetValue(Id, out id))
             {
                 int temp;
-                if (!int.TryParse(idValue, out temp))
+                if (!int.TryParse(id, out temp))
                 {
                     Console.WriteLine("Invalid Id value.");
                 }
@@ -63,12 +71,12 @@ namespace FileCabinetApp
             }
 
             string type = where["type"];
-            var whereRecord = CreateValidateArgs(where);
+            var whereRecord = this.CreateValidateArgs(where);
             var allRecords = this.Service.GetRecords();
 
             var records = QueryParser.GetRecorgs(whereRecord, allRecords, type);
 
-            var builder = GetId(records);
+            var builder = this.GetId(records);
 
             string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
             this.Service.Delete(records);
@@ -76,7 +84,7 @@ namespace FileCabinetApp
             Console.WriteLine(text);
         }
 
-        private static ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
+        private ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
         {
             var arg = new ValidateParametersData();
             foreach (var item in propNewValues)

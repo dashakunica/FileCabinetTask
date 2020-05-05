@@ -2,6 +2,9 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Exit command handle.
+    /// </summary>
     public class ExitCommandHandler : CommandHandlerBase
     {
         private const string Command = "exit";
@@ -12,6 +15,7 @@ namespace FileCabinetApp
             this.action = action;
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)

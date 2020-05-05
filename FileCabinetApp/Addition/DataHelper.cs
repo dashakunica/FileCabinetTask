@@ -1,23 +1,59 @@
 ﻿using System;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Class helper for working with data.
+    /// </summary>
     public static class DataHelper
     {
-        private const int MinNameLength = 2;
-        private const int MaxNameLength = 60;
+        private static readonly FirstNameJson FirstName = ValidatorBuilder.FNameValidValue;
+        private static readonly LastNameJson LastName = ValidatorBuilder.LNameValidValue;
+        private static readonly DateOfBirthJson DateOfBirth = ValidatorBuilder.DoBValidValue;
+        private static readonly BonusesJson Bonuses = ValidatorBuilder.BonusesValidValue;
+        private static readonly SalaryJson Salary = ValidatorBuilder.SalaryValidValue;
 
-        private const short MinWorkPlaceNumber = 0;
-        private const short MaxWorkPlaceNumber = 30_000;
+        /// <summary>
+        /// Request data from user in console.
+        /// </summary>
+        /// <returns>Validate parameters data from user input.</returns>
+        public static ValidateParametersData RequestData()
+        {
+            var data = new ValidateParametersData();
+            Console.Write("First Name: ");
+            data.FirstName = ReadInput<string>(Convert<string>, x => x.Length < FirstName.Min || x.Length > FirstName.Max
+                                                                    ? new Tuple<bool, string>(false, nameof(data.FirstName))
+                                                                    : new Tuple<bool, string>(true, nameof(data.FirstName)));
+            Console.Write("Last Name: ");
+            data.LastName = ReadInput<string>(Convert<string>, x => x.Length < LastName.Min || x.Length > LastName.Max
+                                                                    ? new Tuple<bool, string>(false, nameof(data.LastName))
+                                                                    : new Tuple<bool, string>(true, nameof(data.LastName)));
+            Console.Write("Date of birth: ");
+            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.From || x > DateOfBirth.To
+                                                                    ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
+                                                                    : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
+            Console.Write("Work place number: ");
+            data.Bonuses = ReadInput<short>(Convert<short>, x => x < Bonuses.Min || x > Bonuses.Max
+                                                                    ? new Tuple<bool, string>(false, nameof(data.Bonuses))
+                                                                    : new Tuple<bool, string>(true, nameof(data.Bonuses)));
+            Console.Write("Salary: ");
+            data.Salary = ReadInput<decimal>(Convert<decimal>, x => x < Salary.Min || x > Salary.Max
+                                                                    ? new Tuple<bool, string>(false, nameof(data.Salary))
+                                                                    : new Tuple<bool, string>(true, nameof(data.Salary)));
+            Console.Write("Department: ");
+            data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetterOrDigit(x)
+                                                                    ? new Tuple<bool, string>(true, nameof(data.AccountType))
+                                                                    : new Tuple<bool, string>(false, nameof(data.AccountType)));
+            return data;
+        }
 
-        private const decimal MinSalary = 3_000;
-        private const decimal MaxSalary = 100_000_000;
-
-        private static DateTime MinDate => new DateTime(1900, 1, 1);
-
-        private static DateTime MaxDate => DateTime.Now;
-
+        /// <summary>
+        /// Convert FileCabinetRecord data into ValidateParametersData.
+        /// </summary>
+        /// <param name="record">Data to convert.</param>
+        /// <returns>Validate parameters data.</returns>
         public static ValidateParametersData CreateValidateData(FileCabinetRecord record)
         {
             if (record is null)
@@ -36,6 +72,12 @@ namespace FileCabinetApp
             };
         }
 
+        /// <summary>
+        /// Convert validate parameters data into file cabinet record model.
+        /// </summary>
+        /// <param name="id">Id.</param>
+        /// <param name="data">Data.</param>
+        /// <returns>File cabinet record model.</returns>
         public static FileCabinetRecord CreateRecordFromArgs(int id, ValidateParametersData data)
         {
             if (data is null)
@@ -55,6 +97,12 @@ namespace FileCabinetApp
             };
         }
 
+        /// <summary>
+        /// Update record from data.
+        /// </summary>
+        /// <param name="id">Id.</param>
+        /// <param name="data">Data.</param>
+        /// <param name="record">Record.</param>
         public static void UpdateRecordFromData(int id, ValidateParametersData data, FileCabinetRecord record)
         {
             if (record is null)
@@ -76,36 +124,10 @@ namespace FileCabinetApp
             record.AccountType = data.AccountType;
         }
 
-        public static ValidateParametersData GetData()
-        {
-            var data = new ValidateParametersData();
-            Console.Write("First Name: ");
-            data.FirstName = ReadInput<string>(Convert<string>, x => x.Length < MinNameLength || x.Length > MaxNameLength
-                                                                    ? new Tuple<bool, string>(false, nameof(data.FirstName))
-                                                                    : new Tuple<bool, string>(true, nameof(data.FirstName)));
-            Console.Write("Last Name: ");
-            data.LastName = ReadInput<string>(Convert<string>, x => x.Length < MinNameLength || x.Length > MaxNameLength
-                                                                    ? new Tuple<bool, string>(false, nameof(data.LastName))
-                                                                    : new Tuple<bool, string>(true, nameof(data.LastName)));
-            Console.Write("Date of birth: ");
-            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < MinDate || x > MaxDate
-                                                                    ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
-                                                                    : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
-            Console.Write("Bonuses: ");
-            data.Bonuses = ReadInput<short>(Convert<short>, x => x < MinWorkPlaceNumber || x > MaxWorkPlaceNumber
-                                                                    ? new Tuple<bool, string>(false, nameof(data.Bonuses))
-                                                                    : new Tuple<bool, string>(true, nameof(data.Bonuses)));
-            Console.Write("Salary: ");
-            data.Salary = ReadInput<decimal>(Convert<decimal>, x => x < MinSalary || x > MaxSalary
-                                                                    ? new Tuple<bool, string>(false, nameof(data.Salary))
-                                                                    : new Tuple<bool, string>(true, nameof(data.Salary)));
-            Console.Write("Account type: ");
-            data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetterOrDigit(x)
-                                                                    ? new Tuple<bool, string>(true, nameof(data.AccountType))
-                                                                    : new Tuple<bool, string>(false, nameof(data.AccountType)));
-            return data;
-        }
-
+        /// <summary>
+        /// Yes or no input message.
+        /// </summary>
+        /// <returns>True or false.</returns>
         public static bool YesOrNo()
         {
             do
@@ -127,6 +149,62 @@ namespace FileCabinetApp
                 Console.WriteLine($"You can only choose Y (yes) or N (no).");
             }
             while (true);
+        }
+
+        /// <summary>
+        /// Calculate similaity of 2 string.
+        /// </summary>
+        /// <param name="source">string 1</param>
+        /// <param name="target">string 2</param>
+        /// <returns>Percent of similarity.</returns>
+        public static double GetSimilarity(string source, string target)
+        {
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target))
+            {
+                return 0;
+            }
+
+            var sourceLength = source.Length;
+            var targetLength = target.Length;
+            int stepsToSame;
+
+            int[,] matrix = new int[sourceLength + 1, targetLength + 1];
+
+            if (sourceLength == 0)
+            {
+                stepsToSame = targetLength;
+            }
+
+            if (targetLength == 0)
+            {
+                stepsToSame = sourceLength;
+            }
+
+            for (var i = 0; i <= sourceLength; i++)
+            {
+                matrix[i, 0] = i;
+            }
+
+            for (var j = 0; j <= targetLength; j++)
+            {
+                matrix[0, j] = j;
+            }
+
+            for (var i = 1; i <= sourceLength; i++)
+            {
+                for (var j = 1; j <= targetLength; j++)
+                {
+                    var cost = (target[j - 1] == source[i - 1]) ? 0 : 1;
+
+                    matrix[i, j] = Math.Min(
+                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
+                        matrix[i - 1, j - 1] + cost);
+                }
+            }
+
+            stepsToSame = matrix[sourceLength, targetLength];
+
+            return 1 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length));
         }
 
         private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<T, Tuple<bool, string>> validator)
@@ -166,76 +244,21 @@ namespace FileCabinetApp
             {
                 if (arg is null)
                 {
-                    throw new ArgumentNullException(nameof(arg));
+                    converted = false;
                 }
 
                 result = (T)System.Convert.ChangeType(arg, typeof(T), CultureInfo.InvariantCulture);
             }
-            catch (Exception)
+            catch (InvalidCastException)
+            {
+                converted = false;
+            }
+            catch (FormatException)
             {
                 converted = false;
             }
 
             return new Tuple<bool, string, T>(converted, arg, result);
-        }
-
-        public static double CalculateSimilarity(string source, string target)
-        {
-            if ((source == null) || (target == null))
-            {
-                return 0;
-            }
-
-            if ((source.Length == 0) || (target.Length == 0))
-            {
-                return 0;
-            }
-
-            if (source == target)
-            {
-                return 1;
-            }
-
-            int stepsToSame = LevenshteinDistance(source, target);
-            return 1 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length));
-        }
-
-        private static int LevenshteinDistance(string source, string target)
-        {
-            if (source is null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (target is null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
-
-            int diff;
-            var m = new int[source.Length][];
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                m[i] = new int[target.Length];
-                m[i][0] = i;
-            }
-
-            for (int j = 0; j < target.Length; j++)
-            {
-                m[0][j] = j;
-            }
-
-            for (int i = 1; i < source.Length; i++)
-            {
-                for (int j = 1; j < target.Length; j++)
-                {
-                    diff = (source[i - 1] == target[j - 1]) ? 0 : 1;
-                    m[i][j] = Math.Min(Math.Min(m[i - 1][j] + 1, m[i][j - 1] + 1), m[i - 1][j - 1] + diff);
-                }
-            }
-
-            return m[source.Length - 1][target.Length - 1];
         }
     }
 }

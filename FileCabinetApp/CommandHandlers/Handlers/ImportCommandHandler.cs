@@ -16,6 +16,7 @@ namespace FileCabinetApp
         {
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)

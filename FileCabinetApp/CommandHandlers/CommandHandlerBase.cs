@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Text;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Base class for command handler.
+    /// </summary>
     public abstract class CommandHandlerBase : ICommandHandler
     {
         private ICommandHandler commandHandler;
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
+        /// <param name="commandRequest">Command handler.</param>
         public virtual void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)
@@ -19,7 +27,7 @@ namespace FileCabinetApp
             }
             else
             {
-                PrintMissedCommandInfo(commandRequest.Command);
+                this.PrintMissedInfo(commandRequest.Command);
             }
         }
 
@@ -29,10 +37,24 @@ namespace FileCabinetApp
             return this.commandHandler;
         }
 
-        private static void PrintMissedCommandInfo(string command)
+        private void PrintMissedInfo(string command)
         {
             Console.WriteLine($"There is no '{command}' command.");
-            Console.WriteLine();
+
+            StringBuilder similarCommand = new StringBuilder();
+
+            foreach (var item in HelpCommandHandler.Commands)
+            {
+                if (DataHelper.GetSimilarity(command, item) > 0.5)
+                {
+                    similarCommand.Append($"{Environment.NewLine}{item}");
+                }
+            }
+
+            if (!string.IsNullOrEmpty(similarCommand.ToString()))
+            {
+                Console.WriteLine($"The most similar commands are" + similarCommand);
+            }
         }
     }
 }

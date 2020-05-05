@@ -194,9 +194,95 @@
             </summary>
             <returns>String.</returns>
         </member>
-        <member name="T:FileCabinetGenerator.FileCabinetRecordsSerializable">
+        <member name="T:FileCabinetApp.FileCabinetRecordSerializable">
             <summary>
             Model for serialization record.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.Id">
+            <summary>
+            Gets or sets id for serialization model.
+            </summary>
+            <value>
+            Id.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.Name">
+            <summary>
+            Gets or sets name for serialization model.
+            </summary>
+            <value>
+            Name.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.DateOfBirth">
+            <summary>
+            Gets or sets date of birth for serialization model.
+            </summary>
+            <value>
+            Date of birth.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.DateString">
+            <summary>
+            Gets or sets date of birth string format.
+            </summary>
+            <value>
+            Date of birth.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.AccountType">
+            <summary>
+            Gets or sets account type for serialization model.
+            </summary>
+            <value>
+            Account type.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.Salary">
+            <summary>
+            Gets or sets salary for serialization model.
+            </summary>
+            <value>
+            Salary.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.Bonuses">
+            <summary>
+            Gets or sets bonuses for serialization model.
+            </summary>
+            <value>
+            Bonuses.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordSerializable.ToString">
+            <summary>
+            Overriding method for to string representation of serialization model.
+            </summary>
+            <returns>String.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetRecordsSerializable">
+            <summary>
+            Model for serialization record.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordsSerializable.#ctor(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecordSerializable})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordsSerializable"/> class.
+            </summary>
+            <param name="fileCabinetRecords">Records.</param>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetRecordsSerializable.Records">
+            <summary>
+            Gets serialization records.
+            </summary>
+            <value>
+            Records.
+            </value>
+        </member>
+        <member name="T:FileCabinetApp.Name">
+            <summary>
+            Full name serialization model.
             </summary>
         </member>
     </members>

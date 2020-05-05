@@ -24,6 +24,7 @@ namespace FileCabinetApp
             this.printer = printer ?? throw new ArgumentNullException(nameof(printer));
         }
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)

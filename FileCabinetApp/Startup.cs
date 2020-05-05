@@ -5,20 +5,24 @@ using Microsoft.Extensions.Configuration;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Class for starting initialization application.
+    /// </summary>
     public static class Startup
     {
-        private static string DefaultRootDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private static string ValidationFileName = @"validation-rules.json";
-
         private const string CustomValidationRules = "custom";
+        private const string DefaultValidationRules = "default";
         private const string FileServiceType = "file";
+
+        private const string ValidationFileName = @"validation-rules.json";
+        private const string BinaryFileName = @"cabinet-records.db";
+        private const string LoggingPath = @"log.txt";
+
+        private static readonly string DefaultRootDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
         private static IFileCabinetService fileCabinetService;
         private static IRecordValidator recordValidator;
         private static FileStream fileStream;
-
-        private static string BinaryFileName = @"cabinet-records.db";
-        private static string LoggingPath = @"log.txt";
 
         static Startup()
         {
@@ -31,43 +35,55 @@ namespace FileCabinetApp
             Configuration = new ConfigurationBuilder().AddJsonFile(ValidationPath).Build();
         }
 
+        /// <summary>
+        /// Gets or sets configuration type.
+        /// </summary>
+        /// <value>
+        /// Configuration type.
+        /// </value>
         public static IConfiguration Configuration { get; set; }
 
+        /// <summary>
+        /// Gets or sets validation path.
+        /// </summary>
+        /// <value>
+        /// Validation path.
+        /// </value>
         public static string ValidationPath { get; set; } = Path.Combine(DefaultRootDirectory, ValidationFileName);
 
+        /// <summary>
+        /// Gets a value indicating whether is running.
+        /// </summary>
+        /// <value>
+        /// Is running.
+        /// </value>
         public static bool IsRunning { get; private set; } = true;
 
+        /// <summary>
+        /// Gets validation type.
+        /// </summary>
+        /// <value>
+        /// Validation type.
+        /// </value>
+        public static string ValidationType { get; private set; } = DefaultValidationRules;
+
+        /// <summary>
+        /// Run and initialize all servecies and parameters.
+        /// </summary>
+        /// <param name="args">Command line argument.</param>
         public static void Run(string[] args)
         {
             var consoleParametersDictionary = CommandLineParser.GetCommandLineArguments(args);
-            var parameters = ParameterParser.SetParameters(consoleParametersDictionary);
-            SetValidators(parameters.validationRules);
-            SetService(parameters.serviceRules, parameters.isStopwatch, parameters.isLogger);
-            Console.WriteLine($"Using {parameters.serviceRules} service and {parameters.validationRules} validation rules.");
+            var (validationRules, serviceRules, isStopwatch, isLogger) = ParameterParser.SetParameters(consoleParametersDictionary);
+            SetValidators(validationRules);
+            SetService(serviceRules, isStopwatch, isLogger);
+            Console.WriteLine($"Using {serviceRules} service and {validationRules} validation rules.");
         }
 
-        private static void SetService(string serviceRules, bool isStopwatch, bool isLogger)
-        {
-            var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
-            fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
-            fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
-            fileCabinetService = isStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
-            fileCabinetService = isLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
-        }
-
-        private static void SetValidators(string validationRules)
-        {
-            var isCustomRules = validationRules.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase);
-            recordValidator = isCustomRules ? ValidatorBuilder.CreateCustom() : ValidatorBuilder.CreateDefault();
-        }
-
-        private static FileStream CreateFileStream(string dataFilePath)
-        {
-            var path = Path.Combine(DefaultRootDirectory, dataFilePath);
-            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
-            return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
-        }
-
+        /// <summary>
+        /// Create command handler.
+        /// </summary>
+        /// <returns>Command handler.</returns>
         public static ICommandHandler CreateCommandHandlers()
         {
             static void Runner(bool x) => IsRunning = x;
@@ -98,6 +114,38 @@ namespace FileCabinetApp
             statHandler.SetNext(insertHandler);
 
             return createHandler;
+        }
+
+        private static void SetService(string serviceRules, bool isStopwatch, bool isLogger)
+        {
+            var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
+            fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
+            fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
+            fileCabinetService = isStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
+            fileCabinetService = isLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
+        }
+
+        private static void SetValidators(string validationRules)
+        {
+            if (validationRules.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase) ||
+                validationRules.Equals(DefaultValidationRules, StringComparison.CurrentCultureIgnoreCase))
+            {
+                ValidationType = validationRules;
+            }
+            else
+            {
+                Console.WriteLine("Validation type does not recognazed. Use default rules.");
+            }
+
+            var isCustomRules = validationRules.Equals(CustomValidationRules, StringComparison.CurrentCultureIgnoreCase);
+            recordValidator = isCustomRules ? ValidatorBuilder.CreateCustom() : ValidatorBuilder.CreateDefault();
+        }
+
+        private static FileStream CreateFileStream(string dataFilePath)
+        {
+            var path = Path.Combine(DefaultRootDirectory, dataFilePath);
+            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
+            return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
         }
 
         private static void Print(IEnumerable<FileCabinetRecord> records)

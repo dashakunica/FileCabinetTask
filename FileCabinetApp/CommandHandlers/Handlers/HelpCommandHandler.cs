@@ -18,14 +18,29 @@ namespace FileCabinetApp
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
             new string[] { "stat", "shows amount of records", "The 'stat' command prints amount of records." },
             new string[] { "create", "create new records", "The 'create' command create new records." },
-            new string[] { "list", "shows list of records", "The 'list' command shows list of records." },
-            new string[] { "edit", "edit current records", "The 'edit' command edit current record." },
-            new string[] { "find firstname", "find all records with current firstname", "The 'find firstname' command shows all records with current firstname." },
-            new string[] { "find lastname", "find all records with current lastname", "The 'find lastname' command shows all records with current lastname." },
-            new string[] { "find dateofbirth", "find all records with current dateofbirth", "The 'find dateofbirth' command shows all records with current dateofbirth." },
-            new string[] { "export", "export all records in CSV", "The 'export' command export all records in CSV"},
-            new string[] { "import", "import records", "The 'import' import records from file." },
-            new string[] { "remove", "remove record", "The 'remove' remove specified record." },
+            new string[]
+            {
+                "select", "select records", $"The 'select' command select and show specified fields of records using clause in table format." +
+                 $"{Environment.NewLine}Example: select id, firstname, lastname where firstname = 'John' and lastname = 'Doe'.",
+            },
+            new string[]
+            {
+                "update", "update records", $"The 'update' command update records using clause." +
+                $"{Environment.NewLine}Example: update set firstname = 'John', lastname = 'Doe' , dateofbirth = '5/18/1986' where id = '1'",
+            },
+            new string[]
+            {
+                "delete", "delete records", "The 'delete' command delete records using clause." +
+                $"{Environment.NewLine}Example: delete where id = '1'",
+            },
+            new string[]
+            {
+                "insert", "insert records", "The 'insert' command insert specific field info in record." +
+                 $"{Environment.NewLine}Example: insert (id, firstname, lastname, dateofbirth) values ('1', 'John', 'Doe', '5/18/1986')",
+            },
+            new string[] { "export", "export all records in CSV or XML", "The 'export' command export all records in CSV or XML"},
+            new string[] { "import", "import records", "The 'import' import records from csv or xml file." },
+            new string[] { "purge", "clear filesystem", "The 'purge' clear filesystem. Use only in FileCabinetFilesystemService." },
         };
 
         public static IEnumerable<string> Commands => HelpMessages.Select(x => x[0]);

@@ -17,6 +17,16 @@ namespace FileCabinetApp
 
         private readonly List<IRecordValidator> validators = new List<IRecordValidator>();
 
+        public static FirstNameJson FNameValidValue { get; private set; }
+
+        public static LastNameJson LNameValidValue { get; private set; }
+
+        public static DateOfBirthJson DoBValidValue { get; private set; }
+
+        public static BonusesJson BonusesValidValue { get; private set; }
+
+        public static SalaryJson SalaryValidValue { get; private set; }
+
         public static IRecordValidator CreateDefault() => CreateValidator(Default);
 
         public static IRecordValidator CreateCustom() => CreateValidator(Custom);
@@ -64,18 +74,18 @@ namespace FileCabinetApp
 
         private static IRecordValidator CreateValidator(string type)
         {
-            var firstName = Startup.Configuration.GetSection(type).GetSection(FirstName).Get<FirstNameJson>();
-            var lastName = Startup.Configuration.GetSection(type).GetSection(LastName).Get<LastNameJson>();
-            var dateOfBirth = Startup.Configuration.GetSection(type).GetSection(DateOfBirth).Get<DateOfBirthJson>();
-            var workPlaceNumber = Startup.Configuration.GetSection(type).GetSection(Bonuses).Get<BonusesJson>();
-            var salary = Startup.Configuration.GetSection(type).GetSection(Salary).Get<SalaryJson>();
+            FNameValidValue = Startup.Configuration.GetSection(type).GetSection(FirstName).Get<FirstNameJson>();
+            LNameValidValue = Startup.Configuration.GetSection(type).GetSection(LastName).Get<LastNameJson>();
+            DoBValidValue = Startup.Configuration.GetSection(type).GetSection(DateOfBirth).Get<DateOfBirthJson>();
+            BonusesValidValue = Startup.Configuration.GetSection(type).GetSection(Bonuses).Get<BonusesJson>();
+            SalaryValidValue = Startup.Configuration.GetSection(type).GetSection(Salary).Get<SalaryJson>();
 
             return new ValidatorBuilder()
-                .ValidateFirstName(firstName.Min, firstName.Max)
-                .ValidateLastName(lastName.Min, lastName.Max)
-                .ValidateDateOfBirth(dateOfBirth.From, dateOfBirth.To)
-                .ValidateBonuses(workPlaceNumber.Min, workPlaceNumber.Max)
-                .ValidateSalary(salary.Min, salary.Max)
+                .ValidateFirstName(FNameValidValue.Min, FNameValidValue.Max)
+                .ValidateLastName(LNameValidValue.Min, LNameValidValue.Max)
+                .ValidateDateOfBirth(DoBValidValue.From, DoBValidValue.To)
+                .ValidateBonuses(BonusesValidValue.Min, BonusesValidValue.Max)
+                .ValidateSalary(SalaryValidValue.Min, SalaryValidValue.Max)
                 .ValidateAccountType()
                 .Create();
         }

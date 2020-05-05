@@ -2,15 +2,27 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Create command handler.
+    /// </summary>
     public class CreateCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "create";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateCommandHandler"/> class.
+        /// Create command handler.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public CreateCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
         }
 
+        /// <summary>
+        /// Hadle.
+        /// </summary>
+        /// <param name="commandRequest">Command request.</param>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)
@@ -41,7 +53,7 @@ namespace FileCabinetApp
             {
                 try
                 {
-                    var record = DataHelper.GetData();
+                    var record = DataHelper.RequestData();
                     id = this.Service.CreateAndSetId(record);
 
                     isValid = true;

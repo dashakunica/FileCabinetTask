@@ -46,23 +46,7 @@ namespace FileCabinetApp
 
                 const int parametersIndex = 1;
                 string parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
-                //try
-                //{
-                    commandHandler.Handle(new AppCommandRequest(command, parameters));
-                //}
-                //catch (Exception)
-                //{
-                //    Console.WriteLine($"There is no explanation for '{command}' command." +
-                //                      $"{Environment.NewLine}The most similar commands are");
-
-                //    foreach (var item in HelpCommandHandler.Commands)
-                //    {
-                //        if (DataHelper.CalculateSimilarity(command, item) > 0.5)
-                //        {
-                //            Console.WriteLine($"\t{item}");
-                //        }
-                //    }
-                //}
+                commandHandler.Handle(new AppCommandRequest(command, parameters));
             }
             while (Startup.IsRunning);
         }
