@@ -3,36 +3,85 @@ using System.Globalization;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace FileCabinetGenerator
+namespace FileCabinetApp
 {
+    /// <summary>
+    /// Model for serialization record.
+    /// </summary>
     [Serializable]
     public class FileCabinetRecordSerializable
     {
-        [XmlAttribute("id")]
+        /// <summary>
+        /// Gets or sets id for serialization model.
+        /// </summary>
+        /// <value>
+        /// Id.
+        /// </value>
+        [XmlAttribute("Id")]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Gets or sets name for serialization model.
+        /// </summary>
+        /// <value>
+        /// Name.
+        /// </value>
         [XmlElement("name")]
-        public Name Name = new Name();
+        public Name Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets date of birth for serialization model.
+        /// </summary>
+        /// <value>
+        /// Date of birth.
+        /// </value>
         [XmlIgnore]
         public DateTime DateOfBirth { get; set; }
 
+        /// <summary>
+        /// Gets or sets date of birth string format.
+        /// </summary>
+        /// <value>
+        /// Date of birth.
+        /// </value>
         [XmlElement("DateOfBirth")]
-        public string SomeDateString
+        public string DateString
         {
             get { return this.DateOfBirth.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture); }
             set { this.DateOfBirth = DateTime.Parse(value, CultureInfo.InvariantCulture); }
         }
 
+        /// <summary>
+        /// Gets or sets account type for serialization model.
+        /// </summary>
+        /// <value>
+        /// Account type.
+        /// </value>
         [XmlElement("AccountType")]
         public char AccountType { get; set; }
 
+        /// <summary>
+        /// Gets or sets salary for serialization model.
+        /// </summary>
+        /// <value>
+        /// Salary.
+        /// </value>
         [XmlElement("Salary")]
         public decimal Salary { get; set; }
 
+        /// <summary>
+        /// Gets or sets bonuses for serialization model.
+        /// </summary>
+        /// <value>
+        /// Bonuses.
+        /// </value>
         [XmlElement("Bonuses")]
         public short Bonuses { get; set; }
 
+        /// <summary>
+        /// Overriding method for to string representation of serialization model.
+        /// </summary>
+        /// <returns>String.</returns>
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -45,14 +94,5 @@ namespace FileCabinetGenerator
             builder.Append($"{this.AccountType}");
             return builder.ToString();
         }
-    }
-
-    public class Name
-    {
-        [XmlAttribute("first")]
-        public string FirstName { get; set; }
-
-        [XmlAttribute("last")]
-        public string LastName { get; set; }
     }
 }

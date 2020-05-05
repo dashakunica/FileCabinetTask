@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace FileCabinetApp
 {
@@ -41,26 +42,26 @@ namespace FileCabinetApp
         public DateTime DateOfBirth { get; set; }
 
         /// <summary>
-        /// Gets or sets Propertie1 of record.
+        /// Gets or sets Bonuses of record.
         /// </summary>
         /// <value>
-        /// Popertie1.
+        /// Bonuses.
         /// </value>
         public short Bonuses { get; set; }
 
         /// <summary>
-        /// Gets or sets Propertie2 of record.
+        /// Gets or sets Salary of record.
         /// </summary>
         /// <value>
-        /// Propertie2.
+        /// Salary.
         /// </value>
         public decimal Salary { get; set; }
 
         /// <summary>
-        /// Gets or sets Propertie3 of record.
+        /// Gets or sets AccountType of record.
         /// </summary>
         /// <value>
-        /// Propertie3.
+        /// AccountType.
         /// </value>
         public char AccountType { get; set; }
 
@@ -68,9 +69,13 @@ namespace FileCabinetApp
         /// Override method for string representation of record.
         /// </summary>
         /// <returns>String representation of record.</returns>
-        public override string ToString()
-        {
-            return string.Format(new CultureInfo("en-US"), "#{0}, {1}, {2}, {3}", this.Id, this.FirstName, this.LastName, this.DateOfBirth);
-        }
+        public override string ToString() => new StringBuilder()
+            .Append($"{this.Id}, ")
+            .Append($"{this.FirstName}, ")
+            .Append($"{this.LastName}, ")
+            .Append($"{this.DateOfBirth.ToString("yyyy-MMM-dd", CultureInfo.InvariantCulture)}, ")
+            .Append($"{this.Bonuses}, ")
+            .Append($"{this.Salary}, ")
+            .Append($"{this.AccountType}").ToString();
     }
 }
