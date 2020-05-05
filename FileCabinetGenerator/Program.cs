@@ -1,13 +1,15 @@
-﻿using FileCabinetApp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Serialization;
+using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
+    /// <summary>
+    /// Application for generator records. 
+    /// </summary>
     class Program
     {
         private const string XmlString = "xml";
@@ -29,6 +31,10 @@ namespace FileCabinetGenerator
             "-i",
         };
 
+        /// <summary>
+        /// Main point of application. 
+        /// </summary>
+        /// <param name="args">Command line arguments.</param>
         static void Main(string[] args)
         {
             var parameters = CommandLineParser.GetCommandLineArguments(args);

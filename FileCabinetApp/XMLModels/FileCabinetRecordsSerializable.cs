@@ -1,24 +1,31 @@
-﻿using System.Xml.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
-namespace FileCabinetGenerator
+namespace FileCabinetApp
 {
+    /// <summary>
+    /// Model for serialization record.
+    /// </summary>
     [Serializable]
     [XmlRoot("records")]
     public class FileCabinetRecordsSerializable
     {
-        public FileCabinetRecordsSerializable()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordsSerializable"/> class.
+        /// </summary>
+        /// <param name="fileCabinetRecords">Records.</param>
+        public FileCabinetRecordsSerializable(IEnumerable<FileCabinetRecordSerializable> fileCabinetRecords)
         {
-            this.Records = new List<FileCabinetRecordSerializable>();
+            this.Records = new List<FileCabinetRecordSerializable>(fileCabinetRecords);
         }
 
-        public FileCabinetRecordsSerializable(IEnumerable<FileCabinetRecordSerializable> records)
-        {
-            this.Records = new List<FileCabinetRecordSerializable>(records);
-        }
-
-        [XmlElement("record")]
-        public List<FileCabinetRecordSerializable> Records;
+        /// <summary>
+        /// Gets serialization records.
+        /// </summary>
+        /// <value>
+        /// Records.
+        /// </value>
+        public List<FileCabinetRecordSerializable> Records { get; }
     }
 }

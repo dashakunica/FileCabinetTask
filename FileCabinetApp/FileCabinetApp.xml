@@ -43,26 +43,26 @@
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Bonuses">
             <summary>
-            Gets or sets Propertie1 of record.
+            Gets or sets Bonuses of record.
             </summary>
             <value>
-            Popertie1.
+            Bonuses.
             </value>
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Salary">
             <summary>
-            Gets or sets Propertie2 of record.
+            Gets or sets Salary of record.
             </summary>
             <value>
-            Propertie2.
+            Salary.
             </value>
         </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.AccountType">
             <summary>
-            Gets or sets Propertie3 of record.
+            Gets or sets AccountType of record.
             </summary>
             <value>
-            Propertie3.
+            AccountType.
             </value>
         </member>
         <member name="M:FileCabinetApp.FileCabinetRecord.ToString">
@@ -121,6 +121,82 @@
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             File cabinet service interface.
+            </summary>
+        </member>
+        <member name="T:FileCabinetApp.ValidateParametersData">
+            <summary>
+            Model for validation data of record.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.FirstName">
+            <summary>
+            Gets or sets firstname for validateData.
+            </summary>
+            <value>
+            Firstname.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.LastName">
+            <summary>
+            Gets or sets lastname for validateData.
+            </summary>
+            <value>
+            Lastname.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.DateOfBirth">
+            <summary>
+            Gets or sets date of birth for validateData.
+            </summary>
+            <value>
+            Date of birth.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.Bonuses">
+            <summary>
+            Gets or sets bonuses for validateData.
+            </summary>
+            <value>
+            Bonuses.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.Salary">
+            <summary>
+            Gets or sets salary for validateData.
+            </summary>
+            <value>
+            Salary.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.ValidateParametersData.AccountType">
+            <summary>
+            Gets or sets account type for validateData.
+            </summary>
+            <value>
+            Account type.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.ValidateParametersData.Clone">
+            <summary>
+            For clone data.
+            </summary>
+            <returns>Cloning data.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ValidateParametersData.System#ICloneable#Clone">
+            <summary>
+            For IClonable interface implementation.
+            </summary>
+            <returns>Clone object.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ValidateParametersData.ToString">
+            <summary>
+            Override method for represents record as string.
+            </summary>
+            <returns>String.</returns>
+        </member>
+        <member name="T:FileCabinetGenerator.FileCabinetRecordsSerializable">
+            <summary>
+            Model for serialization record.
             </summary>
         </member>
     </members>

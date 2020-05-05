@@ -38,6 +38,11 @@ namespace FileCabinetApp
 
         public static FileCabinetRecord CreateRecordFromArgs(int id, ValidateParametersData data)
         {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
             return new FileCabinetRecord()
             {
                 Id = id,
@@ -48,6 +53,27 @@ namespace FileCabinetApp
                 Salary = data.Salary,
                 AccountType = data.AccountType,
             };
+        }
+
+        public static void UpdateRecordFromData(int id, ValidateParametersData data, FileCabinetRecord record)
+        {
+            if (record is null)
+            {
+                throw new ArgumentNullException(nameof(record));
+            }
+
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            record.Id = id;
+            record.FirstName = data.FirstName;
+            record.LastName = data.LastName;
+            record.DateOfBirth = data.DateOfBirth;
+            record.Bonuses = data.Bonuses;
+            record.Salary = data.Salary;
+            record.AccountType = data.AccountType;
         }
 
         public static ValidateParametersData GetData()
@@ -84,21 +110,21 @@ namespace FileCabinetApp
         {
             do
             {
-                var yn = Console.ReadKey();
+                var input = Console.ReadKey();
 
-                if (yn.KeyChar == 'Y' || yn.KeyChar == 'y')
+                if (input.KeyChar == 'Y' || input.KeyChar == 'y')
                 {
                     Console.WriteLine();
                     return true;
                 }
 
-                if (yn.KeyChar == 'N' || yn.KeyChar == 'n')
+                if (input.KeyChar == 'N' || input.KeyChar == 'n')
                 {
                     Console.WriteLine();
                     return false;
                 }
 
-                Console.Write($"{Environment.NewLine}Error: you can only chose [Y] yes or [N] no.");
+                Console.WriteLine($"You can only choose Y (yes) or N (no).");
             }
             while (true);
         }
@@ -140,7 +166,7 @@ namespace FileCabinetApp
             {
                 if (arg is null)
                 {
-                    throw new ArgumentNullException(nameof(arg), $"{nameof(arg)} cannot be null.");
+                    throw new ArgumentNullException(nameof(arg));
                 }
 
                 result = (T)System.Convert.ChangeType(arg, typeof(T), CultureInfo.InvariantCulture);
@@ -210,27 +236,6 @@ namespace FileCabinetApp
             }
 
             return m[source.Length - 1][target.Length - 1];
-        }
-
-        public static void UpdateRecordFromData(int id, ValidateParametersData data, FileCabinetRecord record)
-        {
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record));
-            }
-
-            if (data is null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            record.Id = id;
-            record.FirstName = data.FirstName;
-            record.LastName = data.LastName;
-            record.DateOfBirth = data.DateOfBirth;
-            record.Bonuses = data.Bonuses;
-            record.Salary = data.Salary;
-            record.AccountType = data.AccountType;
         }
     }
 }
