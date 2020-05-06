@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Builder of all validators.
+    /// </summary>
     public class ValidatorBuilder
     {
         private const string Default = "default";
@@ -17,60 +20,57 @@ namespace FileCabinetApp
 
         private readonly List<IRecordValidator> validators = new List<IRecordValidator>();
 
+        /// <summary>
+        /// Gets json model first name.
+        /// </summary>
+        /// <value>
+        /// Json model first name.
+        /// </value>
         public static FirstNameJson FNameValidValue { get; private set; }
 
+        /// <summary>
+        /// Gets json model last name.
+        /// </summary>
+        /// <value>
+        /// Json model last name.
+        /// </value>
         public static LastNameJson LNameValidValue { get; private set; }
 
+        /// <summary>
+        /// Gets json model DoB.
+        /// </summary>
+        /// <value>
+        /// Json model DoB.
+        /// </value>
         public static DateOfBirthJson DoBValidValue { get; private set; }
 
+        /// <summary>
+        /// Gets json model bonuses.
+        /// </summary>
+        /// <value>
+        /// Json model bonuses.
+        /// </value>
         public static BonusesJson BonusesValidValue { get; private set; }
 
+        /// <summary>
+        /// Gets json model salary.
+        /// </summary>
+        /// <value>
+        /// Json model salary.
+        /// </value>
         public static SalaryJson SalaryValidValue { get; private set; }
 
+        /// <summary>
+        /// Create default validator.
+        /// </summary>
+        /// <returns>Validator.</returns>
         public static IRecordValidator CreateDefault() => CreateValidator(Default);
 
+        /// <summary>
+        /// Create custom validator.
+        /// </summary>
+        /// <returns>Validator.</returns>
         public static IRecordValidator CreateCustom() => CreateValidator(Custom);
-
-        public ValidatorBuilder ValidateFirstName(int min, int max)
-        {
-            this.validators.Add(new FirstNameValidator(min, max));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateLastName(int min, int max)
-        {
-            this.validators.Add(new LastNameValidator(min, max));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateDateOfBirth(DateTime from, DateTime to)
-        {
-            this.validators.Add(new DateOfBirthValidator(from, to));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateBonuses(short min, short max)
-        {
-            this.validators.Add(new BonusesValidator(min, max));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateSalary(decimal min, decimal max)
-        {
-            this.validators.Add(new SalaryValidator(min, max));
-            return this;
-        }
-
-        public ValidatorBuilder ValidateAccountType()
-        {
-            this.validators.Add(new AccountTypeValidator());
-            return this;
-        }
-
-        public IRecordValidator Create()
-        {
-            return new CompositeValidator(this.validators);
-        }
 
         private static IRecordValidator CreateValidator(string type)
         {
@@ -83,11 +83,52 @@ namespace FileCabinetApp
             return new ValidatorBuilder()
                 .ValidateFirstName(FNameValidValue.Min, FNameValidValue.Max)
                 .ValidateLastName(LNameValidValue.Min, LNameValidValue.Max)
-                .ValidateDateOfBirth(DoBValidValue.From, DoBValidValue.To)
+                .ValidateDateOfBirth(DoBValidValue.Min, DoBValidValue.Max)
                 .ValidateBonuses(BonusesValidValue.Min, BonusesValidValue.Max)
                 .ValidateSalary(SalaryValidValue.Min, SalaryValidValue.Max)
                 .ValidateAccountType()
                 .Create();
+        }
+
+        private ValidatorBuilder ValidateFirstName(int min, int max)
+        {
+            this.validators.Add(new FirstNameValidator(min, max));
+            return this;
+        }
+
+        private ValidatorBuilder ValidateLastName(int min, int max)
+        {
+            this.validators.Add(new LastNameValidator(min, max));
+            return this;
+        }
+
+        private ValidatorBuilder ValidateDateOfBirth(DateTime from, DateTime to)
+        {
+            this.validators.Add(new DateOfBirthValidator(from, to));
+            return this;
+        }
+
+        private ValidatorBuilder ValidateBonuses(short min, short max)
+        {
+            this.validators.Add(new BonusesValidator(min, max));
+            return this;
+        }
+
+        private ValidatorBuilder ValidateSalary(decimal min, decimal max)
+        {
+            this.validators.Add(new SalaryValidator(min, max));
+            return this;
+        }
+
+        private ValidatorBuilder ValidateAccountType()
+        {
+            this.validators.Add(new AccountTypeValidator());
+            return this;
+        }
+
+        private IRecordValidator Create()
+        {
+            return new CompositeValidator(this.validators);
         }
     }
 }

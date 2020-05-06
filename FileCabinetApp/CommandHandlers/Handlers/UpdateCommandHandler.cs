@@ -1,12 +1,15 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Reflection;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Update command handler.
+    /// </summary>
     public class UpdateCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "update";
@@ -14,6 +17,10 @@ namespace FileCabinetApp
         private static readonly PropertyInfo[] FileCabinetRecordProperties = typeof(FileCabinetRecord).GetProperties();
         private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public UpdateCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
@@ -51,8 +58,8 @@ namespace FileCabinetApp
 
             string type = where["type"];
 
-            var newValues = CreateValidateArgs(set);
-            var oldRecords = CreateValidateArgs(where);
+            var newValues = this.CreateValidateArgs(set);
+            var oldRecords = this.CreateValidateArgs(where);
             var allRecords = this.Service.GetRecords();
 
             var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, type);
@@ -61,7 +68,7 @@ namespace FileCabinetApp
             foreach (var item in updatedRecords)
             {
                 builder.Append($"#{item.Id}, ");
-                var current = CopyAndFillUnusedFields(newValues, item);
+                var current = this.CopyAndFillUnusedFields(newValues, item);
                 this.Service.EditRecord(item.Id, current);
                 Memoization.RefreshMemoization();
             }
@@ -69,7 +76,7 @@ namespace FileCabinetApp
             Console.WriteLine(builder.Length == 0 ? string.Empty : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.");
         }
 
-        private static ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
+        private ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
         {
             var arg = new ValidateParametersData();
             foreach (var item in propNewValues)
@@ -82,7 +89,7 @@ namespace FileCabinetApp
             return arg;
         }
 
-        private static ValidateParametersData CopyAndFillUnusedFields(ValidateParametersData args, FileCabinetRecord record)
+        private ValidateParametersData CopyAndFillUnusedFields(ValidateParametersData args, FileCabinetRecord record)
         {
             var defaultValidateArgs = new ValidateParametersData();
             var current = args.Clone();

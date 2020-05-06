@@ -3,6 +3,9 @@ using System.IO;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Import command.
+    /// </summary>
     public class ImportCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "import";
@@ -11,6 +14,10 @@ namespace FileCabinetApp
         private const string XmlString = "XML";
         private const char WhiteSpace = ' ';
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public ImportCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
@@ -66,7 +73,7 @@ namespace FileCabinetApp
                     using var reader = new FileCabinetRecordCsvReader(stream);
                     snapshot.LoadFrom(reader);
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
                     message = $"Import failed: {ex.InnerException.Message}";
                 }
@@ -83,7 +90,7 @@ namespace FileCabinetApp
                     using var reader = new FileCabinetRecordXmlReader(stream);
                     snapshot.LoadFrom(reader);
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
                 {
                     message = $"Import failed: {ex.InnerException.Message}";
                 }

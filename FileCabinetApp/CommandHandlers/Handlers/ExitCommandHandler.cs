@@ -10,6 +10,10 @@ namespace FileCabinetApp
         private const string Command = "exit";
         private Action<bool> action;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExitCommandHandler"/> class.
+        /// </summary>
+        /// <param name="action">Action.</param>
         public ExitCommandHandler(Action<bool> action)
         {
             this.action = action;
@@ -40,7 +44,7 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            Console.WriteLine("Exiting an application...");
+            Console.WriteLine("Exiting of application.");
             this.action(false);
         }
     }

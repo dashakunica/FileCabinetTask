@@ -5,10 +5,17 @@ using System.IO;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Reader for csv.
+    /// </summary>
     public class FileCabinetRecordCsvReader : IFileCabinetReader
     {
         private readonly StreamReader reader;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordCsvReader"/> class.
+        /// </summary>
+        /// <param name="reader">Reader.</param>
         public FileCabinetRecordCsvReader(StreamReader reader)
         {
             if (reader is null)
@@ -19,6 +26,7 @@ namespace FileCabinetApp
             this.reader = reader;
         }
 
+        /// <inheritdoc/>
         public IList<FileCabinetRecord> ReadAll()
         {
             var listOfRecords = new List<FileCabinetRecord>();
@@ -36,6 +44,23 @@ namespace FileCabinetApp
             }
 
             return listOfRecords;
+        }
+
+        /// <summary>
+        /// Close.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">True or false.</param>
+        protected virtual void Dispose(bool disposing)
+        {
         }
 
         private static FileCabinetRecord CreateRecord(string[] paramaters)
@@ -58,16 +83,6 @@ namespace FileCabinetApp
                 Salary = salary,
                 AccountType = department,
             };
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
         }
     }
 }

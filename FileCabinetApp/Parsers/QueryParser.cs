@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Query parser.
+    /// </summary>
     public static class QueryParser
     {
         private const char WhiteSpace = ' ';
@@ -23,14 +25,11 @@ namespace FileCabinetApp
 
         private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
 
-        private const string Id = "id";
-        private const string FirstName = "firstname";
-        private const string LastName = "lastname";
-        private const string DateOfBirth = "dateofbirth";
-        private const string Salary = "salary";
-        private const string Bonuses = "bonuses";
-        private const string AccountType = "accounttype";
-
+        /// <summary>
+        /// Insert command parser.
+        /// </summary>
+        /// <param name="parameters">Input message.</param>
+        /// <returns>Parsed parameters.</returns>
         public static (List<string> attributes, List<string> values) InsertParser(string parameters)
         {
             if (parameters is null)
@@ -64,6 +63,11 @@ namespace FileCabinetApp
             return (fields, values);
         }
 
+        /// <summary>
+        /// Delete command parser.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <returns>Parsed parameter.</returns>
         public static Dictionary<string, string> DeleteParser(string parameters)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
@@ -74,9 +78,6 @@ namespace FileCabinetApp
             }
 
             var arguments = parameters.Split(Where, 2);
-
-            string field = string.Empty;
-            string value = string.Empty;
 
             if (arguments.Length < 2)
             {
@@ -90,6 +91,11 @@ namespace FileCabinetApp
             return result;
         }
 
+        /// <summary>
+        /// Update command parser.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <returns>Parsed parameter.</returns>
         public static (Dictionary<string, string> propNewValuesPair, Dictionary<string, string> propWhereValuesPair) UpdateParser(string parameters)
         {
             Dictionary<string, string> set = new Dictionary<string, string>();
@@ -133,6 +139,11 @@ namespace FileCabinetApp
             return (set, where);
         }
 
+        /// <summary>
+        /// Select command parser.
+        /// </summary>
+        /// <param name="parameters">Input parameters.</param>
+        /// <returns>Parsed parameters.</returns>
         public static (List<string> properties, Dictionary<string, string> propWhereValuesPair) SelectParser(string parameters)
         {
             List<string> properties = new List<string>();
@@ -159,18 +170,30 @@ namespace FileCabinetApp
             return (properties, where);
         }
 
+        /// <summary>
+        /// Get records by predicates.
+        /// </summary>
+        /// <param name="record">Record.</param>
+        /// <param name="allRecords">All records.</param>
+        /// <param name="type">Type of condition (and/or).</param>
+        /// <returns>Records.</returns>
         public static IEnumerable<FileCabinetRecord> GetRecorgs(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords, string type)
         {
             IEnumerable<FileCabinetRecord> result = allRecords;
 
             if (record is null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(record));
             }
 
             if (allRecords is null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(allRecords));
+            }
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
             }
 
             string query = record.ToString() + type;
@@ -237,7 +260,7 @@ namespace FileCabinetApp
             return valuesPairs;
         }
 
-        public static IEnumerable<FileCabinetRecord> SelectAnd(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        private static IEnumerable<FileCabinetRecord> SelectAnd(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
         {
             var result = allRecords.ToList();
 
@@ -252,7 +275,7 @@ namespace FileCabinetApp
             return result;
         }
 
-        public static IEnumerable<FileCabinetRecord> SelectOr(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        private static IEnumerable<FileCabinetRecord> SelectOr(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
         {
             var result = new List<FileCabinetRecord>();
 

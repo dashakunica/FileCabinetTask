@@ -2,8 +2,12 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Validator for account type propertie.
+    /// </summary>
     public class AccountTypeValidator : IRecordValidator
     {
+        /// <inheritdoc/>
         public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)

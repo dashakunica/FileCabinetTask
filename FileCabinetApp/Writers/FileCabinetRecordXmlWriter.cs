@@ -1,15 +1,21 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Xml;
-using System.Globalization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Xml writer.
+    /// </summary>
     public class FileCabinetRecordXmlWriter : IFileCabinetWriter
     {
         private readonly XmlWriter xmlTextWriter;
-        private bool disposed = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordXmlWriter"/> class.
+        /// </summary>
+        /// <param name="writer">Writer.</param>
         public FileCabinetRecordXmlWriter(StreamWriter writer)
         {
             this.xmlTextWriter = new XmlTextWriter(writer ?? throw new ArgumentNullException(nameof(writer)));
@@ -17,6 +23,7 @@ namespace FileCabinetApp
             this.xmlTextWriter.WriteStartElement("records");
         }
 
+        /// <inheritdoc/>
         public void Write(FileCabinetRecord record)
         {
             if (record is null)
@@ -37,12 +44,19 @@ namespace FileCabinetApp
             this.xmlTextWriter.WriteEndElement();
         }
 
+        /// <summary>
+        /// Dispose.
+        /// </summary>
         public void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">True or false.</param>
         protected virtual void Dispose(bool disposing)
         {
         }

@@ -6,10 +6,17 @@ using System.Xml.Serialization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Reader from xml.
+    /// </summary>
     public class FileCabinetRecordXmlReader : IFileCabinetReader
     {
         private readonly StreamReader reader;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordXmlReader"/> class.
+        /// </summary>
+        /// <param name="reader">Reader.</param>
         public FileCabinetRecordXmlReader(StreamReader reader)
         {
             if (reader is null)
@@ -20,6 +27,7 @@ namespace FileCabinetApp
             this.reader = reader;
         }
 
+        /// <inheritdoc/>
         public IList<FileCabinetRecord> ReadAll()
         {
             var listOfRecords = new List<FileCabinetRecord>();
@@ -42,6 +50,23 @@ namespace FileCabinetApp
             return listOfRecords;
         }
 
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose.
+        /// </summary>
+        /// <param name="disposing">True or false.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+
         private static FileCabinetRecord ConvertToRecord(FileCabinetRecordSerializable item)
         {
             return new FileCabinetRecord()
@@ -54,16 +79,6 @@ namespace FileCabinetApp
                 Salary = item.Salary,
                 AccountType = item.AccountType,
             };
-        }
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
         }
     }
 }

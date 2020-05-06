@@ -2,10 +2,18 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Purge command.
+    /// </summary>
     public class PurgeCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "purge";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PurgeCommandHandler"/> class.
+        /// Purge command handler.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public PurgeCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {

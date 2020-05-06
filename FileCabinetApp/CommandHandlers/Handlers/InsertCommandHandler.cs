@@ -1,15 +1,21 @@
 ﻿using System;
-using System.Globalization;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Insert command.
+    /// </summary>
     public class InsertCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "insert";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InsertCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public InsertCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {

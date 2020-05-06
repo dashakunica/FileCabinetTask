@@ -4,19 +4,25 @@ using System.Diagnostics;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Service meter.
+    /// </summary>
     public class ServiceMeter : IFileCabinetService
     {
         private readonly IFileCabinetService fileCabinetService;
         private readonly Stopwatch stopwatch;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceMeter"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public ServiceMeter(IFileCabinetService fileCabinetService)
         {
             this.fileCabinetService = fileCabinetService ?? throw new ArgumentNullException(nameof(fileCabinetService));
             this.stopwatch = new Stopwatch();
         }
 
-        public string Name => nameof(ServiceMeter);
-
+        /// <inheritdoc/>
         public int CreateAndSetId(ValidateParametersData data)
         {
             this.stopwatch.Restart();
@@ -26,6 +32,7 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <inheritdoc/>
         public int CreateRecord(int id, ValidateParametersData data)
         {
             this.stopwatch.Restart();
@@ -35,6 +42,7 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <inheritdoc/>
         public void EditRecord(int id, ValidateParametersData data)
         {
             this.stopwatch.Restart();
@@ -43,6 +51,7 @@ namespace FileCabinetApp
             Print(nameof(this.EditRecord), this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.stopwatch.Restart();
@@ -52,6 +61,7 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <inheritdoc/>
         public (int active, int removed) GetStat()
         {
             this.stopwatch.Restart();
@@ -61,6 +71,7 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <inheritdoc/>
         public FileCabinetServiceSnapshot MakeSnapshot()
         {
             this.stopwatch.Restart();
@@ -70,6 +81,7 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <inheritdoc/>
         public void Purge()
         {
             this.stopwatch.Restart();
@@ -78,6 +90,7 @@ namespace FileCabinetApp
             Print(nameof(this.Purge), this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public void RemoveRecord(int id)
         {
             this.stopwatch.Restart();
@@ -86,6 +99,7 @@ namespace FileCabinetApp
             Print(nameof(this.RemoveRecord), this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public void Restore(FileCabinetServiceSnapshot snapshot)
         {
             this.stopwatch.Restart();
@@ -94,6 +108,7 @@ namespace FileCabinetApp
             Print(nameof(this.Restore), this.stopwatch.ElapsedTicks);
         }
 
+        /// <inheritdoc/>
         public void Delete(IEnumerable<FileCabinetRecord> records)
         {
             this.stopwatch.Restart();

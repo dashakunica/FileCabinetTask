@@ -13,9 +13,7 @@ namespace FileCabinetApp
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "delete";
-
         private const string Id = "Id";
-
         private const char WhiteSpace = ' ';
         private const char Comma = ',';
 
@@ -76,7 +74,11 @@ namespace FileCabinetApp
 
             var records = QueryParser.GetRecorgs(whereRecord, allRecords, type);
 
-            var builder = this.GetId(records);
+            var builder = new StringBuilder();
+            foreach (var item in records)
+            {
+                builder.Append($"#{item.Id}, ");
+            }
 
             string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
             this.Service.Delete(records);
@@ -95,17 +97,6 @@ namespace FileCabinetApp
             }
 
             return arg;
-        }
-
-        private StringBuilder GetId(IEnumerable<FileCabinetRecord> records)
-        {
-            var builder = new StringBuilder();
-            foreach (var item in records)
-            {
-                builder.Append($"#{item.Id}, ");
-            }
-
-            return builder;
         }
     }
 }

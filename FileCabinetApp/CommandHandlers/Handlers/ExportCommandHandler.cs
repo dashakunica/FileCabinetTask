@@ -3,6 +3,9 @@ using System.IO;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Export command.
+    /// </summary>
     public class ExportCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "export";
@@ -10,6 +13,10 @@ namespace FileCabinetApp
         private const string CsvString = "csv";
         private const string XmlString = "xml";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public ExportCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {
@@ -59,7 +66,10 @@ namespace FileCabinetApp
                 isCanceled = !DataHelper.YesOrNo();
             }
 
-            if (isCanceled) message = "Export canceled by the user.";
+            if (isCanceled)
+            {
+                message = "Export canceled by the user.";
+            }
 
             FileStream filestream = default;
             try

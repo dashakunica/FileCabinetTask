@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Help command.
+    /// </summary>
     public class HelpCommandHandler : CommandHandlerBase
     {
         private const string Command = "help";
@@ -12,7 +15,7 @@ namespace FileCabinetApp
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
 
-        private static string[][] HelpMessages = new string[][]
+        private static readonly string[][] HelpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
@@ -38,13 +41,21 @@ namespace FileCabinetApp
                 "insert", "insert records", "The 'insert' command insert specific field info in record." +
                  $"{Environment.NewLine}Example: insert (id, firstname, lastname, dateofbirth) values ('1', 'John', 'Doe', '5/18/1986')",
             },
-            new string[] { "export", "export all records in CSV or XML", "The 'export' command export all records in CSV or XML"},
-            new string[] { "import", "import records", "The 'import' import records from csv or xml file." },
-            new string[] { "purge", "clear filesystem", "The 'purge' clear filesystem. Use only in FileCabinetFilesystemService." },
+            new string[] { "export", "export all records in CSV or XML", "The 'export' command export all records in CSV or XML" },
+            new string[] { "import", "import records", "The 'import' command import records from csv or xml file." },
+            new string[] { "purge", "clear filesystem", "The 'purge' command clear filesystem. Use only in FileCabinetFilesystemService." },
+            new string[] { "list", "get all records", "The 'list' command get all records in table format." },
         };
 
+        /// <summary>
+        /// Gets all commands.
+        /// </summary>
+        /// <value>
+        /// All commands string.
+        /// </value>
         public static IEnumerable<string> Commands => HelpMessages.Select(x => x[0]);
 
+        /// <inheritdoc/>
         public override void Handle(AppCommandRequest commandRequest)
         {
             if (commandRequest is null)

@@ -3,12 +3,20 @@ using System.Collections.Generic;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// List command.
+    /// </summary>
     public class ListCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "list";
 
         private readonly Action<IEnumerable<FileCabinetRecord>> printer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
+        /// <param name="printer">Printer.</param>
         public ListCommandHandler(IFileCabinetService fileCabinetService, Action<IEnumerable<FileCabinetRecord>> printer)
             : base(fileCabinetService)
         {

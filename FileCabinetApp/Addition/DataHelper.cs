@@ -31,8 +31,7 @@ namespace FileCabinetApp
                                                                     ? new Tuple<bool, string>(false, nameof(data.LastName))
                                                                     : new Tuple<bool, string>(true, nameof(data.LastName)));
             Console.Write("Date of birth: ");
-            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.From || x > DateOfBirth.To
-                                                                    ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
+            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.Min || x > DateOfBirth.Max ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
                                                                     : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
             Console.Write("Work place number: ");
             data.Bonuses = ReadInput<short>(Convert<short>, x => x < Bonuses.Min || x > Bonuses.Max
@@ -154,8 +153,8 @@ namespace FileCabinetApp
         /// <summary>
         /// Calculate similaity of 2 string.
         /// </summary>
-        /// <param name="source">string 1</param>
-        /// <param name="target">string 2</param>
+        /// <param name="source">string 1.</param>
+        /// <param name="target">string 2.</param>
         /// <returns>Percent of similarity.</returns>
         public static double GetSimilarity(string source, string target)
         {

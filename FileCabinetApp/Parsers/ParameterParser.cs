@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Parameter parser.
+    /// </summary>
     public static class ParameterParser
     {
         private const string FileServiceType = "File";
@@ -11,19 +13,24 @@ namespace FileCabinetApp
         private const string LoggString = "Logging";
         private const string StopwatchString = "Stopwatch";
 
-        private static string[] commandLineParameters = new string[]
+        private static readonly string[] CommandLineParameters = new string[]
         {
             "--validation-rules",
             "--storage",
             "--use",
         };
 
-        private static string[] shortCommandLineParameters = new string[]
+        private static readonly string[] ShortCommandLineParameters = new string[]
         {
             "-v",
             "-s",
         };
 
+        /// <summary>
+        /// Set parameters from dictionary.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        /// <returns>Parsed parameters.</returns>
         public static (string validationRules, string serviceRules, bool isStopwatch, bool isLogger) SetParameters(Dictionary<string, string> parameters)
         {
             if (parameters is null)
@@ -35,17 +42,17 @@ namespace FileCabinetApp
             var serviceRules = FileServiceType;
             var loggingRules = LoggString;
 
-            if (!parameters.TryGetValue(shortCommandLineParameters[0], out validationRules))
+            if (!parameters.TryGetValue(ShortCommandLineParameters[0], out validationRules))
             {
-                parameters.TryGetValue(commandLineParameters[0], out validationRules);
+                parameters.TryGetValue(CommandLineParameters[0], out validationRules);
             }
 
-            if (!parameters.TryGetValue(shortCommandLineParameters[1], out serviceRules))
+            if (!parameters.TryGetValue(ShortCommandLineParameters[1], out serviceRules))
             {
-                parameters.TryGetValue(commandLineParameters[1], out serviceRules);
+                parameters.TryGetValue(CommandLineParameters[1], out serviceRules);
             }
 
-            parameters.TryGetValue(commandLineParameters[2], out loggingRules);
+            parameters.TryGetValue(CommandLineParameters[2], out loggingRules);
 
             bool isStopwatch = loggingRules.Equals(StopwatchString, StringComparison.InvariantCultureIgnoreCase);
             bool isLogger = loggingRules.Equals(LoggString, StringComparison.InvariantCultureIgnoreCase);

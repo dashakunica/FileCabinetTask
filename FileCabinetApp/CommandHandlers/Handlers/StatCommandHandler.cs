@@ -2,10 +2,17 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Statistic command handler.
+    /// </summary>
     public class StatCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "stat";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service.</param>
         public StatCommandHandler(IFileCabinetService fileCabinetService)
             : base(fileCabinetService)
         {

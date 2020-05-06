@@ -31,6 +31,11 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Set next command.
+        /// </summary>
+        /// <param name="commandHandler">Command handler.</param>
+        /// <returns>Next command.</returns>
         public ICommandHandler SetNext(ICommandHandler commandHandler)
         {
             this.commandHandler = commandHandler;

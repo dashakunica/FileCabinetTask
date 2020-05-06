@@ -2,8 +2,16 @@
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Validator for last name propertie.
+    /// </summary>
     public class LastNameValidator : IRecordValidator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LastNameValidator"/> class.
+        /// </summary>
+        /// <param name="min">Min valid value.</param>
+        /// <param name="max">Max valid value.</param>
         public LastNameValidator(int min, int max)
         {
             this.Min = min;
@@ -14,6 +22,7 @@ namespace FileCabinetApp
 
         private int Max { get; set; }
 
+        /// <inheritdoc/>
         public void ValidateParameters(ValidateParametersData data)
         {
             if (data is null)

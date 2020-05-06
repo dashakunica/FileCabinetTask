@@ -7,19 +7,45 @@ using System.Xml;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Snapshot of file cabinet service.
+    /// </summary>
     public class FileCabinetServiceSnapshot
     {
         private FileCabinetRecord[] records;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
+        /// </summary>
+        /// <param name="records">Records.</param>
         public FileCabinetServiceSnapshot(FileCabinetRecord[] records)
         {
             this.records = records;
         }
 
+        /// <summary>
+        /// Gets logger.
+        /// </summary>
+        /// <value>
+        /// Logger.
+        /// </value>
         public IList<string> Logger { get; } = new List<string>();
 
-        public ReadOnlyCollection<FileCabinetRecord> Records { get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records)); }
+        /// <summary>
+        /// Gets all records.
+        /// </summary>
+        /// <value>
+        /// All records.
+        /// </value>
+        public ReadOnlyCollection<FileCabinetRecord> Records
+        {
+            get => new ReadOnlyCollection<FileCabinetRecord>(new List<FileCabinetRecord>(this.records));
+        }
 
+        /// <summary>
+        /// Load from file.
+        /// </summary>
+        /// <param name="reader">Reader.</param>
         public void LoadFrom(IFileCabinetReader reader)
         {
             if (reader is null)
@@ -31,11 +57,16 @@ namespace FileCabinetApp
             {
                 this.records = reader.ReadAll().ToArray();
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                throw new ArgumentException("Cannot load file.");
             }
         }
 
+        /// <summary>
+        /// Save to file.
+        /// </summary>
+        /// <param name="writer">Writer.</param>
         public void SaveTo(IFileCabinetWriter writer)
         {
             if (writer is null)
