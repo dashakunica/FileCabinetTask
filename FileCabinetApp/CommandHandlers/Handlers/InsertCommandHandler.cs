@@ -41,7 +41,15 @@ namespace FileCabinetApp
 
         private void Insert(int id, ValidateParametersData data)
         {
-            id = id == 0 ? this.Service.CreateAndSetId(data) : this.Service.CreateRecord(id, data);
+            try
+            {
+                id = id == 0 ? this.Service.CreateAndSetId(data) : this.Service.CreateRecord(id, data);
+            }
+            catch (ArgumentNullException)
+            {
+                Console.WriteLine("Insert command should contains all properties in record. Please correct your input.");
+            }
+
             Console.WriteLine($"Record #{id} is created.");
         }
 

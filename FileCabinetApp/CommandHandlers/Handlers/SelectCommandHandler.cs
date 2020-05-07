@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace FileCabinetApp
 {
@@ -14,8 +13,6 @@ namespace FileCabinetApp
     {
         private const string Command = "select";
         private const string Id = "Id";
-
-        private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
 
         private readonly Action<IEnumerable<FileCabinetRecord>> printer;
 
@@ -69,27 +66,12 @@ namespace FileCabinetApp
                 this.Service.RemoveRecord(temp);
             }
 
-            string type = where["type"];
-
-            var oldRecords = this.CreateValidateArgs(where);
+            var oldRecords = DataHelper.CreateRecordFromDict(where);
             var allRecords = this.Service.GetRecords();
 
-            var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, type);
+            var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
             this.printer(selectedRecords);
             Console.WriteLine("Completed successfully.");
-        }
-
-        private ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
-        {
-            var arg = new ValidateParametersData();
-            foreach (var item in propNewValues)
-            {
-                var prop = ValidateParametersProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
-                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
-                prop.SetValue(arg, converter.ConvertFromString(item.Value));
-            }
-
-            return arg;
         }
     }
 }

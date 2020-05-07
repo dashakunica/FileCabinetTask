@@ -261,7 +261,7 @@ namespace FileCabinetApp
             this.disposed = true;
         }
 
-        private FileCabinetRecord BytesToUser(byte[] bytes)
+        private static FileCabinetRecord BytesToUser(byte[] bytes)
         {
             if (bytes == null)
             {
@@ -304,7 +304,7 @@ namespace FileCabinetApp
                 var recordBuffer = new byte[RecordSize];
 
                 this.fileStream.Read(recordBuffer, i * recordBuffer.Length, recordBuffer.Length);
-                var record = this.BytesToUser(recordBuffer);
+                var record = BytesToUser(recordBuffer);
 
                 list.Add(record);
             }

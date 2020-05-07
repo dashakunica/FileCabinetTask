@@ -17,8 +17,6 @@ namespace FileCabinetApp
         private const char WhiteSpace = ' ';
         private const char Comma = ',';
 
-        private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteCommandHandler"/> class.
         /// Delete command handler.
@@ -66,37 +64,27 @@ namespace FileCabinetApp
                 }
 
                 this.Service.RemoveRecord(temp);
+
+                Console.WriteLine($"Records with {temp} is deleted.");
             }
-
-            string type = where["type"];
-            var whereRecord = this.CreateValidateArgs(where);
-            var allRecords = this.Service.GetRecords();
-
-            var records = QueryParser.GetRecorgs(whereRecord, allRecords, type);
-
-            var builder = new StringBuilder();
-            foreach (var item in records)
+            else
             {
-                builder.Append($"#{item.Id}, ");
+                var whereRecord = DataHelper.CreateRecordFromDict(where);
+                var allRecords = this.Service.GetRecords();
+
+                var records = QueryParser.GetRecorgs(whereRecord, allRecords, QueryParser.TypeCondition);
+
+                var builder = new StringBuilder();
+                foreach (var item in records)
+                {
+                    builder.Append($"#{item.Id}, ");
+                }
+
+                string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
+                this.Service.Delete(records);
+                Memoization.RefreshMemoization();
+                Console.WriteLine(text);
             }
-
-            string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
-            this.Service.Delete(records);
-            Memoization.RefreshMemoization();
-            Console.WriteLine(text);
-        }
-
-        private ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
-        {
-            var arg = new ValidateParametersData();
-            foreach (var item in propNewValues)
-            {
-                var prop = ValidateParametersProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
-                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
-                prop.SetValue(arg, converter.ConvertFromString(item.Value));
-            }
-
-            return arg;
         }
     }
 }

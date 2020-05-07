@@ -23,7 +23,15 @@ namespace FileCabinetApp
         private const string And = "and";
         private const string Or = "or";
 
-        private static readonly PropertyInfo[] ValidateParametersProperties = typeof(ValidateParametersData).GetProperties();
+        private static readonly PropertyInfo[] FileCabinetProperties = typeof(FileCabinetRecord).GetProperties();
+
+        /// <summary>
+        /// Gets type of condition (And/Or).
+        /// </summary>
+        /// <value>
+        /// Type of condition (And/Or).
+        /// </value>
+        public static string TypeCondition { get; private set; } = And;
 
         /// <summary>
         /// Insert command parser.
@@ -58,6 +66,11 @@ namespace FileCabinetApp
                 {
                     values[i] = values[i].Trim(SingleQuote, WhiteSpace);
                 }
+
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    fields[i] = fields[i].Trim(WhiteSpace);
+                }
             }
 
             return (fields, values);
@@ -70,7 +83,7 @@ namespace FileCabinetApp
         /// <returns>Parsed parameter.</returns>
         public static Dictionary<string, string> DeleteParser(string parameters)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             if (parameters is null)
             {
@@ -85,7 +98,7 @@ namespace FileCabinetApp
             }
             else if (arguments.Length == 2)
             {
-                result = AndOrParser(arguments[0]);
+                result = AndOrParser(arguments[1]);
             }
 
             return result;
@@ -98,8 +111,8 @@ namespace FileCabinetApp
         /// <returns>Parsed parameter.</returns>
         public static (Dictionary<string, string> propNewValuesPair, Dictionary<string, string> propWhereValuesPair) UpdateParser(string parameters)
         {
-            Dictionary<string, string> set = new Dictionary<string, string>();
-            Dictionary<string, string> where = new Dictionary<string, string>();
+            Dictionary<string, string> set = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, string> where = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             string errorText = "Invalid update query. Please enter delete command in exampel:" +
                     "[update set DateOfBirth = '5/18/1986' where FirstName='Stan' and LastName='Smith']";
@@ -147,7 +160,7 @@ namespace FileCabinetApp
         public static (List<string> properties, Dictionary<string, string> propWhereValuesPair) SelectParser(string parameters)
         {
             List<string> properties = new List<string>();
-            Dictionary<string, string> where = new Dictionary<string, string>();
+            Dictionary<string, string> where = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             string errorText = "select id, firstname, lastname where firstname = 'John' and lastname = 'Doe'";
 
@@ -177,7 +190,7 @@ namespace FileCabinetApp
         /// <param name="allRecords">All records.</param>
         /// <param name="type">Type of condition (and/or).</param>
         /// <returns>Records.</returns>
-        public static IEnumerable<FileCabinetRecord> GetRecorgs(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords, string type)
+        public static IEnumerable<FileCabinetRecord> GetRecorgs(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords, string type)
         {
             IEnumerable<FileCabinetRecord> result = allRecords;
 
@@ -219,7 +232,7 @@ namespace FileCabinetApp
 
         private static Dictionary<string, string> GetDictionary(string[] fieldsToReplace)
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var fieldsAndValuesToReplace = fieldsToReplace.Select(x => x.Split(Equal).Select(y => y.Trim(SingleQuote, WhiteSpace)));
             foreach (var pair in fieldsAndValuesToReplace)
@@ -239,51 +252,71 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(arguments));
             }
 
-            var valuesAnd = arguments.Split(And);
-            var valuesOr = arguments.Split(Or);
+            var valuesAnd = arguments.Split(And, StringSplitOptions.RemoveEmptyEntries);
+            var valuesOr = arguments.Split(Or, StringSplitOptions.RemoveEmptyEntries);
             string[] values;
-            string type = null;
 
             if (valuesAnd.Length < valuesOr.Length)
             {
                 values = valuesOr;
-                type = Or;
+                TypeCondition = Or;
             }
             else
             {
                 values = valuesAnd;
-                type = And;
+                TypeCondition = And;
             }
 
             var valuesPairs = GetDictionary(values);
-            valuesPairs.Add("type", type);
             return valuesPairs;
         }
 
-        private static IEnumerable<FileCabinetRecord> SelectAnd(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        private static IEnumerable<FileCabinetRecord> SelectAnd(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
         {
-            var result = allRecords.ToList();
+            var result = new List<FileCabinetRecord>(allRecords);
 
-            foreach (var prop in ValidateParametersProperties)
+            foreach (var prop in FileCabinetProperties)
             {
-                if (prop.GetValue(record) != null)
+                var item = prop.GetValue(record);
+                if (!IsNullOrDefault(item))
                 {
-                    result.RemoveAll(x => prop.GetValue(record).Equals(x.FirstName));
+                    result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
                 }
             }
 
             return result;
         }
 
-        private static IEnumerable<FileCabinetRecord> SelectOr(ValidateParametersData record, IEnumerable<FileCabinetRecord> allRecords)
+        private static bool IsNullOrDefault(object item)
+        {
+            if (item is null)
+            {
+                return true;
+            }
+
+            if (item.Equals(default(int))
+                || item.Equals(default(DateTime))
+                || item.Equals(default(char))
+                || item.Equals(default(decimal))
+                || item.Equals(default(short)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static IEnumerable<FileCabinetRecord> SelectOr(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
         {
             var result = new List<FileCabinetRecord>();
 
-            foreach (var prop in ValidateParametersProperties)
+            foreach (var prop in FileCabinetProperties)
             {
-                if (prop.GetValue(record) != null)
+                var item = prop.GetValue(record);
+
+                if (!IsNullOrDefault(item))
                 {
-                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(x.FirstName)).Where(y => !result.Contains(y)));
+                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
                 }
             }
 

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FileCabinetApp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
-using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
@@ -129,8 +129,8 @@ namespace FileCabinetGenerator
                 yield return new FileCabinetRecordSerializable
                 {
                     Id = id,
-                    Name = new Name() 
-                    { 
+                    Name = new Name()
+                    {
                         FirstName = data.FirstName,
                         LastName = data.LastName
                     },
@@ -138,7 +138,7 @@ namespace FileCabinetGenerator
                     Bonuses = data.Bonuses,
                     Salary = data.Salary,
                     AccountType = data.AccountType,
-                }; 
+                };
             }
         }
 

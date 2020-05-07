@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace FileCabinetApp
@@ -83,7 +82,7 @@ namespace FileCabinetApp
             return new ValidatorBuilder()
                 .ValidateFirstName(FNameValidValue.Min, FNameValidValue.Max)
                 .ValidateLastName(LNameValidValue.Min, LNameValidValue.Max)
-                .ValidateDateOfBirth(DoBValidValue.Min, DoBValidValue.Max)
+                .ValidateDateOfBirth(DoBValidValue.From, DoBValidValue.To)
                 .ValidateBonuses(BonusesValidValue.Min, BonusesValidValue.Max)
                 .ValidateSalary(SalaryValidValue.Min, SalaryValidValue.Max)
                 .ValidateAccountType()

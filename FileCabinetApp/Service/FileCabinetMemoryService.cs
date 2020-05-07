@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace FileCabinetApp
@@ -46,12 +45,12 @@ namespace FileCabinetApp
         {
             if (id < MinId)
             {
-                throw new InvalidOperationException($"Invalid #{id} value.");
+                throw new InvalidOperationException($"Invalid id #{id} value.");
             }
 
             if (this.GetRecords().Any(x => x.Id == id))
             {
-                throw new InvalidOperationException($"Record #{id} doesn't exists.");
+                throw new InvalidOperationException($"Record with id #{id} already exists.");
             }
 
             this.validator.ValidateParameters(data ?? throw new ArgumentNullException(nameof(data)));
@@ -165,7 +164,14 @@ namespace FileCabinetApp
         public void RemoveRecord(int id)
         {
             Memoization.RefreshMemoization();
-            this.list.Remove(this.GetRecords().First(x => x.Id == id));
+            try
+            {
+                this.list.Remove(this.GetRecords().First(x => x.Id == id));
+            }
+            catch (InvalidOperationException)
+            {
+                Console.WriteLine("Record with id {id} does not exist.");
+            }
         }
 
         private int GenerateId()

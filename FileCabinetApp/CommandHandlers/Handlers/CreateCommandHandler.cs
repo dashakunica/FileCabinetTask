@@ -58,7 +58,11 @@ namespace FileCabinetApp
 
                     isValid = true;
                 }
-                catch (Exception ex)
+                catch (ArgumentException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (InvalidOperationException ex)
                 {
                     Console.WriteLine(ex.Message);
                 }

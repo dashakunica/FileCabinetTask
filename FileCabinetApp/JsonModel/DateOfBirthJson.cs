@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace FileCabinetApp
 {
@@ -15,7 +13,7 @@ namespace FileCabinetApp
         /// <value>
         /// From valid value.
         /// </value>
-        public DateTime Min { get; set; }
+        public DateTime From { get; set; }
 
         /// <summary>
         /// Gets or sets to valid value.
@@ -23,6 +21,6 @@ namespace FileCabinetApp
         /// <value>
         /// To valid value.
         /// </value>
-        public DateTime Max { get; set; }
+        public DateTime To { get; set; }
     }
 }

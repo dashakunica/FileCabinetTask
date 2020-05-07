@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
-using Microsoft.Extensions.Configuration;
+using System.Linq;
+using System.Reflection;
 
 namespace FileCabinetApp
 {
@@ -14,6 +17,8 @@ namespace FileCabinetApp
         private static readonly DateOfBirthJson DateOfBirth = ValidatorBuilder.DoBValidValue;
         private static readonly BonusesJson Bonuses = ValidatorBuilder.BonusesValidValue;
         private static readonly SalaryJson Salary = ValidatorBuilder.SalaryValidValue;
+
+        private static readonly PropertyInfo[] FileCabinetProperties = typeof(FileCabinetRecord).GetProperties();
 
         /// <summary>
         /// Request data from user in console.
@@ -31,13 +36,14 @@ namespace FileCabinetApp
                                                                     ? new Tuple<bool, string>(false, nameof(data.LastName))
                                                                     : new Tuple<bool, string>(true, nameof(data.LastName)));
             Console.Write("Date of birth: ");
-            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.Min || x > DateOfBirth.Max ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
+            data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.From || x > DateOfBirth.To
+                                                                    ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
                                                                     : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
             Console.Write("Work place number: ");
             data.Bonuses = ReadInput<short>(Convert<short>, x => x < Bonuses.Min || x > Bonuses.Max
                                                                     ? new Tuple<bool, string>(false, nameof(data.Bonuses))
                                                                     : new Tuple<bool, string>(true, nameof(data.Bonuses)));
-            Console.Write("Salary: ");
+            Console.Write($"Salary(min: {Salary.Min} max: {Salary.Max}): ");
             data.Salary = ReadInput<decimal>(Convert<decimal>, x => x < Salary.Min || x > Salary.Max
                                                                     ? new Tuple<bool, string>(false, nameof(data.Salary))
                                                                     : new Tuple<bool, string>(true, nameof(data.Salary)));
@@ -124,6 +130,29 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Create record from value propertie pair.
+        /// </summary>
+        /// <param name="propNewValues">Dictionary with propertie value pair.</param>
+        /// <returns>Record model.</returns>
+        public static FileCabinetRecord CreateRecordFromDict(Dictionary<string, string> propNewValues)
+        {
+            if (propNewValues is null)
+            {
+                throw new ArgumentNullException(nameof(propNewValues));
+            }
+
+            var arg = new FileCabinetRecord();
+            foreach (var item in propNewValues)
+            {
+                var prop = FileCabinetProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
+                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
+                prop.SetValue(arg, converter.ConvertFromString(item.Value));
+            }
+
+            return arg;
+        }
+
+        /// <summary>
         /// Yes or no input message.
         /// </summary>
         /// <returns>True or false.</returns>
@@ -173,35 +202,36 @@ namespace FileCabinetApp
             {
                 stepsToSame = targetLength;
             }
-
-            if (targetLength == 0)
+            else if (targetLength == 0)
             {
                 stepsToSame = sourceLength;
             }
-
-            for (var i = 0; i <= sourceLength; i++)
+            else
             {
-                matrix[i, 0] = i;
-            }
-
-            for (var j = 0; j <= targetLength; j++)
-            {
-                matrix[0, j] = j;
-            }
-
-            for (var i = 1; i <= sourceLength; i++)
-            {
-                for (var j = 1; j <= targetLength; j++)
+                for (var i = 0; i <= sourceLength; i++)
                 {
-                    var cost = (target[j - 1] == source[i - 1]) ? 0 : 1;
-
-                    matrix[i, j] = Math.Min(
-                        Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
-                        matrix[i - 1, j - 1] + cost);
+                    matrix[i, 0] = i;
                 }
-            }
 
-            stepsToSame = matrix[sourceLength, targetLength];
+                for (var j = 0; j <= targetLength; j++)
+                {
+                    matrix[0, j] = j;
+                }
+
+                for (var i = 1; i <= sourceLength; i++)
+                {
+                    for (var j = 1; j <= targetLength; j++)
+                    {
+                        var cost = (target[j - 1] == source[i - 1]) ? 0 : 1;
+
+                        matrix[i, j] = Math.Min(
+                            Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),
+                            matrix[i - 1, j - 1] + cost);
+                    }
+                }
+
+                stepsToSame = matrix[sourceLength, targetLength];
+            }
 
             return 1 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length));
         }
@@ -217,7 +247,7 @@ namespace FileCabinetApp
 
                 if (!conversionResult.Item1)
                 {
-                    Console.WriteLine($"It is not valid parameter {conversionResult.Item2}. Please, correct your input.");
+                    Console.WriteLine($"Cannot convert parameter {conversionResult.Item2}. Please, correct your input.");
                     continue;
                 }
 

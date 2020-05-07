@@ -58,8 +58,8 @@ namespace FileCabinetApp
 
             string type = where["type"];
 
-            var newValues = this.CreateValidateArgs(set);
-            var oldRecords = this.CreateValidateArgs(where);
+            var newValues = DataHelper.CreateRecordFromDict(set);
+            var oldRecords = DataHelper.CreateRecordFromDict(where);
             var allRecords = this.Service.GetRecords();
 
             var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, type);
@@ -76,21 +76,9 @@ namespace FileCabinetApp
             Console.WriteLine(builder.Length == 0 ? string.Empty : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.");
         }
 
-        private ValidateParametersData CreateValidateArgs(Dictionary<string, string> propNewValues)
+        private ValidateParametersData CopyAndFillUnusedFields(FileCabinetRecord validArgs, FileCabinetRecord record)
         {
-            var arg = new ValidateParametersData();
-            foreach (var item in propNewValues)
-            {
-                var prop = ValidateParametersProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
-                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
-                prop.SetValue(arg, converter.ConvertFromString(item.Value));
-            }
-
-            return arg;
-        }
-
-        private ValidateParametersData CopyAndFillUnusedFields(ValidateParametersData args, FileCabinetRecord record)
-        {
+            var args = DataHelper.CreateValidateData(validArgs);
             var defaultValidateArgs = new ValidateParametersData();
             var current = args.Clone();
             foreach (var item in ValidateParametersProperties)
