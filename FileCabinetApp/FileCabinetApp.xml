@@ -74,6 +74,26 @@
             Clear saved fields.
             </summary>
         </member>
+        <member name="T:FileCabinetApp.TablePrinter`1">
+            <summary>
+            Table printer.
+            </summary>
+            <typeparam name="T">Type.</typeparam>
+        </member>
+        <member name="P:FileCabinetApp.TablePrinter`1.TextPrinter">
+            <summary>
+            Gets printer.
+            </summary>
+            <value>
+            Printer.
+            </value>
+        </member>
+        <member name="M:FileCabinetApp.TablePrinter`1.ToTableFormat(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Print table.
+            </summary>
+            <param name="records">Records.</param>
+        </member>
         <member name="T:FileCabinetApp.AppCommandRequest">
             <summary>
             Application command request.

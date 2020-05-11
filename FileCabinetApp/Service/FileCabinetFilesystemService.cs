@@ -13,22 +13,18 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetFilesystemService : IFileCabinetService, IDisposable
     {
-        private const int MaxStringLength = 120;
-        private const int MinId = 0;
+        private const int StringLengthSize = 2;
         private const int CharSize = sizeof(char);
         private const int IntSize = sizeof(int);
         private const int ShortSize = sizeof(short);
         private const int DecimalSize = sizeof(decimal);
-        private const int RecordSize = (IntSize * 4) + (MaxStringLength * 2) + CharSize + DecimalSize + ShortSize;
-        private const short RemovedFlag = 0b0000_0000_0000_0100;
+        private const int MaxStringLength = 60 * CharSize;
+        private const int RecordSize = (IntSize * 4) + (MaxStringLength * 2) + CharSize + DecimalSize + ShortSize + StringLengthSize;
+        private const short RemovedFlag = 0b0000_0000_0000_0001;
         private const char WhiteSpace = ' ';
 
         private readonly Dictionary<int, long> activeStorage = new Dictionary<int, long>();
         private readonly Dictionary<int, long> removedStorage = new Dictionary<int, long>();
-
-        private readonly Dictionary<string, List<long>> firstNameDictionary = new Dictionary<string, List<long>>();
-        private readonly Dictionary<string, List<long>> lastNameDictionary = new Dictionary<string, List<long>>();
-        private readonly Dictionary<DateTime, List<long>> dateOfBirthDictionary = new Dictionary<DateTime, List<long>>();
 
         private readonly FileStream fileStream;
         private readonly BinaryReader binaryReader;
@@ -36,7 +32,6 @@ namespace FileCabinetApp
 
         private IRecordValidator validator;
         private bool disposed = false;
-        private int lastId = MinId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -49,7 +44,7 @@ namespace FileCabinetApp
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
             this.binaryReader = new BinaryReader(fileStream);
             this.binaryWriter = new BinaryWriter(fileStream);
-            this.InitializeDictionaries();
+            this.SetStorage();
         }
 
         /// <summary>
@@ -87,14 +82,10 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public int CreateRecord(int id, ValidateParametersData data)
         {
-            if (id < MinId)
-            {
-                throw new InvalidOperationException($"Invalid #{id} value.");
-            }
-
+            Console.WriteLine(RemovedFlag);
             if (this.activeStorage.ContainsKey(id))
             {
-                throw new InvalidOperationException($"Record #{id} doesn't exists.");
+                throw new InvalidOperationException($"Record with #{id} already exists.");
             }
 
             this.validator.ValidateParameters(data);
@@ -107,7 +98,7 @@ namespace FileCabinetApp
                 this.removedStorage.Remove(id);
             }
 
-            this.WriteToFileStream(position, record);
+            this.RecordsToBytes(position, record);
             this.activeStorage.Add(id, position);
             return record.Id;
         }
@@ -128,16 +119,18 @@ namespace FileCabinetApp
             this.validator.ValidateParameters(data);
             var current = DataHelper.CreateRecordFromArgs(id, data);
             DataHelper.UpdateRecordFromData(current.Id, data, current);
-            this.WriteToFileStream(this.activeStorage[id], current);
+            this.RecordsToBytes(this.activeStorage[id], current);
         }
 
         /// <inheritdoc/>
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
-            var list = this.BinaryRecordsToList();
-            ReadOnlyCollection<FileCabinetRecord> readOnlyRecords = new ReadOnlyCollection<FileCabinetRecord>(list);
+            foreach (var item in this.activeStorage.Values.ToList())
+            {
+                var record = this.BytesToRecord(item);
 
-            return readOnlyRecords;
+                yield return record;
+            }
         }
 
         /// <inheritdoc/>
@@ -227,9 +220,7 @@ namespace FileCabinetApp
             }
 
             this.fileStream.SetLength(this.fileStream.Position);
-            this.activeStorage.Clear();
-            this.removedStorage.Clear();
-            this.InitializeDictionaries();
+            this.SetStorage();
         }
 
         /// <summary>
@@ -261,64 +252,13 @@ namespace FileCabinetApp
             this.disposed = true;
         }
 
-        private static FileCabinetRecord BytesToUser(byte[] bytes)
-        {
-            if (bytes == null)
-            {
-                throw new ArgumentNullException(nameof(bytes));
-            }
-
-            var record = new FileCabinetRecord();
-
-            using (var memoryStream = new MemoryStream(bytes))
-            using (var binaryReader = new BinaryReader(memoryStream))
-            {
-                record.Id = binaryReader.ReadInt32();
-
-                var nameLength = binaryReader.ReadInt32();
-                var nameBuffer = binaryReader.ReadBytes(MaxStringLength);
-
-                record.FirstName = Encoding.Unicode.GetString(nameBuffer, 0, nameLength);
-
-                var lastNameLength = binaryReader.ReadInt32();
-                var lastNameBuffer = binaryReader.ReadBytes(MaxStringLength);
-
-                record.LastName = Encoding.Unicode.GetString(lastNameBuffer, 0, lastNameLength);
-
-                int day = binaryReader.ReadInt32();
-                int month = binaryReader.ReadInt32();
-                int year = binaryReader.ReadInt32();
-
-                record.DateOfBirth = new DateTime(day, month, year);
-            }
-
-            return record;
-        }
-
-        private List<FileCabinetRecord> BinaryRecordsToList()
-        {
-            List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-            long numberOfRecords = this.fileStream.Length / RecordSize;
-            for (int i = 0; i < numberOfRecords; i++)
-            {
-                var recordBuffer = new byte[RecordSize];
-
-                this.fileStream.Read(recordBuffer, i * recordBuffer.Length, recordBuffer.Length);
-                var record = BytesToUser(recordBuffer);
-
-                list.Add(record);
-            }
-
-            return list;
-        }
-
-        private void WriteToFileStream(long position, FileCabinetRecord record)
+        private void RecordsToBytes(long position, FileCabinetRecord record)
         {
             this.binaryWriter.Seek((int)position, SeekOrigin.Begin);
-            this.binaryWriter.Write(ShortSize);
+            this.binaryWriter.Write((short)0);
             this.binaryWriter.Write(record.Id);
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(char.MinValue, MaxStringLength - record.FirstName.Length)).ToArray()));
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(char.MinValue, MaxStringLength - record.LastName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(WhiteSpace, 60 - record.FirstName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(WhiteSpace, 60 - record.LastName.Length)).ToArray()));
             this.binaryWriter.Write(record.DateOfBirth.Month);
             this.binaryWriter.Write(record.DateOfBirth.Day);
             this.binaryWriter.Write(record.DateOfBirth.Year);
@@ -327,7 +267,7 @@ namespace FileCabinetApp
             this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.AccountType.ToString(CultureInfo.InvariantCulture)));
         }
 
-        private FileCabinetRecord ReadRecordFromFileStream(long position)
+        private FileCabinetRecord BytesToRecord(long position)
         {
             if (position % RecordSize != 0)
             {
@@ -337,16 +277,18 @@ namespace FileCabinetApp
             this.binaryReader.BaseStream.Position = position;
             this.binaryReader.ReadInt16();
 
-            return new FileCabinetRecord()
+            var record = new FileCabinetRecord()
             {
                 Id = this.binaryReader.ReadInt32(),
-                FirstName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(MaxStringLength)).Replace(char.MinValue, WhiteSpace).Trim(),
-                LastName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(MaxStringLength)).Replace(char.MinValue, WhiteSpace).Trim(),
+                FirstName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(60 * 2)).Trim(),
+                LastName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(60 * 2)).Trim(),
                 DateOfBirth = DateTime.Parse($"{this.binaryReader.ReadInt32()}/{this.binaryReader.ReadInt32()}/{this.binaryReader.ReadInt32()}", CultureInfo.InvariantCulture),
                 Bonuses = this.binaryReader.ReadInt16(),
                 Salary = this.binaryReader.ReadDecimal(),
                 AccountType = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(CharSize)).First(),
             };
+
+            return record;
         }
 
         private void WriteToFile(long position, FileCabinetRecord record)
@@ -364,45 +306,63 @@ namespace FileCabinetApp
             this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.AccountType.ToString(CultureInfo.InvariantCulture)));
         }
 
-        private void InitializeDictionaries()
-        {
-            this.firstNameDictionary.Clear();
-            this.lastNameDictionary.Clear();
-            this.dateOfBirthDictionary.Clear();
-
-            foreach (var item in this.activeStorage)
-            {
-                var record = this.ReadRecordFromFileStream(item.Value);
-                this.AddToDictionary(record.FirstName, item.Value, this.firstNameDictionary);
-                this.AddToDictionary(record.LastName, item.Value, this.lastNameDictionary);
-                this.AddToDictionary(record.DateOfBirth, item.Value, this.dateOfBirthDictionary);
-            }
-        }
-
-        private void AddToDictionary<T>(T key, long value, Dictionary<T, List<long>> dictionary)
-        {
-            if (!dictionary.ContainsKey(key))
-            {
-                dictionary.Add(key, new List<long>());
-            }
-
-            dictionary[key].Add(value);
-        }
-
         private int GenerateId()
         {
-            var start = this.lastId != int.MaxValue - 1 ? this.lastId : MinId;
-
-            for (int i = start; i < int.MaxValue; i++)
+            for (int i = 1; i < int.MaxValue; i++)
             {
                 if (!this.activeStorage.ContainsKey(i))
                 {
-                    this.lastId = i;
                     return i;
                 }
             }
 
             throw new ArgumentException($"Does'n exist available id.");
+        }
+
+        private void SetStorage()
+        {
+            this.activeStorage.Clear();
+            this.removedStorage.Clear();
+
+            var count = (int)(this.fileStream.Length / RecordSize);
+            for (int i = 0; i < count; i++)
+            {
+                this.fileStream.Position = i * RecordSize;
+                var status = this.binaryReader.ReadInt16();
+
+                var idposition = (i * RecordSize) + 2;
+                this.fileStream.Position = idposition;
+                var id = this.binaryReader.ReadInt32();
+
+                if (status == RemovedFlag)
+                {
+                    this.removedStorage.Add(id, idposition - 2);
+                }
+                else
+                {
+                    var beginOfTheRecord = idposition - 2;
+                    if (this.IsValid(beginOfTheRecord))
+                    {
+                        this.activeStorage.Add(id, beginOfTheRecord);
+                    }
+                }
+            }
+        }
+
+        private bool IsValid(long beginOfTheRecord)
+        {
+            var record = this.BytesToRecord(beginOfTheRecord);
+            var validate = DataHelper.CreateValidateData(record);
+
+            try
+            {
+                this.validator.ValidateParameters(validate);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
         }
     }
 }

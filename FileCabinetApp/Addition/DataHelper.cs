@@ -286,6 +286,10 @@ namespace FileCabinetApp
             {
                 converted = false;
             }
+            catch (OverflowException)
+            {
+                converted = false;
+            }
 
             return new Tuple<bool, string, T>(converted, arg, result);
         }

@@ -119,9 +119,15 @@ namespace FileCabinetApp
         private static void SetService(string serviceRules, bool isStopwatch, bool isLogger)
         {
             var isFileService = serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase);
+
             fileStream = isFileService ? CreateFileStream(BinaryFileName) : null;
-            fileCabinetService = isFileService ? FileCabinetFilesystemService.Create(fileStream, recordValidator) : FileCabinetMemoryService.Create(recordValidator);
+
+            fileCabinetService = isFileService
+                ? FileCabinetFilesystemService.Create(fileStream, recordValidator)
+                : FileCabinetMemoryService.Create(recordValidator);
+
             fileCabinetService = isStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
+
             fileCabinetService = isLogger ? new ServiceLogger(fileCabinetService, LoggingPath) : fileCabinetService;
         }
 
@@ -144,8 +150,12 @@ namespace FileCabinetApp
         private static FileStream CreateFileStream(string dataFilePath)
         {
             var path = Path.Combine(DefaultRootDirectory, dataFilePath);
-            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
-            return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            return new FileStream(dataFilePath, FileMode.Create, FileAccess.ReadWrite);
         }
 
         private static void Print(IEnumerable<FileCabinetRecord> records)

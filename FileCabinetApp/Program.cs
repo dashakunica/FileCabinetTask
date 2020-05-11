@@ -45,6 +45,7 @@ namespace FileCabinetApp
                 const int parametersIndex = 1;
                 string parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
                 commandHandler.Handle(new AppCommandRequest(command, parameters));
+                Console.WriteLine();
             }
             while (Startup.IsRunning);
         }
