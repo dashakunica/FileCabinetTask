@@ -14,14 +14,14 @@ namespace FileCabinetApp
         private const string Command = "select";
         private const string Id = "Id";
 
-        private readonly Action<IEnumerable<FileCabinetRecord>> printer;
+        private readonly Action<IEnumerable<FileCabinetRecord>, List<string>> printer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service.</param>
         /// <param name="printer">Printer.</param>
-        public SelectCommandHandler(IFileCabinetService fileCabinetService, Action<IEnumerable<FileCabinetRecord>> printer)
+        public SelectCommandHandler(IFileCabinetService fileCabinetService, Action<IEnumerable<FileCabinetRecord>, List<string>> printer)
             : base(fileCabinetService)
         {
             this.printer = printer ?? throw new ArgumentNullException(nameof(printer));
@@ -70,7 +70,7 @@ namespace FileCabinetApp
             var allRecords = this.Service.GetRecords();
 
             var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
-            this.printer(selectedRecords);
+            this.printer(selectedRecords, properties);
             Console.WriteLine("Completed successfully.");
         }
     }

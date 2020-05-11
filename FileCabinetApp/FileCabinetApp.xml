@@ -88,11 +88,12 @@
             Printer.
             </value>
         </member>
-        <member name="M:FileCabinetApp.TablePrinter`1.ToTableFormat(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:FileCabinetApp.TablePrinter`1.ToTableFormat(System.Collections.Generic.IEnumerable{`0},System.Collections.Generic.List{System.String})">
             <summary>
-            Print table.
+            Table printer.
             </summary>
             <param name="records">Records.</param>
+            <param name="properties">What we should print.</param>
         </member>
         <member name="T:FileCabinetApp.AppCommandRequest">
             <summary>
@@ -251,7 +252,7 @@
             List command.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord}})">
+        <member name="M:FileCabinetApp.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.List{System.String}})">
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.ListCommandHandler"/> class.
             </summary>
@@ -281,7 +282,7 @@
             Select command handler.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.SelectCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord}})">
+        <member name="M:FileCabinetApp.SelectCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,System.Action{System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.Collections.Generic.List{System.String}})">
             <summary>
             Initializes a new instance of the <see cref="T:FileCabinetApp.SelectCommandHandler"/> class.
             </summary>

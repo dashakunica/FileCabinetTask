@@ -56,13 +56,11 @@ namespace FileCabinetApp
             var set = items.propNewValuesPair;
             var where = items.propWhereValuesPair;
 
-            string type = where["type"];
-
             var newValues = DataHelper.CreateRecordFromDict(set);
             var oldRecords = DataHelper.CreateRecordFromDict(where);
             var allRecords = this.Service.GetRecords();
 
-            var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, type);
+            var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
             var builder = new StringBuilder();
 
             foreach (var item in updatedRecords)

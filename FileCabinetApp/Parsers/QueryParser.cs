@@ -180,6 +180,11 @@ namespace FileCabinetApp
                 where = AndOrParser(arguments[1]);
             }
 
+            for (int i = 0; i < properties.Count; i++)
+            {
+                properties[i] = properties[i].Trim(WhiteSpace);
+            }
+
             return (properties, where);
         }
 

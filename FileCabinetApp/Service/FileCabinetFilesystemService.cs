@@ -18,10 +18,14 @@ namespace FileCabinetApp
         private const int IntSize = sizeof(int);
         private const int ShortSize = sizeof(short);
         private const int DecimalSize = sizeof(decimal);
-        private const int MaxStringLength = 60 * CharSize;
-        private const int RecordSize = (IntSize * 4) + (MaxStringLength * 2) + CharSize + DecimalSize + ShortSize + StringLengthSize;
         private const short RemovedFlag = 0b0000_0000_0000_0001;
         private const char WhiteSpace = ' ';
+
+        private static readonly int MaxFNameLength = ValidatorBuilder.FNameValidValue.Max;
+        private static readonly int MaxLNameLength = ValidatorBuilder.LNameValidValue.Max;
+
+        private static readonly int RecordSize = (IntSize * 4) + ((MaxFNameLength + MaxLNameLength) * StringLengthSize)
+                                                    + CharSize + DecimalSize + ShortSize + StringLengthSize;
 
         private readonly Dictionary<int, long> activeStorage = new Dictionary<int, long>();
         private readonly Dictionary<int, long> removedStorage = new Dictionary<int, long>();
@@ -296,11 +300,16 @@ namespace FileCabinetApp
             this.binaryWriter.Seek((int)position, SeekOrigin.Begin);
             this.binaryWriter.Write((short)0);
             this.binaryWriter.Write(record.Id);
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(char.MinValue, MaxStringLength - record.FirstName.Length)).ToArray()));
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(char.MinValue, MaxStringLength - record.LastName.Length)).ToArray()));
+
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(
+                new string(char.MinValue, (MaxFNameLength * StringLengthSize) - record.FirstName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(
+                new string(char.MinValue, (MaxLNameLength * StringLengthSize) - record.LastName.Length)).ToArray()));
+
             this.binaryWriter.Write(record.DateOfBirth.Month);
             this.binaryWriter.Write(record.DateOfBirth.Day);
             this.binaryWriter.Write(record.DateOfBirth.Year);
+
             this.binaryWriter.Write(record.Bonuses);
             this.binaryWriter.Write(record.Salary);
             this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.AccountType.ToString(CultureInfo.InvariantCulture)));

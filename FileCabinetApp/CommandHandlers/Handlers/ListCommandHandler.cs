@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FileCabinetApp
 {
@@ -10,14 +11,14 @@ namespace FileCabinetApp
     {
         private const string Command = "list";
 
-        private readonly Action<IEnumerable<FileCabinetRecord>> printer;
+        private readonly Action<IEnumerable<FileCabinetRecord>, List<string>> printer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service.</param>
         /// <param name="printer">Printer.</param>
-        public ListCommandHandler(IFileCabinetService fileCabinetService, Action<IEnumerable<FileCabinetRecord>> printer)
+        public ListCommandHandler(IFileCabinetService fileCabinetService, Action<IEnumerable<FileCabinetRecord>, List<string>> printer)
             : base(fileCabinetService)
         {
             this.printer = printer ?? throw new ArgumentNullException(nameof(printer));
@@ -48,7 +49,15 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            this.printer(this.Service.GetRecords());
+            var records = this.Service.GetRecords();
+            if (records == null || !records.Any())
+            {
+                Console.WriteLine("There are currently no records in the storage.");
+            }
+            else
+            {
+                this.printer(records, null);
+            }
         }
     }
 }

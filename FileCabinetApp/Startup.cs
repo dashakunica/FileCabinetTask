@@ -158,10 +158,10 @@ namespace FileCabinetApp
             return new FileStream(dataFilePath, FileMode.Create, FileAccess.ReadWrite);
         }
 
-        private static void Print(IEnumerable<FileCabinetRecord> records)
+        private static void Print(IEnumerable<FileCabinetRecord> records, List<string> properties)
         {
             var printer = new TablePrinter<FileCabinetRecord>();
-            printer.ToTableFormat(records);
+            printer.ToTableFormat(records, properties);
         }
     }
 }

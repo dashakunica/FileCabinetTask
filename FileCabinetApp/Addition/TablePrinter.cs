@@ -35,10 +35,11 @@ namespace FileCabinetApp
         private PropertyInfo[] RecordProperties { get; } = typeof(T).GetProperties();
 
         /// <summary>
-        /// Print table.
+        /// Table printer.
         /// </summary>
         /// <param name="records">Records.</param>
-        public void ToTableFormat(IEnumerable<T> records)
+        /// <param name="properties">What we should print.</param>
+        public void ToTableFormat(IEnumerable<T> records, List<string> properties)
         {
             if (records is null)
             {
@@ -52,18 +53,18 @@ namespace FileCabinetApp
             {
                 if (createHeader)
                 {
-                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine);
-                    this.ToRow(item, columnLength, SymbolType.Header);
-                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine);
+                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
+                    this.ToRow(item, columnLength, SymbolType.Header, properties);
+                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
                     createHeader = false;
                 }
 
-                this.ToRow(item, columnLength, SymbolType.Values);
-                this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine);
+                this.ToRow(item, columnLength, SymbolType.Values, properties);
+                this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
             }
         }
 
-        private void ToRow(T record, Dictionary<string, int> columnLength, SymbolType type)
+        private void ToRow(T record, Dictionary<string, int> columnLength, SymbolType type, List<string> propertiesToPrint)
         {
             this.TextPrinter.Clear();
             char symbol = (type == SymbolType.Header || type == SymbolType.Values) ? WhiteSpace : HorizontalBorder;
@@ -73,17 +74,20 @@ namespace FileCabinetApp
             {
                 var mappingProp = this.RecordProperties.First(x => x.Name == prop.Name);
 
-                string value = type == SymbolType.Header ? prop.Name :
+                if (propertiesToPrint is null || propertiesToPrint.FindIndex(x => x.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)) != -1)
+                {
+                    string value = type == SymbolType.Header ? prop.Name :
                     (type == SymbolType.Values) ? prop.GetValue(record).ToString() :
                     new string(HorizontalBorder, columnLength[prop.Name]);
 
-                if (prop.PropertyType.IsValueType)
-                {
-                    this.TextPrinter.Append($"{border}{value.PadRight(columnLength[prop.Name], symbol)}");
-                }
-                else
-                {
-                    this.TextPrinter.Append($"{border}{value.PadLeft(columnLength[prop.Name], symbol)}");
+                    if (prop.PropertyType.IsValueType)
+                    {
+                        this.TextPrinter.Append($"{border}{value.PadRight(columnLength[prop.Name], symbol)}");
+                    }
+                    else
+                    {
+                        this.TextPrinter.Append($"{border}{value.PadLeft(columnLength[prop.Name], symbol)}");
+                    }
                 }
             }
 
