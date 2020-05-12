@@ -13,6 +13,15 @@ namespace FileCabinetApp
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordsSerializable"/> class.
+        /// File Cabinet Records Serializable.
+        /// </summary>
+        public FileCabinetRecordsSerializable()
+        {
+            this.Records = new List<FileCabinetRecordSerializable>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordsSerializable"/> class.
         /// </summary>
         /// <param name="fileCabinetRecords">Records.</param>
         public FileCabinetRecordsSerializable(IEnumerable<FileCabinetRecordSerializable> fileCabinetRecords)

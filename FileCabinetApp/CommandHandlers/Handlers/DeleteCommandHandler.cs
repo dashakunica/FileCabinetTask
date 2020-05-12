@@ -71,14 +71,19 @@ namespace FileCabinetApp
                 var records = QueryParser.GetRecorgs(whereRecord, allRecords, QueryParser.TypeCondition);
 
                 var builder = new StringBuilder();
+                int countMatchedRecords = 0;
                 foreach (var item in records)
                 {
                     builder.Append($"#{item.Id}, ");
+                    countMatchedRecords++;
                 }
 
-                string text = builder.Length == 0
+                string text = countMatchedRecords == 0
                     ? $"No deleted records."
-                    : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
+                    : $"{(countMatchedRecords == 1 ? "Record" : "Records")} " +
+                    $"{builder.ToString().TrimEnd(WhiteSpace, Comma)} " +
+                    $"{(countMatchedRecords == 1 ? "is" : "are")} deleted.";
+
                 this.Service.Delete(records);
                 Memoization.RefreshMemoization();
                 Console.WriteLine(text);

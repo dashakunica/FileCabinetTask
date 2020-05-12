@@ -39,12 +39,29 @@ namespace FileCabinetGenerator
         {
             var parameters = CommandLineParser.GetCommandLineArguments(args);
 
+            if(parameters.Count() != 4)
+            {
+                ShowErrorMessage();
+            }
+
             var parameterKey = (args[0].Trim().StartsWith("--")) ? commandLineParameters : shortCommandLineParameters;
 
-            string fileType = parameters[parameterKey[0]];
-            string filePath = parameters[parameterKey[1]];
-            int recordsAmount = Int32.Parse(parameters[parameterKey[2]]);
-            int startId = Int32.Parse(parameters[parameterKey[3]]);
+            string fileType = TryGetValue(parameters, parameterKey[0]);
+            string filePath = TryGetValue(parameters, parameterKey[1]);
+
+            int recordsAmount = 0;
+            if(!Int32.TryParse(TryGetValue(parameters, parameterKey[2]), out recordsAmount))
+            {
+                Console.WriteLine("Records amount should be integer.");
+                ShowErrorMessage();
+            }
+
+            int startId = 0;
+            if (!Int32.TryParse(TryGetValue(parameters, parameterKey[2]), out startId))
+            {
+                Console.WriteLine("Start id should be integer.");
+                ShowErrorMessage();
+            }
 
             if (!fileType.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase) &&
                 !fileType.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
@@ -58,7 +75,16 @@ namespace FileCabinetGenerator
                 File.Delete(filePath);
             }
 
-            var stream = File.Create(filePath);
+            FileStream stream = default;
+            try
+            {
+                stream = File.Create(filePath);
+            }
+            catch (UnauthorizedAccessException)
+            {
+
+            }
+            
             using var writer = new StreamWriter(stream);
             var records = Generate(startId, recordsAmount);
 
@@ -148,6 +174,32 @@ namespace FileCabinetGenerator
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        private static void ShowErrorMessage()
+        {
+            Console.WriteLine($"Cannot convert this command line arguments. {Environment.NewLine}" +
+                    $"You shiould fill in all command line arguments. {Environment.NewLine}" +
+                    $"Example: [-t xml -o c:\\users\\myuser\\records.xml -a 5000 -i 45]. {Environment.NewLine}" +
+                    $"Please, rebuild your project with valid command line parameters.");
+
+            Environment.Exit(1488);
+        }
+
+        private static string TryGetValue(Dictionary<string, string> parameter, string parameterKey)
+        {
+            string result = string.Empty;
+
+            if (parameter.TryGetValue(parameterKey, out result))
+            {
+                return result;
+            }
+            else
+            {
+                ShowErrorMessage();
+            }
+
+            return result;
         }
     }
 }

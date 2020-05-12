@@ -55,7 +55,7 @@ namespace FileCabinetApp
 
             this.validator.ValidateParameters(data ?? throw new ArgumentNullException(nameof(data)));
             Memoization.RefreshMemoization();
-            var record = DataHelper.CreateRecordFromArgs(id != default ? id : this.GenerateId(), data);
+            var record = DataHelper.CreateRecordFromArgs(id != 0 ? id : this.GenerateId(), data);
             this.list.Add(record);
             return record.Id;
         }
