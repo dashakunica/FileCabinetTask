@@ -9,6 +9,7 @@ namespace FileCabinetApp
     public class FileCabinetRecordCsvWriter : IFileCabinetWriter
     {
         private readonly StreamWriter writer;
+        private bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
@@ -45,6 +46,17 @@ namespace FileCabinetApp
         /// <param name="disposing">True or false.</param>
         protected virtual void Dispose(bool disposing)
         {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                this.writer.Dispose();
+            }
+
+            this.disposed = true;
         }
     }
 }

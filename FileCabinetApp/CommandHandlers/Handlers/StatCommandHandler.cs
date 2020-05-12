@@ -44,12 +44,7 @@ namespace FileCabinetApp
             }
 
             var (active, removed) = this.Service.GetStat();
-            Console.WriteLine($"Contains {active} records.");
-
-            if (this.Service is FileCabinetFilesystemService)
-            {
-                Console.WriteLine($"Count removed records {removed} .");
-            }
+            Console.WriteLine($"Storage contains {active} records. {Environment.NewLine}Count removed records are {removed}.");
         }
     }
 }

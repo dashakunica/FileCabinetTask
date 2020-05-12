@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -86,7 +85,6 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public int CreateRecord(int id, ValidateParametersData data)
         {
-            Console.WriteLine(RemovedFlag);
             if (this.activeStorage.ContainsKey(id))
             {
                 throw new InvalidOperationException($"Record with #{id} already exists.");

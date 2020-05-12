@@ -69,7 +69,7 @@ namespace FileCabinetApp
             }
             while (!isValid);
 
-            Console.WriteLine($"Record #{id} is created.");
+            Console.WriteLine($"Record with id #{id} is created.");
         }
     }
 }

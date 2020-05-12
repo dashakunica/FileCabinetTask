@@ -11,6 +11,7 @@ namespace FileCabinetApp
     public class FileCabinetRecordXmlWriter : IFileCabinetWriter
     {
         private readonly XmlWriter xmlTextWriter;
+        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordXmlWriter"/> class.
@@ -59,6 +60,19 @@ namespace FileCabinetApp
         /// <param name="disposing">True or false.</param>
         protected virtual void Dispose(bool disposing)
         {
+            this.xmlTextWriter.WriteEndElement();
+
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                this.xmlTextWriter.Dispose();
+            }
+
+            this.disposed = true;
         }
     }
 }

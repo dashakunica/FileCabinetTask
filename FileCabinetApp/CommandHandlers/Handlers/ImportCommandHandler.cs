@@ -60,7 +60,7 @@ namespace FileCabinetApp
             string message = string.Empty;
             if (!File.Exists(path))
             {
-                message = $"Import error: file {path} not exist.";
+                message = $"Import error: file {path} does not exist.";
             }
 
             using var stream = new StreamReader(File.OpenRead(path));
@@ -79,7 +79,7 @@ namespace FileCabinetApp
                 }
 
                 this.Service.Restore(snapshot);
-                message = $"{snapshot?.Records.Count} were imported from {path}.";
+                message = $"{snapshot?.Records.Count} records were imported from {path}.";
             }
 
             if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))

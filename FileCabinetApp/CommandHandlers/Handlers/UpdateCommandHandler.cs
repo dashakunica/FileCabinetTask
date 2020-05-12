@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -51,10 +49,10 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            var items = QueryParser.UpdateParser(parameters);
+            var (propNewValuesPair, propWhereValuesPair) = QueryParser.UpdateParser(parameters);
 
-            var set = items.propNewValuesPair;
-            var where = items.propWhereValuesPair;
+            var set = propNewValuesPair;
+            var where = propWhereValuesPair;
 
             var newValues = DataHelper.CreateRecordFromDict(set);
             var oldRecords = DataHelper.CreateRecordFromDict(where);
@@ -66,15 +64,27 @@ namespace FileCabinetApp
             foreach (var item in updatedRecords)
             {
                 builder.Append($"#{item.Id}, ");
-                var current = this.CopyAndFillUnusedFields(newValues, item);
+                var current = this.TrimFields(newValues, item);
                 this.Service.EditRecord(item.Id, current);
                 Memoization.RefreshMemoization();
             }
 
-            Console.WriteLine(builder.Length == 0 ? string.Empty : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.");
+            string message = string.Empty;
+            if (builder.Length == 0)
+            {
+                message = "There is no selected records to update matching this condition.";
+            }
+            else
+            {
+                message = builder.Length == 1
+                    ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
+                    : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
+            }
+
+            Console.WriteLine(message);
         }
 
-        private ValidateParametersData CopyAndFillUnusedFields(FileCabinetRecord validArgs, FileCabinetRecord record)
+        private ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
         {
             var args = DataHelper.CreateValidateData(validArgs);
             var defaultValidateArgs = new ValidateParametersData();

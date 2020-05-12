@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 
 namespace FileCabinetApp
 {
@@ -70,8 +68,15 @@ namespace FileCabinetApp
             var allRecords = this.Service.GetRecords();
 
             var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
-            this.printer(selectedRecords, properties);
-            Console.WriteLine("Completed successfully.");
+
+            if (selectedRecords == null || !selectedRecords.Any())
+            {
+                Console.WriteLine("There are no selected records matching this condition.");
+            }
+            else
+            {
+                this.printer(selectedRecords, properties);
+            }
         }
     }
 }

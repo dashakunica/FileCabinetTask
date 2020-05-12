@@ -40,7 +40,6 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(data));
             }
 
-            this.Print(nameof(this.CreateAndSetId), data.ToString());
             var value = this.fileCabinetService.CreateAndSetId(data);
             this.Print(nameof(this.CreateAndSetId), value.ToString(CultureInfo.InvariantCulture));
             return value;
@@ -54,9 +53,8 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(data));
             }
 
-            this.Print(nameof(this.CreateAndSetId), data.ToString());
             var value = this.fileCabinetService.CreateRecord(id, data);
-            this.Print(nameof(this.CreateAndSetId), value.ToString(CultureInfo.InvariantCulture));
+            this.Print(nameof(this.CreateRecord), value.ToString(CultureInfo.InvariantCulture));
             return value;
         }
 
@@ -128,7 +126,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void Delete(IEnumerable<FileCabinetRecord> records)
         {
-            this.Print(nameof(this.Restore), string.Empty);
+            this.Print(nameof(this.Delete), string.Empty);
             this.fileCabinetService.Delete(records);
         }
 
@@ -165,6 +163,7 @@ namespace FileCabinetApp
             string message = $"Calling {method} with {parameters}.";
 
             this.writer.WriteLine($"{DateTime.Now} : {message}");
+            this.writer.Flush();
             Console.WriteLine(message);
         }
     }

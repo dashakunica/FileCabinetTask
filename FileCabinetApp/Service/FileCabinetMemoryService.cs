@@ -170,7 +170,7 @@ namespace FileCabinetApp
             }
             catch (InvalidOperationException)
             {
-                Console.WriteLine("Record with id {id} does not exist.");
+                Console.WriteLine($"Record with id {id} does not exist.");
             }
         }
 

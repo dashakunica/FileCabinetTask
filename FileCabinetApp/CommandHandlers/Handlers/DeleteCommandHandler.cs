@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace FileCabinetApp
@@ -80,7 +76,9 @@ namespace FileCabinetApp
                     builder.Append($"#{item.Id}, ");
                 }
 
-                string text = builder.Length == 0 ? $"No deleted records." : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
+                string text = builder.Length == 0
+                    ? $"No deleted records."
+                    : $"Records {builder.ToString().TrimEnd(WhiteSpace, Comma)} are deleted.";
                 this.Service.Delete(records);
                 Memoization.RefreshMemoization();
                 Console.WriteLine(text);
