@@ -17,7 +17,6 @@
 mono_crash.*
 
 # Build results
-[Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
@@ -26,7 +25,6 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
@@ -348,3 +346,38 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/FileCabinetApp/bin/Debug/netcoreapp3.1/cabinet-records.db
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.deps.json
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.exe
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.runtimeconfig.dev.json
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.runtimeconfig.json
+/FileCabinetApp/bin/Debug/netcoreapp3.1/FileCabinetApp.xml
+/FileCabinetApp/bin/Debug/netcoreapp3.1/log.txt
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Abstractions.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Binder.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.FileExtensions.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Physical.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Primitives.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Json.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileSystemGlobbing.dll
+/FileCabinetApp/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Abstractions.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetApp.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetApp.exe
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetApp.xml
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.deps.json
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.exe
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.runtimeconfig.dev.json
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.runtimeconfig.json
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/FileCabinetGenerator.xml
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Abstractions.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Binder.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.FileExtensions.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Configuration.Json.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Abstractions.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileProviders.Physical.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.FileSystemGlobbing.dll
+/FileCabinetGenerator/bin/Debug/netcoreapp3.1/Microsoft.Extensions.Primitives.dll
