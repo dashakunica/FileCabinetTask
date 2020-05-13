@@ -48,7 +48,11 @@ namespace FileCabinetApp
             {
                 var (active, removed) = this.Service.GetStat();
                 this.Service.Purge();
-                Console.WriteLine($"Data file processing is completed: {removed} of {removed + active} records were purged.");
+                Console.WriteLine($"Defragmentation of records is completed: {removed} of {removed + active} records were purged.");
+            }
+            else
+            {
+                Console.WriteLine("This command work only in file cabinet Filesystem Service.");
             }
         }
     }

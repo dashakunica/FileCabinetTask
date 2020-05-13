@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -77,7 +78,7 @@ namespace FileCabinetApp
                 if (propertiesToPrint is null || propertiesToPrint.FindIndex(x => x.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)) != -1)
                 {
                     string value = type == SymbolType.Header ? prop.Name :
-                    (type == SymbolType.Values) ? prop.GetValue(record).ToString() :
+                    (type == SymbolType.Values) ? string.Format(CultureInfo.InvariantCulture, GetFormat(prop.PropertyType), prop.GetValue(record)) :
                     new string(HorizontalBorder, columnLength[prop.Name]);
 
                     if (prop.PropertyType.IsValueType)
@@ -93,6 +94,8 @@ namespace FileCabinetApp
 
             this.TextPrinter.Append($"{border}");
             Console.WriteLine(this.TextPrinter);
+
+            static string GetFormat(Type type) => type.Equals(typeof(DateTime)) ? "{0:yyyy-MMM-dd}" : "{0:0}";
         }
 
         private Dictionary<string, int> MaxLengthOfFields(IEnumerable<T> records)

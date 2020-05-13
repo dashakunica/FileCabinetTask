@@ -11,6 +11,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetRecordXmlReader : IFileCabinetReader
     {
+        private bool disposed = false;
         private readonly StreamReader reader;
 
         /// <summary>

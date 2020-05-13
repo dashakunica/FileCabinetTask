@@ -144,7 +144,7 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public FileCabinetServiceSnapshot MakeSnapshot()
         {
-            throw new NotImplementedException();
+            return new FileCabinetServiceSnapshot(this.GetRecords().ToArray());
         }
 
         /// <inheritdoc/>
@@ -214,14 +214,18 @@ namespace FileCabinetApp
         /// <inheritdoc/>
         public void Purge()
         {
-            var records = this.GetRecords();
-            this.fileStream.Position = 0;
-            foreach (var record in records)
+            var currentPosition = 0;
+            var startRecordPositions = new List<long>(this.activeStorage.Values);
+            startRecordPositions.Sort();
+
+            foreach (var start in startRecordPositions)
             {
-                this.WriteToFile(this.fileStream.Position, record);
+                this.RecordsToBytes(currentPosition, this.BytesToRecord(start));
+                currentPosition += RecordSize;
             }
 
-            this.fileStream.SetLength(this.fileStream.Position);
+            this.fileStream.SetLength(currentPosition);
+
             this.SetStorage();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 
 namespace FileCabinetApp
 {
@@ -50,12 +51,17 @@ namespace FileCabinetApp
 
             var importParameters = parameters.Split(WhiteSpace, StringSplitOptions.RemoveEmptyEntries);
 
-            var message = importParameters.Length == 2 ? this.ImportFromFormat(importParameters[0], importParameters[1]) : "Import failed: invalid arguments.";
-
-            Console.WriteLine(message);
+            if (importParameters.Length == 2)
+            {
+                this.ImportFromFormat(importParameters[0], importParameters[1]);
+            }
+            else
+            {
+                QueryParser.ShowErrorMessage(Command);
+            }
         }
 
-        private string ImportFromFormat(string format, string path)
+        private void ImportFromFormat(string format, string path)
         {
             string message = string.Empty;
             if (!File.Exists(path))
@@ -63,43 +69,65 @@ namespace FileCabinetApp
                 message = $"Import error: file {path} does not exist.";
             }
 
-            using var stream = new StreamReader(File.OpenRead(path));
-
-            if (format.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase))
+            FileStream fileStream = default;
+            try
             {
+                fileStream = new FileStream(path, FileMode.Open);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine($"Export failed: can't open file {path}.");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if (fileStream != null)
+            {
+                using var stream = new StreamReader(fileStream);
                 var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
-                try
+
+                if (format.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase))
                 {
                     using var reader = new FileCabinetRecordCsvReader(stream);
-                    snapshot.LoadFrom(reader);
-                }
-                catch (ArgumentException ex)
-                {
-                    message = $"Import failed: {ex.InnerException.Message}";
+                    message = this.LoadFrom(reader, path, snapshot);
                 }
 
-                this.Service.Restore(snapshot);
-                message = $"{snapshot?.Records.Count} records were imported from {path}.";
-            }
-
-            if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
-            {
-                var snapshot = new FileCabinetServiceSnapshot(Array.Empty<FileCabinetRecord>());
-                try
+                if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
                 {
                     using var reader = new FileCabinetRecordXmlReader(stream);
-                    snapshot.LoadFrom(reader);
+                    message = this.LoadFrom(reader, path, snapshot);
                 }
-                catch (ArgumentException ex)
-                {
-                    message = $"Import failed: {ex.InnerException.Message}";
-                }
-
-                this.Service.Restore(snapshot);
-                message = $"{snapshot?.Records.Count} were imported from {path}.";
             }
 
-            return message;
+            Console.WriteLine(message);
+        }
+
+        private string LoadFrom(IFileCabinetReader reader, string path, FileCabinetServiceSnapshot snapshot)
+        {
+            try
+            {
+                snapshot.LoadFrom(reader);
+                this.Service.Restore(snapshot);
+            }
+            catch (ArgumentException ex)
+            {
+                return $"Import failed: {ex.Message}";
+            }
+
+            var builder = new StringBuilder();
+            foreach (var item in snapshot.Logger)
+            {
+                builder.AppendLine(item);
+            }
+
+            builder.Append($"{snapshot?.Records.Count - snapshot.Logger.Count} records were imported from {path}.");
+            return builder.ToString();
         }
     }
 }

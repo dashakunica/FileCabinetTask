@@ -23,6 +23,13 @@ namespace FileCabinetApp
         private const string And = "and";
         private const string Or = "or";
 
+        private const string Delete = "delete";
+        private const string Export = "export";
+        private const string Import = "import";
+        private const string Update = "update";
+        private const string Select = "select";
+        private const string Insert = "insert";
+
         private static readonly PropertyInfo[] FileCabinetProperties = typeof(FileCabinetRecord).GetProperties();
 
         /// <summary>
@@ -40,9 +47,10 @@ namespace FileCabinetApp
         /// <returns>Parsed parameters.</returns>
         public static (List<string> attributes, List<string> values) InsertParser(string parameters)
         {
-            if (parameters is null)
+            if (string.IsNullOrEmpty(parameters))
             {
-                throw new ArgumentNullException(nameof(parameters));
+                ShowErrorMessage(Insert);
+                return (null, null);
             }
 
             var arguments = parameters.Split(Values);
@@ -52,7 +60,8 @@ namespace FileCabinetApp
 
             if (arguments.Length < 2)
             {
-                Console.WriteLine("Invalid Insert query. Please enter insert command in exampel:[insert (id, firstname, lastname, dateofbirth) values ('1', 'John', 'Doe', '5/18/1986')]");
+                ShowErrorMessage(Insert);
+                return (null, null);
             }
             else if (arguments.Length == 2)
             {
@@ -73,6 +82,13 @@ namespace FileCabinetApp
                 }
             }
 
+            if (fields.Count != 7 || values.Count != fields.Count)
+            {
+                Console.WriteLine("Query should contains all properties and values for them.");
+                ShowErrorMessage(Insert);
+                return (null, null);
+            }
+
             return (fields, values);
         }
 
@@ -85,20 +101,28 @@ namespace FileCabinetApp
         {
             Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            if (parameters is null)
+            if (string.IsNullOrEmpty(parameters))
             {
-                throw new ArgumentNullException(nameof(parameters));
+                ShowErrorMessage(Delete);
+                return null;
             }
 
             var arguments = parameters.Split(Where, 2);
 
             if (arguments.Length < 2)
             {
-                Console.WriteLine("Invalid delete query. Please enter delete command in exampel:[delete where id = '1']");
+                ShowErrorMessage(Delete);
+                return null;
             }
             else if (arguments.Length == 2)
             {
                 result = AndOrParser(arguments[1]);
+            }
+
+            if (result.Keys.Count != result.Values.Count)
+            {
+                ShowErrorMessage(Delete);
+                return null;
             }
 
             return result;
@@ -114,17 +138,16 @@ namespace FileCabinetApp
             Dictionary<string, string> set = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             Dictionary<string, string> where = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            string errorText = "Invalid update query. Please enter delete command in exampel:" +
-                    "[update set DateOfBirth = '5/18/1986' where FirstName='Stan' and LastName='Smith']";
-
-            if (parameters is null)
+            if (string.IsNullOrEmpty(parameters))
             {
-                throw new ArgumentNullException(nameof(parameters));
+                ShowErrorMessage(Update);
+                return (null, null);
             }
 
             if (parameters.Length < 3)
             {
-                Console.WriteLine(errorText);
+                ShowErrorMessage(Update);
+                return (null, null);
             }
 
             if (parameters.Substring(0, 3).Equals(Set, StringComparison.InvariantCulture))
@@ -133,13 +156,15 @@ namespace FileCabinetApp
             }
             else
             {
-                Console.WriteLine(errorText);
+                ShowErrorMessage(Update);
+                return (null, null);
             }
 
             var arguments = parameters.Split(Where, 2);
             if (arguments.Length < 2)
             {
-                Console.WriteLine(errorText);
+                ShowErrorMessage(Update);
+                return (null, null);
             }
             else
             {
@@ -147,6 +172,13 @@ namespace FileCabinetApp
                 set = GetDictionary(fieldsToReplace);
 
                 where = AndOrParser(arguments[1]);
+            }
+
+            if (set.Values.Count != set.Keys.Count ||
+                where.Values.Count != where.Keys.Count)
+            {
+                ShowErrorMessage(Update);
+                return (null, null);
             }
 
             return (set, where);
@@ -162,27 +194,34 @@ namespace FileCabinetApp
             List<string> properties = new List<string>();
             Dictionary<string, string> where = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            string errorText = "select id, firstname, lastname where firstname = 'John' and lastname = 'Doe'";
-
             if (parameters is null)
             {
-                throw new ArgumentNullException(nameof(parameters));
+                ShowErrorMessage(Select);
+                return (null, null);
             }
 
             var arguments = parameters.Split(Where, 2);
-            if (arguments.Length < 2)
+            properties = arguments[0].Split(Comma).ToList();
+            if (arguments.Length == 2)
             {
-                Console.WriteLine(errorText);
-            }
-            else
-            {
-                properties = arguments[0].Split(Comma).ToList();
                 where = AndOrParser(arguments[1]);
+            }
+
+            if (where.Keys.Count != where.Values.Count)
+            {
+                ShowErrorMessage(Select);
+                return (null, null);
             }
 
             for (int i = 0; i < properties.Count; i++)
             {
                 properties[i] = properties[i].Trim(WhiteSpace);
+            }
+
+            if (where.Keys.Count != where.Values.Count)
+            {
+                ShowErrorMessage(Update);
+                return (null, null);
             }
 
             return (properties, where);
@@ -233,6 +272,41 @@ namespace FileCabinetApp
                 Memoization.Saved.Add(new Tuple<string, IEnumerable<FileCabinetRecord>>(query, result));
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Shows error message.
+        /// </summary>
+        /// <param name="query">Query string.</param>
+        public static void ShowErrorMessage(string query)
+        {
+            Console.WriteLine($"Invalid {query} query.");
+
+            string example = string.Empty;
+            switch (query)
+            {
+                case Delete:
+                    example = "[delete where id = '1']";
+                    break;
+                case Export:
+                    example = "[export csv e:\\filename.csv]";
+                    break;
+                case Import:
+                    example = "[import csv d:\\data\\records.csv]";
+                    break;
+                case Select:
+                    example = "[select id, firstname, lastname where firstname = 'John' and lastname = 'Doe']";
+                    break;
+                case Update:
+                    example = "[update set firstname = 'John', lastname = 'Doe' , dateofbirth = '5/18/1986' where id = '1']";
+                    break;
+                case Insert:
+                    example = "[insert(id, firstname, lastname, dateofbirth, salary, accounttype, bonuses) " +
+                        "values('1', 'John', 'Doe', '5/18/1986', '3500', 'd', '12')]";
+                    break;
+            }
+
+            Console.WriteLine($"Please enter {query} command in example: {Environment.NewLine}{example}");
         }
 
         private static Dictionary<string, string> GetDictionary(string[] fieldsToReplace)

@@ -50,7 +50,7 @@ namespace FileCabinetApp
 
             foreach (var item in HelpCommandHandler.Commands)
             {
-                if (DataHelper.GetSimilarity(command, item) > 0.5)
+                if (DataHelper.GetSimilarity(command, item) > 0.4)
                 {
                     similarCommand.Append($"{Environment.NewLine}{item}");
                 }

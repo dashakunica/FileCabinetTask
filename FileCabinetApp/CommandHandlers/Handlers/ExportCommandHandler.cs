@@ -49,12 +49,17 @@ namespace FileCabinetApp
 
             var inputs = parameter.Split(WhiteSpace, 2);
 
-            var message = inputs.Length == 2 ? this.ExportTo(inputs[0], inputs[1]) : "Export failed: invalid arguments.";
-
-            Console.WriteLine(message);
+            if (inputs.Length == 2)
+            {
+                this.ExportTo(inputs[0], inputs[1]);
+            }
+            else
+            {
+                QueryParser.ShowErrorMessage(Command);
+            }
         }
 
-        private string ExportTo(string format, string path)
+        private void ExportTo(string format, string path)
         {
             var snapshot = this.Service.MakeSnapshot();
 
@@ -68,7 +73,7 @@ namespace FileCabinetApp
 
             if (isCanceled)
             {
-                message = "Export canceled by the user.";
+                Console.WriteLine("Export canceled by the user.");
             }
 
             FileStream filestream = default;
@@ -78,26 +83,37 @@ namespace FileCabinetApp
             }
             catch (FileNotFoundException)
             {
-                message = $"Export failed: can't open file {path}.";
+                Console.WriteLine($"Export failed: can't open file {path}.");
             }
-
-            using var stream = new StreamWriter(filestream);
-
-            if (format.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase))
+            catch (UnauthorizedAccessException ex)
             {
-                using var writer = new FileCabinetRecordCsvWriter(stream);
-                snapshot.SaveTo(writer);
-                message = $"All records export into CSV file {path}";
+                Console.WriteLine(ex.Message);
             }
 
-            if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
+            if (filestream is null)
             {
-                using var writer = new FileCabinetRecordXmlWriter(stream);
-                snapshot.SaveTo(writer);
-                message = $"All record export into XML file {path}";
+                message = "Invalid path.";
+            }
+            else
+            {
+                using var stream = new StreamWriter(filestream);
+
+                if (format.Equals(CsvString, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    using var writer = new FileCabinetRecordCsvWriter(stream);
+                    snapshot.SaveTo(writer);
+                    message = $"All records export into CSV file {path}";
+                }
+
+                if (format.Equals(XmlString, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    using var writer = new FileCabinetRecordXmlWriter(stream);
+                    snapshot.SaveTo(writer);
+                    message = $"All record export into XML file {path}";
+                }
             }
 
-            return message;
+            Console.WriteLine(message);
         }
     }
 }

@@ -44,13 +44,24 @@ namespace FileCabinetApp
             try
             {
                 id = id == 0 ? this.Service.CreateAndSetId(data) : this.Service.CreateRecord(id, data);
+                Console.WriteLine($"Record #{id} is created.");
             }
-            catch (ArgumentNullException)
+            catch (InvalidOperationException ioe)
             {
-                Console.WriteLine("Insert command should contains all properties in record. Please correct your input.");
+                Console.WriteLine(ioe.Message);
             }
-
-            Console.WriteLine($"Record #{id} is created.");
+            catch (FormatException fe)
+            {
+                Console.WriteLine(fe.Message);
+            }
+            catch (OverflowException oe)
+            {
+                Console.WriteLine(oe.Message);
+            }
+            catch (ArgumentException ae)
+            {
+                Console.WriteLine(ae.Message);
+            }
         }
 
         private void GetArguments(string parameters)
@@ -63,22 +74,37 @@ namespace FileCabinetApp
             PropertyInfo[] fileCabinetRecordProperties = typeof(FileCabinetRecord).GetProperties();
 
             var (fields, values) = QueryParser.InsertParser(parameters);
-            var record = new FileCabinetRecord();
-
-            for (int i = 0; i < fields.Count; i++)
+            if (fields != null || values != null)
             {
-                var currentAttribute = fields[i];
-                var currentValue = values[i];
-                var prop = fileCabinetRecordProperties.FirstOrDefault(x => x.Name.Equals(currentAttribute, StringComparison.InvariantCultureIgnoreCase));
-                if (prop != null)
+                var record = new FileCabinetRecord();
+                bool isValid = true;
+
+                for (int i = 0; i < fields.Count; i++)
                 {
-                    var converter = TypeDescriptor.GetConverter(prop.PropertyType);
-                    prop.SetValue(record, converter.ConvertFromInvariantString(currentValue));
+                    var currentAttribute = fields[i];
+                    var currentValue = values[i];
+                    var prop = fileCabinetRecordProperties.FirstOrDefault(x => x.Name.Equals(currentAttribute, StringComparison.InvariantCultureIgnoreCase));
+                    if (prop != null)
+                    {
+                        var converter = TypeDescriptor.GetConverter(prop.PropertyType);
+                        try
+                        {
+                            prop.SetValue(record, converter.ConvertFromInvariantString(currentValue));
+                        }
+                        catch (ArgumentException)
+                        {
+                            Console.WriteLine($"Cannot convert propertie {prop.Name}. Pleas correct your input.");
+                            isValid = false;
+                        }
+                    }
+                }
+
+                if (isValid)
+                {
+                    var data = DataHelper.CreateValidateData(record);
+                    this.Insert(record.Id, data);
                 }
             }
-
-            var data = DataHelper.CreateValidateData(record);
-            this.Insert(record.Id, data);
         }
     }
 }

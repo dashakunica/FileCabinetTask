@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace FileCabinetApp
@@ -9,7 +10,6 @@ namespace FileCabinetApp
     public class DeleteCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "delete";
-        private const string Id = "Id";
         private const char WhiteSpace = ' ';
         private const char Comma = ',';
 
@@ -48,24 +48,11 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            var where = QueryParser.DeleteParser(parameters);
+            Dictionary<string, string> where = QueryParser.DeleteParser(parameters);
 
-            string id;
-            if (where.TryGetValue(Id, out id))
+            if (where != null)
             {
-                int temp;
-                if (!int.TryParse(id, out temp))
-                {
-                    Console.WriteLine("Invalid Id value.");
-                }
-
-                this.Service.RemoveRecord(temp);
-
-                Console.WriteLine($"Records with {temp} is deleted.");
-            }
-            else
-            {
-                var whereRecord = DataHelper.CreateRecordFromDict(where);
+                FileCabinetRecord whereRecord = DataHelper.CreateRecordFromDict(where);
                 var allRecords = this.Service.GetRecords();
 
                 var records = QueryParser.GetRecorgs(whereRecord, allRecords, QueryParser.TypeCondition);

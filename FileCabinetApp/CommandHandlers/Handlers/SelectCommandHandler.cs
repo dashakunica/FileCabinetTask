@@ -10,7 +10,6 @@ namespace FileCabinetApp
     public class SelectCommandHandler : ServiceCommandHandlerBase
     {
         private const string Command = "select";
-        private const string Id = "Id";
 
         private readonly Action<IEnumerable<FileCabinetRecord>, List<string>> printer;
 
@@ -52,30 +51,28 @@ namespace FileCabinetApp
 
             var (properties, where) = QueryParser.SelectParser(parameters);
 
-            string id;
-            if (where.TryGetValue(Id, out id))
+            if (properties != null && where != null)
             {
-                int temp;
-                if (!int.TryParse(id, out temp))
+                var oldRecords = DataHelper.CreateRecordFromDict(where);
+                var allRecords = this.Service.GetRecords();
+
+                if (where is null || !where.Any())
                 {
-                    Console.WriteLine("Invalid Id value.");
+                    this.printer(allRecords, properties);
                 }
+                else
+                {
+                    var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
 
-                this.Service.RemoveRecord(temp);
-            }
-
-            var oldRecords = DataHelper.CreateRecordFromDict(where);
-            var allRecords = this.Service.GetRecords();
-
-            var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
-
-            if (selectedRecords == null || !selectedRecords.Any())
-            {
-                Console.WriteLine("There are no selected records matching this condition.");
-            }
-            else
-            {
-                this.printer(selectedRecords, properties);
+                    if (selectedRecords == null || !selectedRecords.Any())
+                    {
+                        Console.WriteLine("There are no selected records matching this condition.");
+                    }
+                    else
+                    {
+                        this.printer(selectedRecords, properties);
+                    }
+                }
             }
         }
     }

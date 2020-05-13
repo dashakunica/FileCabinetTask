@@ -8,7 +8,7 @@ namespace FileCabinetApp
     /// </summary>
     public static class ParameterParser
     {
-        private const string FileServiceType = "File";
+        private const string MemoryServiceType = "Memory";
         private const string DefaultValidationRules = "Default";
         private const string LoggString = "Logging";
         private const string StopwatchString = "Stopwatch";
@@ -38,29 +38,34 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            var validationRules = DefaultValidationRules;
-            var serviceRules = FileServiceType;
-            var loggingRules = LoggString;
-
-            if (!parameters.TryGetValue(ShortCommandLineParameters[0], out validationRules))
+            if (!parameters.TryGetValue(ShortCommandLineParameters[0], out string validationRules))
             {
                 parameters.TryGetValue(CommandLineParameters[0], out validationRules);
             }
 
-            if (!parameters.TryGetValue(ShortCommandLineParameters[1], out serviceRules))
+            if (!parameters.TryGetValue(ShortCommandLineParameters[1], out string serviceRules))
             {
                 parameters.TryGetValue(CommandLineParameters[1], out serviceRules);
             }
 
-            parameters.TryGetValue(CommandLineParameters[2], out loggingRules);
+            parameters.TryGetValue(CommandLineParameters[2], out string loggingRules);
+
+            if (loggingRules is null)
+            {
+                loggingRules = string.Empty;
+            }
 
             bool isStopwatch = loggingRules.Equals(StopwatchString, StringComparison.InvariantCultureIgnoreCase);
             bool isLogger = loggingRules.Equals(LoggString, StringComparison.InvariantCultureIgnoreCase);
 
-            if (validationRules is null || serviceRules is null)
+            if (validationRules is null)
             {
                 validationRules = DefaultValidationRules;
-                serviceRules = FileServiceType;
+            }
+
+            if (serviceRules is null)
+            {
+                serviceRules = MemoryServiceType;
             }
 
             return (validationRules, serviceRules, isStopwatch, isLogger);

@@ -180,7 +180,7 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Calculate similaity of 2 string.
+        /// Calculate similarity of 2 string.
         /// </summary>
         /// <param name="source">string 1.</param>
         /// <param name="target">string 2.</param>

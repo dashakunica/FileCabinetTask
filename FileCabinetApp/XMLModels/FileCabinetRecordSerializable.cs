@@ -12,6 +12,13 @@ namespace FileCabinetApp
     public class FileCabinetRecordSerializable
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecordSerializable"/> class.
+        /// </summary>
+        public FileCabinetRecordSerializable()
+        {
+        }
+
+        /// <summary>
         /// Gets or sets id for serialization model.
         /// </summary>
         /// <value>
@@ -35,21 +42,8 @@ namespace FileCabinetApp
         /// <value>
         /// Date of birth.
         /// </value>
-        [XmlIgnore]
-        public DateTime DateOfBirth { get; set; }
-
-        /// <summary>
-        /// Gets or sets date of birth string format.
-        /// </summary>
-        /// <value>
-        /// Date of birth.
-        /// </value>
         [XmlElement("DateOfBirth")]
-        public string DateString
-        {
-            get { return this.DateOfBirth.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture); }
-            set { this.DateOfBirth = DateTime.Parse(value, CultureInfo.InvariantCulture); }
-        }
+        public DateTime DateOfBirth { get; set; }
 
         /// <summary>
         /// Gets or sets account type for serialization model.

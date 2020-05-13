@@ -41,6 +41,7 @@ namespace FileCabinetGenerator
 
             if(parameters.Count() != 4)
             {
+                Console.WriteLine("You should fill in all command line arguments.");
                 ShowErrorMessage();
             }
 
@@ -100,11 +101,11 @@ namespace FileCabinetGenerator
             {
                 var xmlSerializedRecords = new FileCabinetRecordsSerializable(records);
 
-                var ns = new XmlSerializerNamespaces();
-                ns.Add(string.Empty, string.Empty);
+                var xmlSerializer = new XmlSerializerNamespaces();
+                xmlSerializer.Add(string.Empty, string.Empty);
 
                 var serializer = new XmlSerializer(typeof(FileCabinetRecordsSerializable));
-                serializer.Serialize(writer, xmlSerializedRecords, ns);
+                serializer.Serialize(writer, xmlSerializedRecords, xmlSerializer);
             }
 
             Console.WriteLine($"{recordsAmount} records were written to {filePath}");
@@ -179,11 +180,10 @@ namespace FileCabinetGenerator
         private static void ShowErrorMessage()
         {
             Console.WriteLine($"Cannot convert this command line arguments. {Environment.NewLine}" +
-                    $"You shiould fill in all command line arguments. {Environment.NewLine}" +
                     $"Example: [-t xml -o c:\\users\\myuser\\records.xml -a 5000 -i 45]. {Environment.NewLine}" +
                     $"Please, rebuild your project with valid command line parameters.");
 
-            Environment.Exit(1488);
+            Environment.Exit(1);
         }
 
         private static string TryGetValue(Dictionary<string, string> parameter, string parameterKey)

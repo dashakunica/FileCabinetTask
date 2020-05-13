@@ -53,7 +53,7 @@
         </member>
         <member name="M:FileCabinetApp.DataHelper.GetSimilarity(System.String,System.String)">
             <summary>
-            Calculate similaity of 2 string.
+            Calculate similarity of 2 string.
             </summary>
             <param name="source">string 1.</param>
             <param name="target">string 2.</param>
@@ -703,6 +703,12 @@
             <param name="type">Type of condition (and/or).</param>
             <returns>Records.</returns>
         </member>
+        <member name="M:FileCabinetApp.QueryParser.ShowErrorMessage(System.String)">
+            <summary>
+            Shows error message.
+            </summary>
+            <param name="query">Query string.</param>
+        </member>
         <member name="T:FileCabinetApp.Program">
             <summary>
             API.
@@ -1342,6 +1348,11 @@
             Model for serialization record.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordSerializable.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordSerializable"/> class.
+            </summary>
+        </member>
         <member name="P:FileCabinetApp.FileCabinetRecordSerializable.Id">
             <summary>
             Gets or sets id for serialization model.
@@ -1361,14 +1372,6 @@
         <member name="P:FileCabinetApp.FileCabinetRecordSerializable.DateOfBirth">
             <summary>
             Gets or sets date of birth for serialization model.
-            </summary>
-            <value>
-            Date of birth.
-            </value>
-        </member>
-        <member name="P:FileCabinetApp.FileCabinetRecordSerializable.DateString">
-            <summary>
-            Gets or sets date of birth string format.
             </summary>
             <value>
             Date of birth.
@@ -1407,6 +1410,12 @@
         <member name="T:FileCabinetApp.FileCabinetRecordsSerializable">
             <summary>
             Model for serialization record.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecordsSerializable.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecordsSerializable"/> class.
+            File Cabinet Records Serializable.
             </summary>
         </member>
         <member name="M:FileCabinetApp.FileCabinetRecordsSerializable.#ctor(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecordSerializable})">

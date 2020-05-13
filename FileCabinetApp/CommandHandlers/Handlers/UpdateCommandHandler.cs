@@ -51,37 +51,40 @@ namespace FileCabinetApp
 
             var (propNewValuesPair, propWhereValuesPair) = QueryParser.UpdateParser(parameters);
 
-            var set = propNewValuesPair;
-            var where = propWhereValuesPair;
-
-            var newValues = DataHelper.CreateRecordFromDict(set);
-            var oldRecords = DataHelper.CreateRecordFromDict(where);
-            var allRecords = this.Service.GetRecords();
-
-            var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
-            var builder = new StringBuilder();
-
-            foreach (var item in updatedRecords)
+            if (propNewValuesPair != null || propWhereValuesPair != null)
             {
-                builder.Append($"#{item.Id}, ");
-                var current = this.TrimFields(newValues, item);
-                this.Service.EditRecord(item.Id, current);
-                Memoization.RefreshMemoization();
-            }
+                var set = propNewValuesPair;
+                var where = propWhereValuesPair;
 
-            string message = string.Empty;
-            if (builder.Length == 0)
-            {
-                message = "There is no selected records to update matching this condition.";
-            }
-            else
-            {
-                message = builder.Length == 1
-                    ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
-                    : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
-            }
+                var newValues = DataHelper.CreateRecordFromDict(set);
+                var oldRecords = DataHelper.CreateRecordFromDict(where);
+                var allRecords = this.Service.GetRecords();
 
-            Console.WriteLine(message);
+                var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
+                var builder = new StringBuilder();
+
+                foreach (var item in updatedRecords)
+                {
+                    builder.Append($"#{item.Id}, ");
+                    var current = this.TrimFields(newValues, item);
+                    this.Service.EditRecord(item.Id, current);
+                    Memoization.RefreshMemoization();
+                }
+
+                string message = string.Empty;
+                if (builder.Length == 0)
+                {
+                    message = "There is no selected records to update matching this condition.";
+                }
+                else
+                {
+                    message = builder.Length == 1
+                        ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
+                        : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
+                }
+
+                Console.WriteLine(message);
+            }
         }
 
         private ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
