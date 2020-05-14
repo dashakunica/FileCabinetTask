@@ -126,7 +126,7 @@ namespace FileCabinetApp
                 builder.AppendLine(item);
             }
 
-            builder.Append($"{snapshot?.Records.Count - snapshot.Logger.Count} records were imported from {path}.");
+            builder.Append($"{snapshot?.Records.Count - snapshot.Logger.Count - 1} records were imported from {path}.");
             return builder.ToString();
         }
     }

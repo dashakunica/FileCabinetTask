@@ -56,6 +56,11 @@ namespace FileCabinetApp
                 var oldRecords = DataHelper.CreateRecordFromDict(where);
                 var allRecords = this.Service.GetRecords();
 
+                if (allRecords == null || !allRecords.Any())
+                {
+                    Console.WriteLine("There are no records in storage, right now.");
+                }
+
                 if (where is null || !where.Any())
                 {
                     this.printer(allRecords, properties);

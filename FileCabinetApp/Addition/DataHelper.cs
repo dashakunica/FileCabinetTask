@@ -39,7 +39,7 @@ namespace FileCabinetApp
             data.DateOfBirth = ReadInput<DateTime>(Convert<DateTime>, x => x < DateOfBirth.From || x > DateOfBirth.To
                                                                     ? new Tuple<bool, string>(false, nameof(data.DateOfBirth))
                                                                     : new Tuple<bool, string>(true, nameof(data.DateOfBirth)));
-            Console.Write("Work place number: ");
+            Console.Write("Bonuses: ");
             data.Bonuses = ReadInput<short>(Convert<short>, x => x < Bonuses.Min || x > Bonuses.Max
                                                                     ? new Tuple<bool, string>(false, nameof(data.Bonuses))
                                                                     : new Tuple<bool, string>(true, nameof(data.Bonuses)));
@@ -47,7 +47,7 @@ namespace FileCabinetApp
             data.Salary = ReadInput<decimal>(Convert<decimal>, x => x < Salary.Min || x > Salary.Max
                                                                     ? new Tuple<bool, string>(false, nameof(data.Salary))
                                                                     : new Tuple<bool, string>(true, nameof(data.Salary)));
-            Console.Write("Department: ");
+            Console.Write("Account type: ");
             data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetterOrDigit(x)
                                                                     ? new Tuple<bool, string>(true, nameof(data.AccountType))
                                                                     : new Tuple<bool, string>(false, nameof(data.AccountType)));
@@ -146,7 +146,18 @@ namespace FileCabinetApp
             {
                 var prop = FileCabinetProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
                 var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
-                prop.SetValue(arg, converter.ConvertFromString(item.Value));
+                try
+                {
+                    prop.SetValue(arg, converter.ConvertFromString(item.Value));
+                }
+                catch (ArgumentException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
 
             return arg;

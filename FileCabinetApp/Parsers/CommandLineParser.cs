@@ -31,7 +31,15 @@ namespace FileCabinetApp
                 var delimeter = arg.StartsWith(Use, StringComparison.OrdinalIgnoreCase) || arg.StartsWith(DoubleDash, StringComparison.OrdinalIgnoreCase)
                     ? Equal : Colon;
                 var splitParam = arg.Split(delimeter, 2);
-                consoleParams.Add(splitParam[0], splitParam[1]);
+                try
+                {
+                    consoleParams.Add(splitParam[0], splitParam[1]);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Console.WriteLine($"Invalid command line parameters. Please rebuild project with another parameters.{Environment.NewLine}" +
+                        $"Default settings are used.");
+                }
             }
 
             return consoleParams;

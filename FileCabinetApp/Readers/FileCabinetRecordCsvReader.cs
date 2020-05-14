@@ -36,8 +36,8 @@ namespace FileCabinetApp
             while (!this.reader.EndOfStream)
             {
                 var paramaters = this.reader.ReadLine().Split(',', StringSplitOptions.RemoveEmptyEntries);
-                var record = CreateRecord(paramaters);
 
+                var record = CreateRecord(paramaters);
                 if (record != null)
                 {
                     listOfRecords.Add(record);

@@ -93,7 +93,7 @@
             Table printer.
             </summary>
             <param name="records">Records.</param>
-            <param name="properties">What we should print.</param>
+            <param name="propertiesToPrint">What we should print.</param>
         </member>
         <member name="T:FileCabinetApp.AppCommandRequest">
             <summary>

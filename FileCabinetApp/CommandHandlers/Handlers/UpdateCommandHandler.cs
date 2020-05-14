@@ -78,7 +78,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    message = builder.Length == 1
+                    message = updatedRecords.Count() == 1
                         ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
                         : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
                 }

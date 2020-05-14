@@ -194,7 +194,7 @@ namespace FileCabinetApp
             List<string> properties = new List<string>();
             Dictionary<string, string> where = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-            if (parameters is null)
+            if (string.IsNullOrEmpty(parameters))
             {
                 ShowErrorMessage(Select);
                 return (null, null);

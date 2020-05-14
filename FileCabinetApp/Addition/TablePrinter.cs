@@ -39,12 +39,36 @@ namespace FileCabinetApp
         /// Table printer.
         /// </summary>
         /// <param name="records">Records.</param>
-        /// <param name="properties">What we should print.</param>
-        public void ToTableFormat(IEnumerable<T> records, List<string> properties)
+        /// <param name="propertiesToPrint">What we should print.</param>
+        public void ToTableFormat(IEnumerable<T> records, List<string> propertiesToPrint)
         {
             if (records is null)
             {
                 throw new ArgumentNullException(nameof(records));
+            }
+
+            StringBuilder message = new StringBuilder(200);
+
+            List<string> propNames = new List<string>(this.RecordProperties.Length);
+            foreach (var prop in this.RecordProperties)
+            {
+                propNames.Add(prop.Name);
+            }
+
+            if (propertiesToPrint != null)
+            {
+                for (int i = 0; i < propertiesToPrint.Count; i++)
+                {
+                    if (propNames.FindIndex(x => x.Equals(propertiesToPrint[i], StringComparison.OrdinalIgnoreCase)) == -1)
+                    {
+                        message.AppendLine($"There is no properties in record with {propertiesToPrint[i]} value.");
+                        propertiesToPrint = propertiesToPrint.Count == 1 ?
+                            null : propertiesToPrint;
+                        break;
+                    }
+                }
+
+                Console.Write(message);
             }
 
             var columnLength = this.MaxLengthOfFields(records);
@@ -54,14 +78,14 @@ namespace FileCabinetApp
             {
                 if (createHeader)
                 {
-                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
-                    this.ToRow(item, columnLength, SymbolType.Header, properties);
-                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
+                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, propertiesToPrint);
+                    this.ToRow(item, columnLength, SymbolType.Header, propertiesToPrint);
+                    this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, propertiesToPrint);
                     createHeader = false;
                 }
 
-                this.ToRow(item, columnLength, SymbolType.Values, properties);
-                this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, properties);
+                this.ToRow(item, columnLength, SymbolType.Values, propertiesToPrint);
+                this.ToRow(item, columnLength, SymbolType.HorizontalBorderLine, propertiesToPrint);
             }
         }
 
@@ -75,7 +99,7 @@ namespace FileCabinetApp
             {
                 var mappingProp = this.RecordProperties.First(x => x.Name == prop.Name);
 
-                if (propertiesToPrint is null || propertiesToPrint.FindIndex(x => x.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)) != -1)
+                if (propertiesToPrint == null || propertiesToPrint.FindIndex(x => x.Equals(prop.Name, StringComparison.OrdinalIgnoreCase)) != -1)
                 {
                     string value = type == SymbolType.Header ? prop.Name :
                     (type == SymbolType.Values) ? string.Format(CultureInfo.InvariantCulture, GetFormat(prop.PropertyType), prop.GetValue(record)) :
