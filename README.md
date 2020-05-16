@@ -9,8 +9,8 @@ Example:
 - --storage=file
 - -s:memory
 ### diagnostics
-- --use-logger
-- --use-stopwatch
+- --use=logger
+- --use=stopwatch
 #### FileCabinetMemoryService.
 Provides memory service for working with records.
 #### FileCabinetFilesystemService.
@@ -52,8 +52,7 @@ Data file processing is completed: 10 of 100 records were purged.
 Пример использования:
 
 ```
-> insert (id, firstname, lastname, dateofbirth) values ('1', 'John', 'Doe', '5/18/1986')
-> insert (dateofbirth,lastname,firstname,id) values ('5/18/1986','Stan','Smith','2')
+> insert(id, firstname, lastname, dateofbirth, salary, accounttype, bonuses) values('1', 'John', 'Doe', '05/08/1986', '3500', 'd', '12')
 ```
 ### delete
 Пример использования:
@@ -105,6 +104,6 @@ Records #2, #3, #4 are deleted.
 $ FileCabinetGenerator.exe --output-type=csv --output=d:\data\records.csv --records-amount=10000 --start-id=30
 10000 records were written to records.csv.
 
-$ FileCabinetGenerator.exe -t xml -o c:\users\myuser\records.xml -a 5000 -i 45
+$ FileCabinetGenerator.exe -t:xml -o:c:\users\myuser\records.xml -a:5000 -i:45
 5000 records were written to c:\users\myuser\records.xml
 ```
