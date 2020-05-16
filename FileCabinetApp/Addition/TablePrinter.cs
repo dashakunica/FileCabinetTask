@@ -133,10 +133,23 @@ namespace FileCabinetApp
 
             foreach (var propertie in this.RecordProperties)
             {
+                string itemStringView;
+
                 int max = records.Max(x =>
                 {
                     object value = propertie.GetValue(x);
-                    return value is null ? 0 : value.ToString().Length + 1;
+                    Type itemType = propertie.PropertyType;
+
+                    if (itemType.Equals(typeof(DateTime)))
+                    {
+                        itemStringView = string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MMM-dd}", value);
+                    }
+                    else
+                    {
+                        itemStringView = value.ToString();
+                    }
+
+                    return value is null ? 0 : itemStringView.Length + 1;
                 });
 
                 propertyLengthPairs.Add(propertie.Name, Math.Max(max, propertie.Name.Length));

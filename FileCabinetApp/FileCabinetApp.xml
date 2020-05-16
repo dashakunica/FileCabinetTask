@@ -387,6 +387,9 @@
         <member name="M:FileCabinetApp.ServiceLogger.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindRecords(FileCabinetApp.FileCabinetRecord,System.String)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.ServiceLogger.GetStat">
             <inheritdoc/>
         </member>
@@ -394,9 +397,6 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.ServiceLogger.Purge">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.RemoveRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.ServiceLogger.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
@@ -439,6 +439,9 @@
         <member name="M:FileCabinetApp.ServiceMeter.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindRecords(FileCabinetApp.FileCabinetRecord,System.String)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.ServiceMeter.GetStat">
             <inheritdoc/>
         </member>
@@ -446,9 +449,6 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.ServiceMeter.Purge">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.RemoveRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.ServiceMeter.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
@@ -694,15 +694,6 @@
             <param name="parameters">Input parameters.</param>
             <returns>Parsed parameters.</returns>
         </member>
-        <member name="M:FileCabinetApp.QueryParser.GetRecorgs(FileCabinetApp.FileCabinetRecord,System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord},System.String)">
-            <summary>
-            Get records by predicates.
-            </summary>
-            <param name="record">Record.</param>
-            <param name="allRecords">All records.</param>
-            <param name="type">Type of condition (and/or).</param>
-            <returns>Records.</returns>
-        </member>
         <member name="M:FileCabinetApp.QueryParser.ShowErrorMessage(System.String)">
             <summary>
             Shows error message.
@@ -813,6 +804,9 @@
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindRecords(FileCabinetApp.FileCabinetRecord,System.String)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetStat">
             <inheritdoc/>
         </member>
@@ -823,9 +817,6 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Purge">
@@ -869,6 +860,9 @@
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">
             <inheritdoc/>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindRecords(FileCabinetApp.FileCabinetRecord,System.String)">
+            <inheritdoc/>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
             <inheritdoc/>
         </member>
@@ -885,9 +879,6 @@
             <inheritdoc/>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.Restore(FileCabinetApp.FileCabinetServiceSnapshot)">
-            <inheritdoc/>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.RemoveRecord(System.Int32)">
             <inheritdoc/>
         </member>
         <member name="T:FileCabinetApp.FileCabinetServiceSnapshot">
@@ -958,9 +949,17 @@
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.GetRecords">
             <summary>
-            Get all records.
+            Gets all records.
             </summary>
             <returns>All records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindRecords(FileCabinetApp.FileCabinetRecord,System.String)">
+            <summary>
+            Get records by predicates.
+            </summary>
+            <param name="predicate">Propertie in record to find.</param>
+            <param name="type">Type of condition (and/or).</param>
+            <returns>Records.</returns>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.MakeSnapshot">
             <summary>
@@ -973,12 +972,6 @@
             Restore snapshot.
             </summary>
             <param name="snapshot">Snapdhot.</param>
-        </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.RemoveRecord(System.Int32)">
-            <summary>
-            Remove record.
-            </summary>
-            <param name="id">Id.</param>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.Delete(System.Collections.Generic.IEnumerable{FileCabinetApp.FileCabinetRecord})">
             <summary>
@@ -1024,6 +1017,14 @@
             </summary>
             <value>
             Is running.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Startup.IsFileService">
+            <summary>
+            Gets a value indicating whether is file sevice.
+            </summary>
+            <value>
+            Is file service.
             </value>
         </member>
         <member name="P:FileCabinetApp.Startup.ValidationType">

@@ -74,8 +74,17 @@ namespace FileCabinetApp
         public IEnumerable<FileCabinetRecord> GetRecords()
         {
             this.Print(nameof(this.GetRecords), string.Empty);
-            var value = this.fileCabinetService.GetRecords();
+            IEnumerable<FileCabinetRecord> value = this.fileCabinetService.GetRecords();
             this.Print(nameof(this.GetRecords), $"{(value == null ? string.Empty : value.GetType().Name)}");
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> FindRecords(FileCabinetRecord predicate, string type)
+        {
+            this.Print(nameof(this.FindRecords), string.Empty);
+            IEnumerable<FileCabinetRecord> value = this.fileCabinetService.FindRecords(predicate, type);
+            this.Print(nameof(this.FindRecords), $"{(value == null ? string.Empty : value.GetType().Name)}");
             return value;
         }
 
@@ -102,13 +111,6 @@ namespace FileCabinetApp
         {
             this.Print(nameof(this.Purge), string.Empty);
             this.fileCabinetService.Purge();
-        }
-
-        /// <inheritdoc/>
-        public void RemoveRecord(int id)
-        {
-            this.Print(nameof(this.RemoveRecord), $"{nameof(id)} = '{id}'");
-            this.fileCabinetService.RemoveRecord(id);
         }
 
         /// <inheritdoc/>

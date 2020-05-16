@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FileCabinetApp
 {
@@ -11,7 +12,9 @@ namespace FileCabinetApp
     {
         private const int Zero = 0;
         private const int MinId = 1;
+        private const string And = "and";
 
+        private static readonly PropertyInfo[] FileCabinetProperties = typeof(FileCabinetRecord).GetProperties();
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
         private readonly IRecordValidator validator;
 
@@ -48,7 +51,7 @@ namespace FileCabinetApp
                 throw new InvalidOperationException($"Invalid id #{id} value.");
             }
 
-            if (this.GetRecords().Any(x => x.Id == id))
+            if (this.list.Any(x => x.Id == id))
             {
                 throw new InvalidOperationException($"Record with id #{id} already exists.");
             }
@@ -68,6 +71,42 @@ namespace FileCabinetApp
             foreach (var item in records)
             {
                 yield return item;
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> FindRecords(FileCabinetRecord predicate, string type)
+        {
+            IEnumerable<FileCabinetRecord> result = this.list;
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (predicate is null)
+            {
+                return this.GetRecords();
+            }
+
+            string query = predicate.ToString() + type;
+            var findResult = Memoization.Saved.Find(x => x.Item1.Equals(query, StringComparison.InvariantCultureIgnoreCase));
+            if (findResult != null)
+            {
+                return findResult.Item2;
+            }
+
+            if (type.Equals(And, StringComparison.InvariantCultureIgnoreCase))
+            {
+                result = this.SelectAnd(predicate, this.list);
+                Memoization.Saved.Add(new Tuple<string, IEnumerable<FileCabinetRecord>>(query, result));
+                return result;
+            }
+            else
+            {
+                result = this.SelectOr(predicate, this.list);
+                Memoization.Saved.Add(new Tuple<string, IEnumerable<FileCabinetRecord>>(query, result));
+                return result;
             }
         }
 
@@ -99,7 +138,7 @@ namespace FileCabinetApp
         {
             try
             {
-                var current = this.GetRecords().First(x => x.Id == id);
+                var current = this.list.First(x => x.Id == id);
                 this.validator.ValidateParameters(data ?? throw new ArgumentNullException(nameof(data)));
                 Memoization.RefreshMemoization();
                 DataHelper.UpdateRecordFromData(current.Id, data, current);
@@ -140,7 +179,7 @@ namespace FileCabinetApp
 
                 try
                 {
-                    if (this.GetRecords().Any(x => x.Id == record.Id))
+                    if (this.list.Any(x => x.Id == record.Id))
                     {
                         this.EditRecord(record.Id, data);
                     }
@@ -160,13 +199,12 @@ namespace FileCabinetApp
             }
         }
 
-        /// <inheritdoc/>
-        public void RemoveRecord(int id)
+        private void RemoveRecord(int id)
         {
             Memoization.RefreshMemoization();
             try
             {
-                this.list.Remove(this.GetRecords().First(x => x.Id == id));
+                this.list.Remove(this.list.First(x => x.Id == id));
             }
             catch (InvalidOperationException)
             {
@@ -180,7 +218,7 @@ namespace FileCabinetApp
 
             for (int i = start; i < int.MaxValue; i++)
             {
-                if (!this.GetRecords().Any(x => x.Id == i))
+                if (!this.list.Any(x => x.Id == i))
                 {
                     this.lastId = i;
                     return i;
@@ -188,6 +226,58 @@ namespace FileCabinetApp
             }
 
             throw new IndexOutOfRangeException();
+        }
+
+        private IEnumerable<FileCabinetRecord> SelectAnd(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var result = new List<FileCabinetRecord>(allRecords);
+
+            foreach (var prop in FileCabinetProperties)
+            {
+                var item = prop.GetValue(record);
+                if (!this.IsNullOrDefault(item))
+                {
+                    result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
+                }
+            }
+
+            return result;
+        }
+
+        private IEnumerable<FileCabinetRecord> SelectOr(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var result = new List<FileCabinetRecord>();
+
+            foreach (var prop in FileCabinetProperties)
+            {
+                var item = prop.GetValue(record);
+
+                if (!this.IsNullOrDefault(item))
+                {
+                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsNullOrDefault(object item)
+        {
+            if (item is null)
+            {
+                return true;
+            }
+
+            if (item.Equals(default(int))
+                || item.Equals(default(DateTime))
+                || item.Equals(default(char))
+                || item.Equals(default(decimal))
+                || item.Equals(default(short)))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

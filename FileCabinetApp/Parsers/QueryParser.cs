@@ -82,7 +82,7 @@ namespace FileCabinetApp
                 }
             }
 
-            if (fields.Count != 7 || values.Count != fields.Count)
+            if (fields.Count != FileCabinetProperties.Length || values.Count != fields.Count)
             {
                 Console.WriteLine("Query should contains all properties and values for them.");
                 ShowErrorMessage(Insert);
@@ -228,53 +228,6 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Get records by predicates.
-        /// </summary>
-        /// <param name="record">Record.</param>
-        /// <param name="allRecords">All records.</param>
-        /// <param name="type">Type of condition (and/or).</param>
-        /// <returns>Records.</returns>
-        public static IEnumerable<FileCabinetRecord> GetRecorgs(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords, string type)
-        {
-            IEnumerable<FileCabinetRecord> result = allRecords;
-
-            if (record is null)
-            {
-                throw new ArgumentNullException(nameof(record));
-            }
-
-            if (allRecords is null)
-            {
-                throw new ArgumentNullException(nameof(allRecords));
-            }
-
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
-            string query = record.ToString() + type;
-            var findResult = Memoization.Saved.Find(x => x.Item1.Equals(query, StringComparison.InvariantCultureIgnoreCase));
-            if (findResult != null)
-            {
-                return findResult.Item2;
-            }
-
-            if (type.Equals(And, StringComparison.InvariantCultureIgnoreCase))
-            {
-                result = SelectAnd(record, allRecords);
-                Memoization.Saved.Add(new Tuple<string, IEnumerable<FileCabinetRecord>>(query, result));
-                return result;
-            }
-            else
-            {
-                result = SelectOr(record, allRecords);
-                Memoization.Saved.Add(new Tuple<string, IEnumerable<FileCabinetRecord>>(query, result));
-                return result;
-            }
-        }
-
-        /// <summary>
         /// Shows error message.
         /// </summary>
         /// <param name="query">Query string.</param>
@@ -301,8 +254,7 @@ namespace FileCabinetApp
                     example = "[update set firstname = 'John', lastname = 'Doe' , dateofbirth = '5/18/1986' where id = '1']";
                     break;
                 case Insert:
-                    example = "[insert(id, firstname, lastname, dateofbirth, salary, accounttype, bonuses) " +
-                        "values('1', 'John', 'Doe', '5/18/1986', '3500', 'd', '12')]";
+                    example = "[insert (id, firstname, lastname, dateofbirth, salary, accounttype, bonuses) values ('1', 'John', 'Doe', '5/18/1986', '3500', 'd', '12')]";
                     break;
             }
 
@@ -318,7 +270,14 @@ namespace FileCabinetApp
             {
                 var key = pair.First();
                 var value = pair.Last();
-                result.Add(key, value);
+                try
+                {
+                    result.Add(key, value);
+                }
+                catch (ArgumentException)
+                {
+                    Console.WriteLine("The search condition can be set only for different properties.");
+                }
             }
 
             return result;
@@ -348,58 +307,6 @@ namespace FileCabinetApp
 
             var valuesPairs = GetDictionary(values);
             return valuesPairs;
-        }
-
-        private static IEnumerable<FileCabinetRecord> SelectAnd(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
-        {
-            var result = new List<FileCabinetRecord>(allRecords);
-
-            foreach (var prop in FileCabinetProperties)
-            {
-                var item = prop.GetValue(record);
-                if (!IsNullOrDefault(item))
-                {
-                    result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
-                }
-            }
-
-            return result;
-        }
-
-        private static bool IsNullOrDefault(object item)
-        {
-            if (item is null)
-            {
-                return true;
-            }
-
-            if (item.Equals(default(int))
-                || item.Equals(default(DateTime))
-                || item.Equals(default(char))
-                || item.Equals(default(decimal))
-                || item.Equals(default(short)))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static IEnumerable<FileCabinetRecord> SelectOr(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
-        {
-            var result = new List<FileCabinetRecord>();
-
-            foreach (var prop in FileCabinetProperties)
-            {
-                var item = prop.GetValue(record);
-
-                if (!IsNullOrDefault(item))
-                {
-                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
-                }
-            }
-
-            return result;
         }
     }
 }

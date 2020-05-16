@@ -62,6 +62,16 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> FindRecords(FileCabinetRecord predicate, string type)
+        {
+            this.stopwatch.Restart();
+            var value = this.fileCabinetService.FindRecords(predicate, type);
+            this.stopwatch.Stop();
+            Print(nameof(this.FindRecords), this.stopwatch.ElapsedTicks);
+            return value;
+        }
+
+        /// <inheritdoc/>
         public (int active, int removed) GetStat()
         {
             this.stopwatch.Restart();
@@ -88,15 +98,6 @@ namespace FileCabinetApp
             this.fileCabinetService.Purge();
             this.stopwatch.Stop();
             Print(nameof(this.Purge), this.stopwatch.ElapsedTicks);
-        }
-
-        /// <inheritdoc/>
-        public void RemoveRecord(int id)
-        {
-            this.stopwatch.Restart();
-            this.fileCabinetService.RemoveRecord(id);
-            this.stopwatch.Stop();
-            Print(nameof(this.RemoveRecord), this.stopwatch.ElapsedTicks);
         }
 
         /// <inheritdoc/>

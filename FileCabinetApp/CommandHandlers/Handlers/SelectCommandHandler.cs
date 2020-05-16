@@ -54,7 +54,7 @@ namespace FileCabinetApp
             if (properties != null && where != null)
             {
                 var oldRecords = DataHelper.CreateRecordFromDict(where);
-                var allRecords = this.Service.GetRecords();
+                IEnumerable<FileCabinetRecord> allRecords = this.Service.GetRecords();
 
                 if (allRecords == null || !allRecords.Any())
                 {
@@ -67,7 +67,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    var selectedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
+                    var selectedRecords = this.Service.FindRecords(oldRecords, QueryParser.TypeCondition);
 
                     if (selectedRecords == null || !selectedRecords.Any())
                     {

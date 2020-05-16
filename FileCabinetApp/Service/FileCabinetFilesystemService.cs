@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace FileCabinetApp
@@ -17,7 +18,7 @@ namespace FileCabinetApp
         private const int IntSize = sizeof(int);
         private const int ShortSize = sizeof(short);
         private const int DecimalSize = sizeof(decimal);
-        private const short RemovedFlag = 0b0000_0000_0000_0001;
+        private const short RemovedFlag = 0b0000_0000_0000_0100;
         private const char WhiteSpace = ' ';
 
         private static readonly int MaxFNameLength = ValidatorBuilder.FNameValidValue.Max;
@@ -25,6 +26,8 @@ namespace FileCabinetApp
 
         private static readonly int RecordSize = (IntSize * 4) + ((MaxFNameLength + MaxLNameLength) * StringLengthSize)
                                                     + CharSize + DecimalSize + ShortSize + StringLengthSize;
+
+        private static readonly PropertyInfo[] FileCabinetProperties = typeof(FileCabinetRecord).GetProperties();
 
         private readonly Dictionary<int, long> activeStorage = new Dictionary<int, long>();
         private readonly Dictionary<int, long> removedStorage = new Dictionary<int, long>();
@@ -136,6 +139,33 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
+        public IEnumerable<FileCabinetRecord> FindRecords(FileCabinetRecord predicate, string type)
+        {
+            IEnumerable<FileCabinetRecord> result = this.GetRecords();
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (predicate is null && type.Length == 0)
+            {
+                return this.GetRecords();
+            }
+
+            if (type.Equals("and", StringComparison.InvariantCultureIgnoreCase))
+            {
+                result = this.SelectAnd(predicate, this.GetRecords());
+                return result;
+            }
+            else
+            {
+                result = this.SelectOr(predicate, this.GetRecords());
+                return result;
+            }
+        }
+
+        /// <inheritdoc/>
         public (int active, int removed) GetStat()
         {
             return (this.activeStorage.Count, this.removedStorage.Count);
@@ -196,22 +226,6 @@ namespace FileCabinetApp
         }
 
         /// <inheritdoc/>
-        public void RemoveRecord(int id)
-        {
-            if (!this.activeStorage.ContainsKey(id))
-            {
-                throw new InvalidOperationException($"Record #{id} doesn't exists.");
-            }
-
-            var removedPoition = this.activeStorage[id];
-            this.binaryReader.BaseStream.Position = removedPoition;
-            this.binaryWriter.Write(RemovedFlag);
-
-            this.removedStorage.Add(id, removedPoition);
-            this.activeStorage.Remove(id);
-        }
-
-        /// <inheritdoc/>
         public void Purge()
         {
             var currentPosition = 0;
@@ -256,6 +270,21 @@ namespace FileCabinetApp
             }
 
             this.disposed = true;
+        }
+
+        private void RemoveRecord(int id)
+        {
+            if (!this.activeStorage.ContainsKey(id))
+            {
+                throw new InvalidOperationException($"Record #{id} doesn't exists.");
+            }
+
+            var removedPoition = this.activeStorage[id];
+            this.binaryReader.BaseStream.Position = removedPoition;
+            this.binaryWriter.Write(RemovedFlag);
+
+            this.removedStorage.Add(id, removedPoition);
+            this.activeStorage.Remove(id);
         }
 
         private void RecordsToBytes(long position, FileCabinetRecord record)
@@ -374,6 +403,58 @@ namespace FileCabinetApp
             {
                 return false;
             }
+        }
+
+        private IEnumerable<FileCabinetRecord> SelectAnd(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var result = new List<FileCabinetRecord>(allRecords);
+
+            foreach (var prop in FileCabinetProperties)
+            {
+                var item = prop.GetValue(record);
+                if (!this.IsNullOrDefault(item))
+                {
+                    result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
+                }
+            }
+
+            return result;
+        }
+
+        private IEnumerable<FileCabinetRecord> SelectOr(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
+        {
+            var result = new List<FileCabinetRecord>();
+
+            foreach (var prop in FileCabinetProperties)
+            {
+                var item = prop.GetValue(record);
+
+                if (!this.IsNullOrDefault(item))
+                {
+                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
+                }
+            }
+
+            return result;
+        }
+
+        private bool IsNullOrDefault(object item)
+        {
+            if (item is null)
+            {
+                return true;
+            }
+
+            if (item.Equals(default(int))
+                || item.Equals(default(DateTime))
+                || item.Equals(default(char))
+                || item.Equals(default(decimal))
+                || item.Equals(default(short)))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

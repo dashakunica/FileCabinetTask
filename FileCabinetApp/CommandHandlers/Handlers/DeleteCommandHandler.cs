@@ -53,9 +53,8 @@ namespace FileCabinetApp
             if (where != null)
             {
                 FileCabinetRecord whereRecord = DataHelper.CreateRecordFromDict(where);
-                var allRecords = this.Service.GetRecords();
 
-                var records = QueryParser.GetRecorgs(whereRecord, allRecords, QueryParser.TypeCondition);
+                var records = this.Service.FindRecords(whereRecord, QueryParser.TypeCondition);
 
                 var builder = new StringBuilder();
                 int countMatchedRecords = 0;

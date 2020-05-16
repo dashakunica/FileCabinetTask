@@ -58,9 +58,8 @@ namespace FileCabinetApp
 
                 var newValues = DataHelper.CreateRecordFromDict(set);
                 var oldRecords = DataHelper.CreateRecordFromDict(where);
-                var allRecords = this.Service.GetRecords();
 
-                var updatedRecords = QueryParser.GetRecorgs(oldRecords, allRecords, QueryParser.TypeCondition);
+                var updatedRecords = this.Service.FindRecords(oldRecords, QueryParser.TypeCondition);
                 var builder = new StringBuilder();
 
                 foreach (var item in updatedRecords)

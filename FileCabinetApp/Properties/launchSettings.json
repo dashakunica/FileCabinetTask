@@ -2,7 +2,7 @@
   "profiles": {
     "FileCabinetApp": {
       "commandName": "Project",
-      "commandLineArgs": "--use-stopwatch",
+      "commandLineArgs": "-v:default -s:file --use=stopwatch",
       "environmentVariables": {
         "": ""
       }

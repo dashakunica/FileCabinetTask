@@ -8,8 +8,10 @@ namespace FileCabinetApp
     /// </summary>
     public static class ParameterParser
     {
-        private const string MemoryServiceType = "Memory";
-        private const string DefaultValidationRules = "Default";
+        private const string MemoryServiceType = "memory";
+        private const string DefaultValidationRules = "default";
+        private const string FileServiceType = "file";
+        private const string CustomValidationRules = "custom";
         private const string LoggString = "Logging";
         private const string StopwatchString = "Stopwatch";
 
@@ -65,6 +67,20 @@ namespace FileCabinetApp
 
             if (serviceRules is null)
             {
+                serviceRules = MemoryServiceType;
+            }
+
+            if (!validationRules.Equals(DefaultValidationRules, StringComparison.InvariantCultureIgnoreCase)
+                && !validationRules.Equals(CustomValidationRules, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine("Unknown validation rules. Using default settings.");
+                validationRules = DefaultValidationRules;
+            }
+
+            if (!serviceRules.Equals(MemoryServiceType, StringComparison.InvariantCultureIgnoreCase)
+                && !serviceRules.Equals(FileServiceType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine("Unknown service type. Using default settings.");
                 serviceRules = MemoryServiceType;
             }
 

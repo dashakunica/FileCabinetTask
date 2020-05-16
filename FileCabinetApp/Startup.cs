@@ -29,7 +29,7 @@ namespace FileCabinetApp
             if (!File.Exists(ValidationPath))
             {
                 Console.WriteLine($"Missing json file {ValidationFileName}.");
-                Environment.Exit(1488);
+                Environment.Exit(1);
             }
 
             Configuration = new ConfigurationBuilder().AddJsonFile(ValidationPath).Build();
@@ -58,6 +58,14 @@ namespace FileCabinetApp
         /// Is running.
         /// </value>
         public static bool IsRunning { get; private set; } = true;
+
+        /// <summary>
+        /// Gets a value indicating whether is file sevice.
+        /// </summary>
+        /// <value>
+        /// Is file service.
+        /// </value>
+        public static bool IsFileService { get; private set; }
 
         /// <summary>
         /// Gets validation type.
@@ -125,6 +133,8 @@ namespace FileCabinetApp
             fileCabinetService = isFileService
                 ? FileCabinetFilesystemService.Create(fileStream, recordValidator)
                 : FileCabinetMemoryService.Create(recordValidator);
+
+            IsFileService = isFileService;
 
             fileCabinetService = isStopwatch ? new ServiceMeter(fileCabinetService) : fileCabinetService;
 

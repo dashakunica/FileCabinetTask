@@ -30,10 +30,18 @@ namespace FileCabinetApp
         void EditRecord(int id, ValidateParametersData data);
 
         /// <summary>
-        /// Get all records.
+        /// Gets all records.
         /// </summary>
         /// <returns>All records.</returns>
-        IEnumerable<FileCabinetRecord> GetRecords();
+        public IEnumerable<FileCabinetRecord> GetRecords();
+
+        /// <summary>
+        /// Get records by predicates.
+        /// </summary>
+        /// <param name="predicate">Propertie in record to find.</param>
+        /// <param name="type">Type of condition (and/or).</param>
+        /// <returns>Records.</returns>
+        public IEnumerable<FileCabinetRecord> FindRecords(FileCabinetRecord predicate, string type);
 
         /// <summary>
         /// Make snapshot.
@@ -46,12 +54,6 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="snapshot">Snapdhot.</param>
         public void Restore(FileCabinetServiceSnapshot snapshot);
-
-        /// <summary>
-        /// Remove record.
-        /// </summary>
-        /// <param name="id">Id.</param>
-        void RemoveRecord(int id);
 
         /// <summary>
         /// Delete specific records.

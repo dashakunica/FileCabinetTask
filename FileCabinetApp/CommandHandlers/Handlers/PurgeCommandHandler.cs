@@ -44,7 +44,7 @@ namespace FileCabinetApp
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (this.Service is FileCabinetFilesystemService)
+            if (Startup.IsFileService)
             {
                 var (active, removed) = this.Service.GetStat();
                 this.Service.Purge();
