@@ -97,11 +97,11 @@ namespace FileCabinetApp
             var record = DataHelper.CreateRecordFromArgs(id, data);
             long position = this.fileStream.Length;
 
-            if (this.removedStorage.ContainsKey(id))
-            {
-                position = this.removedStorage[id];
-                this.removedStorage.Remove(id);
-            }
+            //if (this.removedStorage.ContainsKey(id))
+            //{
+            //    position = this.removedStorage[id];
+            //    this.removedStorage.Remove(id);
+            //}
 
             this.RecordsToBytes(position, record);
             this.activeStorage.Add(id, position);
@@ -292,8 +292,8 @@ namespace FileCabinetApp
             this.binaryWriter.Seek((int)position, SeekOrigin.Begin);
             this.binaryWriter.Write((short)0);
             this.binaryWriter.Write(record.Id);
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(WhiteSpace, 60 - record.FirstName.Length)).ToArray()));
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(WhiteSpace, 60 - record.LastName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(new string(WhiteSpace, MaxFNameLength - record.FirstName.Length)).ToArray()));
+            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(new string(WhiteSpace, MaxLNameLength - record.LastName.Length)).ToArray()));
             this.binaryWriter.Write(record.DateOfBirth.Month);
             this.binaryWriter.Write(record.DateOfBirth.Day);
             this.binaryWriter.Write(record.DateOfBirth.Year);
@@ -315,8 +315,8 @@ namespace FileCabinetApp
             var record = new FileCabinetRecord()
             {
                 Id = this.binaryReader.ReadInt32(),
-                FirstName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(60 * 2)).Trim(),
-                LastName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(60 * 2)).Trim(),
+                FirstName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(MaxFNameLength * 2)).Trim(),
+                LastName = Encoding.Unicode.GetString(this.binaryReader.ReadBytes(MaxLNameLength * 2)).Trim(),
                 DateOfBirth = DateTime.Parse($"{this.binaryReader.ReadInt32()}/{this.binaryReader.ReadInt32()}/{this.binaryReader.ReadInt32()}", CultureInfo.InvariantCulture),
                 Bonuses = this.binaryReader.ReadInt16(),
                 Salary = this.binaryReader.ReadDecimal(),
@@ -324,26 +324,6 @@ namespace FileCabinetApp
             };
 
             return record;
-        }
-
-        private void WriteToFile(long position, FileCabinetRecord record)
-        {
-            this.binaryWriter.Seek((int)position, SeekOrigin.Begin);
-            this.binaryWriter.Write((short)0);
-            this.binaryWriter.Write(record.Id);
-
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.FirstName.Concat(
-                new string(char.MinValue, (MaxFNameLength * StringLengthSize) - record.FirstName.Length)).ToArray()));
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.LastName.Concat(
-                new string(char.MinValue, (MaxLNameLength * StringLengthSize) - record.LastName.Length)).ToArray()));
-
-            this.binaryWriter.Write(record.DateOfBirth.Month);
-            this.binaryWriter.Write(record.DateOfBirth.Day);
-            this.binaryWriter.Write(record.DateOfBirth.Year);
-
-            this.binaryWriter.Write(record.Bonuses);
-            this.binaryWriter.Write(record.Salary);
-            this.binaryWriter.Write(Encoding.Unicode.GetBytes(record.AccountType.ToString(CultureInfo.InvariantCulture)));
         }
 
         private int GenerateId()
@@ -391,16 +371,20 @@ namespace FileCabinetApp
 
         private bool IsValid(long beginOfTheRecord)
         {
-            var record = this.BytesToRecord(beginOfTheRecord);
-            var validate = DataHelper.CreateValidateData(record);
-
             try
             {
+                var record = this.BytesToRecord(beginOfTheRecord);
+                var validate = DataHelper.CreateValidateData(record);
                 this.validator.ValidateParameters(validate);
                 return true;
             }
             catch (ArgumentException)
             {
+                return false;
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("You use another validate prameters. Past invalid records deleted.");
                 return false;
             }
         }

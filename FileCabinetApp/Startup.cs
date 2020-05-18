@@ -160,12 +160,9 @@ namespace FileCabinetApp
         private static FileStream CreateFileStream(string dataFilePath)
         {
             var path = Path.Combine(DefaultRootDirectory, dataFilePath);
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
+            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
 
-            return new FileStream(dataFilePath, FileMode.Create, FileAccess.ReadWrite);
+            return new FileStream(dataFilePath, fileMode, FileAccess.ReadWrite);
         }
 
         private static void Print(IEnumerable<FileCabinetRecord> records, List<string> properties)

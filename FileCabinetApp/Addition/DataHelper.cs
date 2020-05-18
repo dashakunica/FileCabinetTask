@@ -153,6 +153,7 @@ namespace FileCabinetApp
                 catch (ArgumentException)
                 {
                     Console.WriteLine("Correct your input. Invalid parameter.");
+                    return null;
                 }
                 catch (FormatException ex)
                 {

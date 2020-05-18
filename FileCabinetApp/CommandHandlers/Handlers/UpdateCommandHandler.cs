@@ -58,36 +58,38 @@ namespace FileCabinetApp
 
                 var newValues = DataHelper.CreateRecordFromDict(set);
                 var oldRecords = DataHelper.CreateRecordFromDict(where);
-
-                var updatedRecords = this.Service.FindRecords(oldRecords, QueryParser.TypeCondition);
-                var builder = new StringBuilder();
-
-                foreach (var item in updatedRecords)
+                if (newValues != null && oldRecords != null)
                 {
-                    builder.Append($"#{item.Id}, ");
-                    var current = TrimFields(newValues, item);
-                    this.Service.EditRecord(item.Id, current);
-                    Memoization.RefreshMemoization();
-                }
 
-                string message = string.Empty;
-                if (builder.Length == 0)
-                {
-                    message = "There is no selected records to update matching this condition.";
-                }
-                else if (set.TryGetValue("id", out string value))
-                {
-                    Console.WriteLine("Unfortunately, you cannot update id.");
-                }
-                else
-                {
-                    message = updatedRecords.Count() == 1
-                        ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
-                        : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
-                }
+                    var updatedRecords = this.Service.FindRecords(oldRecords, QueryParser.TypeCondition);
+                    var builder = new StringBuilder();
 
-                Console.WriteLine(message);
+                    foreach (var item in updatedRecords)
+                    {
+                        builder.Append($"#{item.Id}, ");
+                        var current = TrimFields(newValues, item);
+                        this.Service.EditRecord(item.Id, current);
+                        Memoization.RefreshMemoization();
+                    }
 
+                    string message = string.Empty;
+                    if (builder.Length == 0)
+                    {
+                        message = "There is no selected records to update matching this condition.";
+                    }
+                    else if (set.TryGetValue("id", out string value))
+                    {
+                        Console.WriteLine("Unfortunately, you cannot update id.");
+                    }
+                    else
+                    {
+                        message = updatedRecords.Count() == 1
+                            ? $"Record {builder.ToString().TrimEnd(' ', ',')} is updated."
+                            : $"Records {builder.ToString().TrimEnd(' ', ',')} are updated.";
+                    }
+
+                    Console.WriteLine(message);
+                }
             }
         }
 
