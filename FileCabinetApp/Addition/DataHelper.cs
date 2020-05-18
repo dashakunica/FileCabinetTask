@@ -145,14 +145,14 @@ namespace FileCabinetApp
             foreach (var item in propNewValues)
             {
                 var prop = FileCabinetProperties.FirstOrDefault(x => x.Name.Equals(item.Key, StringComparison.InvariantCultureIgnoreCase));
-                var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
                 try
                 {
+                    var converter = TypeDescriptor.GetConverter(prop?.PropertyType);
                     prop.SetValue(arg, converter.ConvertFromString(item.Value));
                 }
-                catch (ArgumentException ex)
+                catch (ArgumentException)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("Correct your input. Invalid parameter.");
                 }
                 catch (FormatException ex)
                 {

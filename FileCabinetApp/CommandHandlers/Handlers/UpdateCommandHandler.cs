@@ -87,6 +87,7 @@ namespace FileCabinetApp
                 }
 
                 Console.WriteLine(message);
+
             }
         }
 
