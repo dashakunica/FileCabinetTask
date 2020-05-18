@@ -65,7 +65,7 @@ namespace FileCabinetApp
                 foreach (var item in updatedRecords)
                 {
                     builder.Append($"#{item.Id}, ");
-                    var current = this.TrimFields(newValues, item);
+                    var current = TrimFields(newValues, item);
                     this.Service.EditRecord(item.Id, current);
                     Memoization.RefreshMemoization();
                 }
@@ -74,6 +74,10 @@ namespace FileCabinetApp
                 if (builder.Length == 0)
                 {
                     message = "There is no selected records to update matching this condition.";
+                }
+                else if (set.TryGetValue("id", out string value))
+                {
+                    Console.WriteLine("Unfortunately, you cannot update id.");
                 }
                 else
                 {
@@ -86,7 +90,7 @@ namespace FileCabinetApp
             }
         }
 
-        private ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
+        private static ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
         {
             var args = DataHelper.CreateValidateData(validArgs);
             var defaultValidateArgs = new ValidateParametersData();
