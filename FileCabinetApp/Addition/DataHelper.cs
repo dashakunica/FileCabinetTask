@@ -48,7 +48,7 @@ namespace FileCabinetApp
                                                                     ? new Tuple<bool, string>(false, nameof(data.Salary))
                                                                     : new Tuple<bool, string>(true, nameof(data.Salary)));
             Console.Write("Account type: ");
-            data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetterOrDigit(x)
+            data.AccountType = ReadInput<char>(Convert<char>, x => char.IsLetter(x)
                                                                     ? new Tuple<bool, string>(true, nameof(data.AccountType))
                                                                     : new Tuple<bool, string>(false, nameof(data.AccountType)));
             return data;

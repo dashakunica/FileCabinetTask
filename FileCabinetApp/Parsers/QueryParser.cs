@@ -218,12 +218,6 @@ namespace FileCabinetApp
                 properties[i] = properties[i].Trim(WhiteSpace);
             }
 
-            if (where.Keys.Count != where.Values.Count)
-            {
-                ShowErrorMessage(Update);
-                return (null, null);
-            }
-
             return (properties, where);
         }
 

@@ -89,6 +89,10 @@ namespace FileCabinetApp
             {
                 Console.WriteLine(ex.Message);
             }
+            catch (DirectoryNotFoundException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             if (filestream is null)
             {

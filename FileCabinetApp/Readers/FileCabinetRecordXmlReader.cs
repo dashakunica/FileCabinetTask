@@ -11,8 +11,8 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetRecordXmlReader : IFileCabinetReader
     {
-        private bool disposed = false;
         private readonly StreamReader reader;
+        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecordXmlReader"/> class.
@@ -66,6 +66,17 @@ namespace FileCabinetApp
         /// <param name="disposing">True or false.</param>
         protected virtual void Dispose(bool disposing)
         {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                this.reader.Dispose();
+            }
+
+            this.disposed = true;
         }
 
         private static FileCabinetRecord ConvertToRecord(FileCabinetRecordSerializable item)

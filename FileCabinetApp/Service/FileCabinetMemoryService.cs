@@ -231,13 +231,27 @@ namespace FileCabinetApp
         private IEnumerable<FileCabinetRecord> SelectAnd(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
         {
             var result = new List<FileCabinetRecord>(allRecords);
+            if (record.FirstName != null)
+            {
+                result.RemoveAll(x => !record.FirstName.Equals(x.FirstName, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            if (record.LastName != null)
+            {
+                result.RemoveAll(x => !record.LastName.Equals(x.LastName, StringComparison.InvariantCultureIgnoreCase));
+            }
 
             foreach (var prop in FileCabinetProperties)
             {
+                Type itemType = prop.PropertyType;
                 var item = prop.GetValue(record);
-                if (!this.IsNullOrDefault(item))
+
+                if (!itemType.Equals(typeof(string)))
                 {
-                    result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
+                    if (!this.IsNullOrDefault(item))
+                    {
+                        result.RemoveAll(x => !item.Equals(prop.GetValue(x)));
+                    }
                 }
             }
 
@@ -247,14 +261,27 @@ namespace FileCabinetApp
         private IEnumerable<FileCabinetRecord> SelectOr(FileCabinetRecord record, IEnumerable<FileCabinetRecord> allRecords)
         {
             var result = new List<FileCabinetRecord>();
+            if (record.FirstName != null)
+            {
+                result.AddRange(allRecords.Where(x => record.FirstName.Equals(x.FirstName, StringComparison.InvariantCultureIgnoreCase)).Where(y => !result.Contains(y)));
+            }
+
+            if (record.LastName != null)
+            {
+                result.AddRange(allRecords.Where(x => record.LastName.Equals(x.LastName, StringComparison.InvariantCultureIgnoreCase)).Where(y => !result.Contains(y)));
+            }
 
             foreach (var prop in FileCabinetProperties)
             {
+                Type itemType = prop.PropertyType;
                 var item = prop.GetValue(record);
 
-                if (!this.IsNullOrDefault(item))
+                if (!itemType.Equals(typeof(string)))
                 {
-                    result.AddRange(allRecords.Where(x => prop.GetValue(record).Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
+                    if (!this.IsNullOrDefault(item))
+                    {
+                        result.AddRange(allRecords.Where(x => item.Equals(prop.GetValue(x))).Where(y => !result.Contains(y)));
+                    }
                 }
             }
 

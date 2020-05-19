@@ -60,14 +60,13 @@ namespace FileCabinetApp
                 var oldRecords = DataHelper.CreateRecordFromDict(where);
                 if (newValues != null && oldRecords != null)
                 {
-
                     var updatedRecords = this.Service.FindRecords(oldRecords, QueryParser.TypeCondition);
                     var builder = new StringBuilder();
 
                     foreach (var item in updatedRecords)
                     {
                         builder.Append($"#{item.Id}, ");
-                        var current = TrimFields(newValues, item);
+                        var current = this.TrimFields(newValues, item);
                         this.Service.EditRecord(item.Id, current);
                         Memoization.RefreshMemoization();
                     }
@@ -93,7 +92,7 @@ namespace FileCabinetApp
             }
         }
 
-        private static ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
+        private ValidateParametersData TrimFields(FileCabinetRecord validArgs, FileCabinetRecord record)
         {
             var args = DataHelper.CreateValidateData(validArgs);
             var defaultValidateArgs = new ValidateParametersData();
