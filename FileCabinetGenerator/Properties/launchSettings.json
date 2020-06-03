@@ -2,7 +2,7 @@
   "profiles": {
     "FileCabinetGenerator": {
       "commandName": "Project",
-      "commandLineArgs": "-t:xml -o:C:\\Users\\User\\FileCabinet\\records.xml -a:50 -i:45"
+      "commandLineArgs": "--output-type=csv --output=C:\\FC\\records10.csv --records-amount=10 --start-id=30"
     }
   }
 }

@@ -23,7 +23,7 @@ namespace FileCabinetApp
 
             Startup.Run(args);
 
-            Console.WriteLine($"File Cabinet Application, developed by {DeveloperName}");
+            Console.WriteLine($"File Cabinet Application, developed by {DeveloperName}.");
             Console.WriteLine(HintMessage);
             Console.WriteLine();
 

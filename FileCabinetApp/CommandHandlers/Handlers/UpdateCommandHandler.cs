@@ -67,7 +67,16 @@ namespace FileCabinetApp
                     {
                         builder.Append($"#{item.Id}, ");
                         var current = this.TrimFields(newValues, item);
-                        this.Service.EditRecord(item.Id, current);
+                        try
+                        {
+                            this.Service.EditRecord(item.Id, current);
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            Console.WriteLine(ex.Message + "Invalid parameters.");
+                            builder.Clear();
+                        }
+
                         Memoization.RefreshMemoization();
                     }
 

@@ -20,6 +20,7 @@ namespace FileCabinetApp
         private const int DecimalSize = sizeof(decimal);
         private const short RemovedFlag = 0b0000_0000_0000_0100;
         private const char WhiteSpace = ' ';
+        private const string AndString = "and";
 
         private static readonly int MaxFNameLength = ValidatorBuilder.FNameValidValue.Max;
         private static readonly int MaxLNameLength = ValidatorBuilder.LNameValidValue.Max;
@@ -99,7 +100,7 @@ namespace FileCabinetApp
             }
 
             this.validator.ValidateParameters(data);
-            var record = DataHelper.CreateRecordFromArgs(id, data);
+            FileCabinetRecord record = DataHelper.CreateRecordFromArgs(id, data);
             long position = this.fileStream.Length;
 
             if (this.removedStorage.ContainsKey(id))
@@ -158,7 +159,7 @@ namespace FileCabinetApp
                 return this.GetRecords();
             }
 
-            if (type.Equals("and", StringComparison.InvariantCultureIgnoreCase))
+            if (type.Equals(AndString, StringComparison.InvariantCultureIgnoreCase))
             {
                 result = this.SelectAnd(predicate, this.GetRecords());
                 return result;

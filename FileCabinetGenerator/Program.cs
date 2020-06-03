@@ -58,7 +58,7 @@ namespace FileCabinetGenerator
             }
 
             int startId = 0;
-            if (!Int32.TryParse(TryGetValue(parameters, parameterKey[2]), out startId))
+            if (!Int32.TryParse(TryGetValue(parameters, parameterKey[3]), out startId))
             {
                 Console.WriteLine("Start id should be integer.");
                 ShowErrorMessage();
@@ -180,7 +180,7 @@ namespace FileCabinetGenerator
         private static void ShowErrorMessage()
         {
             Console.WriteLine($"Cannot convert this command line arguments. {Environment.NewLine}" +
-                    $"Example: [-t xml -o c:\\users\\myuser\\records.xml -a 5000 -i 45]. {Environment.NewLine}" +
+                    $"Example: [-t:xml -o:c:\\users\\myuser\\records.xml -a:5000 -i:45]. {Environment.NewLine}" +
                     $"Please, rebuild your project with valid command line parameters.");
 
             Environment.Exit(1);

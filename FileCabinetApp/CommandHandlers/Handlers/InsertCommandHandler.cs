@@ -81,9 +81,9 @@ namespace FileCabinetApp
 
                 for (int i = 0; i < fields.Count; i++)
                 {
-                    var currentAttribute = fields[i];
+                    var currentPropertie = fields[i];
                     var currentValue = values[i];
-                    var prop = fileCabinetRecordProperties.FirstOrDefault(x => x.Name.Equals(currentAttribute, StringComparison.InvariantCultureIgnoreCase));
+                    var prop = fileCabinetRecordProperties.FirstOrDefault(x => x.Name.Equals(currentPropertie, StringComparison.InvariantCultureIgnoreCase));
                     if (prop != null)
                     {
                         var converter = TypeDescriptor.GetConverter(prop.PropertyType);
@@ -93,7 +93,12 @@ namespace FileCabinetApp
                         }
                         catch (ArgumentException)
                         {
-                            Console.WriteLine($"Cannot convert propertie {prop.Name}. Pleas correct your input.");
+                            Console.WriteLine($"Cannot convert propertie {prop.Name}. Please correct your input.");
+                            isValid = false;
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine($"Cannot convert propertie {prop.Name}. Invalid format.");
                             isValid = false;
                         }
                     }
